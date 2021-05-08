@@ -2,19 +2,18 @@ package com.gyso.gysotreeviewapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
 import android.os.Bundle;
 
 import com.gyso.gysotreeviewapplication.base.Animal;
-import com.gyso.gysotreeviewapplication.base.GysoTreeViewAdapter;
+import com.gyso.gysotreeviewapplication.base.AnimalTreeViewAdapter;
 import com.gyso.gysotreeviewapplication.databinding.ActivityMainBinding;
-import com.gyso.treeview.layout.RightITreeLayoutManager;
+import com.gyso.treeview.layout.RightTreeLayoutManager;
+import com.gyso.treeview.line.SimpleSmoothLine;
+import com.gyso.treeview.line.SimpleStraightLine;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
-import com.gyso.treeview.util.DensityUtils;
 
 public class MainActivity extends AppCompatActivity {
-    private GysoTreeViewAdapter adapter;
     private ActivityMainBinding binding;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,16 +25,35 @@ public class MainActivity extends AppCompatActivity {
         initWidgets();
     }
 
+    /**
+     * To use a tree view, you should do 4 steps as follows:
+     *      1 customs adapter
+     *
+     *      2 configure layout manager. Space unit is dp. You can custom you line by extends {@link com.gyso.treeview.line.Baseline}
+     *
+     *      3 view setting
+     *
+     *      4 nodes data setting
+     */
     private void initWidgets() {
-        int dx = DensityUtils.dp2px(this, 50);
-        int dy = DensityUtils.dp2px(this, 20);
-        adapter = new GysoTreeViewAdapter();
+        //1 customs adapter
+        AnimalTreeViewAdapter adapter = new AnimalTreeViewAdapter();
+
+        //2 configure layout manager; unit dp
+        int spaceX = 50;
+        int spaceY = 20;
+        SimpleSmoothLine line = new SimpleSmoothLine();
+        RightTreeLayoutManager rightTreeLayoutManager = new RightTreeLayoutManager(this,spaceX,spaceY,line);
+
+        //3 view setting
         binding.baseTreeView.setAdapter(adapter);
-        binding.baseTreeView.setTreeLayoutManager(new RightITreeLayoutManager(dx, dy));
-        setData();
+        binding.baseTreeView.setTreeLayoutManager(rightTreeLayoutManager);
+
+        //4 nodes data setting
+        setData(adapter);
     }
 
-    private void setData(){
+    private void setData(AnimalTreeViewAdapter adapter){
         //root
         NodeModel<Animal> root = new NodeModel<>(new Animal(R.drawable.ic_01,"root"));
         TreeModel<Animal> treeModel = new TreeModel<>(root);

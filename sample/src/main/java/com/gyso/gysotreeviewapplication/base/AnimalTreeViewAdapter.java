@@ -16,8 +16,11 @@ import androidx.core.content.res.ResourcesCompat;
 
 import com.gyso.gysotreeviewapplication.R;
 import com.gyso.gysotreeviewapplication.databinding.NodeBaseLayoutBinding;
+import com.gyso.treeview.adapter.DrawInfo;
 import com.gyso.treeview.adapter.TreeViewAdapter;
 import com.gyso.treeview.adapter.TreeViewHolder;
+import com.gyso.treeview.line.Baseline;
+import com.gyso.treeview.line.SimpleSmoothLine;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.util.DensityUtils;
 
@@ -30,7 +33,7 @@ import com.gyso.treeview.util.DensityUtils;
  * @Describe:
  * Tree View Adapter for node data to view
  */
-public class GysoTreeViewAdapter extends TreeViewAdapter<Animal> {
+public class AnimalTreeViewAdapter extends TreeViewAdapter<Animal> {
     @Override
     public TreeViewHolder<Animal> onCreateViewHolder(@NonNull ViewGroup viewGroup, NodeModel<Animal> node) {
         NodeBaseLayoutBinding nodeBinding = NodeBaseLayoutBinding.inflate(LayoutInflater.from(viewGroup.getContext()),viewGroup,false);
@@ -47,35 +50,5 @@ public class GysoTreeViewAdapter extends TreeViewAdapter<Animal> {
         Animal animal = node.value;
         nameView.setText(animal.name);
         headView.setImageResource(animal.headId);
-    }
-
-    @Override
-    public void onDrawLine(Canvas canvas, TreeViewHolder<Animal> fromHolder, TreeViewHolder<Animal> toHolder, Paint mPaint, Path mPath) {
-        //get view and node
-        View fromView = fromHolder.getView();
-        NodeModel<Animal> fromNode = fromHolder.getNode();
-        View toView = toHolder.getView();
-        NodeModel<Animal> toNode = toHolder.getNode();
-        Context context = fromView.getContext();
-
-        //set paint
-        mPaint.reset();
-        mPaint.setColor(ResourcesCompat.getColor(context.getResources(),R.color.textColor,null));
-        mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeWidth(DensityUtils.dp2px(context,3));
-        mPaint.setAntiAlias(true);
-
-        //setPath
-        mPath.reset();
-        PointF startPoint = new PointF(fromView.getRight(),(fromView.getTop()+fromView.getBottom())/2f);
-        PointF endPoint = new PointF(toView.getLeft(),(toView.getTop()+toView.getBottom())/2f);
-        mPath.moveTo(startPoint.x,startPoint.y);
-        mPath.cubicTo(
-                startPoint.x+DensityUtils.dp2px(context,15),startPoint.y,
-                startPoint.x,endPoint.y,
-                endPoint.x,endPoint.y);
-
-        //draw
-        canvas.drawPath(mPath,mPaint);
     }
 }

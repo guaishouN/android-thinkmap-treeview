@@ -2,18 +2,17 @@ package com.gyso.treeview;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
 import com.gyso.treeview.adapter.TreeViewAdapter;
-import com.gyso.treeview.layout.ITreeLayoutManager;
+import com.gyso.treeview.cache_pool.PointPool;
+import com.gyso.treeview.layout.TreeLayoutManager;
 import com.gyso.treeview.listener.TreeViewItemClick;
 import com.gyso.treeview.listener.TreeViewItemLongClick;
 import com.gyso.treeview.touch.TouchEventHandler;
+import com.gyso.treeview.util.TreeViewLog;
 
 
 /**
@@ -22,6 +21,7 @@ import com.gyso.treeview.touch.TouchEventHandler;
  * @Email: 674149099@qq.com
  * @WeChat: guaishouN
  * @Describe:
+ * the main tree view.
  */
 public class GysoTreeView extends FrameLayout {
     public static final String TAG = GysoTreeView.class.getSimpleName();
@@ -46,13 +46,13 @@ public class GysoTreeView extends FrameLayout {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
-        Log.e(TAG, "onInterceptTouchEvent: "+MotionEvent.actionToString(event.getAction()));
+        TreeViewLog.e(TAG, "onInterceptTouchEvent: "+MotionEvent.actionToString(event.getAction()));
         return treeViewGestureHandler.detectInterceptTouchEvent(event) || super.onInterceptTouchEvent(event);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        Log.e(TAG, "onTouchEvent: "+MotionEvent.actionToString(event.getAction()));
+        TreeViewLog.e(TAG, "onTouchEvent: "+MotionEvent.actionToString(event.getAction()));
         return treeViewGestureHandler.onTouchEvent(event);
     }
 
@@ -69,8 +69,8 @@ public class GysoTreeView extends FrameLayout {
         return treeViewContainer.getAdapter();
     }
 
-    public void setTreeLayoutManager(ITreeLayoutManager ITreeLayoutManager) {
-        treeViewContainer.setTreeLayoutManager(ITreeLayoutManager);
+    public void setTreeLayoutManager(TreeLayoutManager TreeLayoutManager) {
+        treeViewContainer.setTreeLayoutManager(TreeLayoutManager);
     }
 
     public void focusMidLocation(){
@@ -85,5 +85,10 @@ public class GysoTreeView extends FrameLayout {
         treeViewContainer.setTreeViewItemLongClick(treeViewItemLongClick);
     }
 
-
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        PointPool.freeAll();
+        TreeViewLog.d(TAG, "onDetachedFromWindow: ");
+    }
 }

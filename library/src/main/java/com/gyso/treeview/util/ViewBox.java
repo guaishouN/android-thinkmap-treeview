@@ -1,8 +1,5 @@
 package com.gyso.treeview.util;
 
-/**
- * Created by owant on 06/03/2017.
- */
 public class ViewBox {
 
     public int top;

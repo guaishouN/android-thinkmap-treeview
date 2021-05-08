@@ -1,10 +1,11 @@
 package com.gyso.treeview.layout;
 
-import android.util.SparseIntArray;
+import android.content.Context;
 import android.view.View;
 
 import com.gyso.treeview.TreeViewContainer;
 import com.gyso.treeview.adapter.TreeViewHolder;
+import com.gyso.treeview.line.Baseline;
 import com.gyso.treeview.model.ITraversal;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
@@ -14,47 +15,11 @@ import com.gyso.treeview.util.ViewBox;
 /**
  * guaishouN xw 674149099@qq.com
  */
-public class RightITreeLayoutManager implements ITreeLayoutManager {
-    private static final String TAG = RightITreeLayoutManager.class.getSimpleName();
+public class RightTreeLayoutManager extends TreeLayoutManager {
+    private static final String TAG = RightTreeLayoutManager.class.getSimpleName();
 
-    /**
-     * the content padding, unit is dp;
-     */
-    private static final int DEFAULT_CONTENT_PADDING_DP = 100;
-
-    private final ViewBox mContentViewBox;
-    private int mDy;
-    private int mDx;
-
-    /**
-     * the fixedViewBox means that the fixedViewBox's width/height is the same as the given viewPort's.
-     */
-    private final ViewBox fixedViewBox;
-    private int mFixedDx;
-    private int mFixedDy;
-
-    /**
-     * content padding box
-     */
-    private final ViewBox paddingBox;
-
-    /**
-     * the max Width in the same floor
-     */
-    private SparseIntArray floorMaxWidth = new SparseIntArray(10);
-    /**
-     * the max height in the same deep
-     */
-    private SparseIntArray deepMaxHeight = new SparseIntArray(200);
-    private int winHeight;
-    private int winWidth;
-
-    public RightITreeLayoutManager(int dx, int dy) {
-        mContentViewBox = new ViewBox();
-        fixedViewBox = new ViewBox();
-        paddingBox = new ViewBox();
-        this.mDx = dx;
-        this.mDy = dy;
+    public RightTreeLayoutManager(Context context, int spaceX, int spaceY, Baseline baseline) {
+        super(context, spaceX, spaceY, baseline);
     }
 
     @Override
@@ -124,7 +89,7 @@ public class RightITreeLayoutManager implements ITreeLayoutManager {
         int curW = currentNodeView.getMeasuredWidth();
         if(preMaxW < curW){
             floorMaxWidth.put(node.floor,curW);
-            int delta = mDx+curW-preMaxW;
+            int delta = spaceX +curW-preMaxW;
             mContentViewBox.right += delta;
         }
 
@@ -132,7 +97,7 @@ public class RightITreeLayoutManager implements ITreeLayoutManager {
         int curH = currentNodeView.getMeasuredHeight();
         if(preMaxH < curH){
             deepMaxHeight.put(node.deep,curH);
-            int delta = mDy+curH-preMaxH;
+            int delta = spaceY +curH-preMaxH;
             mContentViewBox.bottom += delta;
         }
     }
@@ -160,12 +125,6 @@ public class RightITreeLayoutManager implements ITreeLayoutManager {
         return fixedViewBox;
     }
 
-    @Override
-    public void setViewport(int winHeight, int winWidth) {
-        this.winHeight =winHeight;
-        this.winWidth = winWidth;
-    }
-
     private void layoutNodes(NodeModel<?> currentNode, TreeViewContainer treeViewContainer){
         TreeViewHolder<?> currentHolder = treeViewContainer.getTreeViewHolder(currentNode);
         View currentNodeView =  currentHolder==null?null:currentHolder.getView();
@@ -183,11 +142,11 @@ public class RightITreeLayoutManager implements ITreeLayoutManager {
 
         int deltaHeight = 0;
         if(leafCount>1){
-            deltaHeight = (leafCount-1)*(height+mDy)/2;
+            deltaHeight = (leafCount-1)*(height+ spaceY)/2;
         }
 
-        int top  =deep*(height+mDy) + deltaHeight + mFixedDy+ paddingBox.top;
-        int left = mDx+(parentNodeView==null?0:parentNodeView.getRight())+(currentNode.floor==0?(mFixedDx+paddingBox.left):0);
+        int top  =deep*(height+ spaceY) + deltaHeight + mFixedDy+ paddingBox.top;
+        int left = spaceX +(parentNodeView==null?0:parentNodeView.getRight())+(currentNode.floor==0?(mFixedDx+paddingBox.left):0);
         int bottom = top+height;
         int right = left+width;
 

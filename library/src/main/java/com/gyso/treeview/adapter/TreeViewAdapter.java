@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 
+import com.gyso.treeview.line.Baseline;
 import com.gyso.treeview.listener.TreeViewNotifier;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
@@ -49,16 +50,6 @@ public abstract class TreeViewAdapter<T> {
      * @param holder holder
      */
     public abstract void onBindViewHolder(@NonNull TreeViewHolder<T> holder);
-
-    /**
-     * draw line between node and node by you decision
-     * @param canvas total canvas for this tree view
-     * @param fromHolder holder from which one, you can get fromView and fromNodeModel from this holder
-     * @param toHolder holder to which one, you can get toView and toNodeModel from this holder
-     * @param paint paint from parent, don't create a new one because the method of onDraw(Canvas canvas) exec too much
-     * @param path path from parent, same as paint
-     */
-    public abstract void onDrawLine(Canvas canvas, TreeViewHolder<T> fromHolder, TreeViewHolder<T> toHolder,Paint paint, Path path);
 
     public void setNotifier(TreeViewNotifier notifier){
         this.notifier = notifier;

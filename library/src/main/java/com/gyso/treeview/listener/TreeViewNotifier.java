@@ -12,5 +12,5 @@ import com.gyso.treeview.model.NodeModel;
  */
 public interface TreeViewNotifier{
     void onDataSetChange();
-    void onItemViewChange(NodeModel nodeModel);
+    void onItemViewChange(NodeModel<?> nodeModel);
 }

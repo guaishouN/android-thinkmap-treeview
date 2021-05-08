@@ -7,19 +7,20 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.gyso.treeview.adapter.DrawInfo;
 import com.gyso.treeview.adapter.TreeViewAdapter;
 import com.gyso.treeview.adapter.TreeViewHolder;
-import com.gyso.treeview.layout.ITreeLayoutManager;
+import com.gyso.treeview.layout.TreeLayoutManager;
 import com.gyso.treeview.listener.TreeViewItemClick;
 import com.gyso.treeview.listener.TreeViewItemLongClick;
 import com.gyso.treeview.listener.TreeViewNotifier;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
+import com.gyso.treeview.util.TreeViewLog;
 import com.gyso.treeview.util.ViewBox;
 
 import java.util.ArrayDeque;
@@ -30,13 +31,14 @@ import java.util.LinkedList;
 import java.util.Map;
 
 /**
- * guaishouN xw 674149099@qq.com
+ * guaishouN 674149099@qq.com
  */
 
 public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     private static final String TAG = TreeViewContainer.class.getSimpleName();
     public  TreeModel<?> mTreeModel;
-    private ITreeLayoutManager mITreeLayoutManager;
+    private DrawInfo drawInfo;
+    private TreeLayoutManager mTreeLayoutManager;
     private TreeViewItemClick mTreeViewItemClick;
     private TreeViewItemLongClick mTreeViewItemLongClick;
     private int viewWidth;
@@ -48,7 +50,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     private Paint mPaint;
     private Path mPath;
     private Matrix centerMatrix;
-    private TreeViewAdapter adapter;
+    private TreeViewAdapter<?> adapter;
 
     public TreeViewContainer(Context context) {
         this(context, null, 0);
@@ -72,6 +74,9 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         mPaint.setAntiAlias(true);
         mPath = new Path();
         mPath.reset();
+        drawInfo = new DrawInfo();
+        drawInfo.setPaint(mPaint);
+        drawInfo.setPath(mPath);
     }
 
     @Override
@@ -84,10 +89,11 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
             winWidth  = MeasureSpec.getSize(widthMeasureSpec);
             winHeight = MeasureSpec.getSize(heightMeasureSpec);
         }
-        if (mITreeLayoutManager != null && mTreeModel != null) {
-            mITreeLayoutManager.setViewport(winHeight,winWidth);
-            mITreeLayoutManager.performMeasure(this);
-            ViewBox viewBox = mITreeLayoutManager.getTreeLayoutBox();
+        if (mTreeLayoutManager != null && mTreeModel != null) {
+            mTreeLayoutManager.setViewport(winHeight,winWidth);
+            mTreeLayoutManager.performMeasure(this);
+            ViewBox viewBox = mTreeLayoutManager.getTreeLayoutBox();
+            drawInfo.setSpace(mTreeLayoutManager.getSpaceX(),mTreeLayoutManager.getSpaceY());
             int specWidth = MeasureSpec.makeMeasureSpec(Math.max(winWidth, viewBox.getWidth()), MeasureSpec.EXACTLY);
             int specHeight = MeasureSpec.makeMeasureSpec(Math.max(winHeight,viewBox.getHeight()),MeasureSpec.EXACTLY);
             setMeasuredDimension(specWidth,specHeight);
@@ -99,8 +105,8 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        if (mITreeLayoutManager != null && mTreeModel != null) {
-            mITreeLayoutManager.performLayout(this);
+        if (mTreeLayoutManager != null && mTreeModel != null) {
+            mTreeLayoutManager.performLayout(this);
             fixWindow();
         }
     }
@@ -138,8 +144,8 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         }
 
         //if child both w h is smaller than win than move to center
-        int dx = (winWidth-mITreeLayoutManager.getTreeLayoutBox().getWidth())/2;
-        int dy = (winHeight-mITreeLayoutManager.getTreeLayoutBox().getHeight())/2;
+        int dx = (winWidth- mTreeLayoutManager.getTreeLayoutBox().getWidth())/2;
+        int dy = (winHeight- mTreeLayoutManager.getTreeLayoutBox().getHeight())/2;
         if(dx>0 || dy>0){
             dx = Math.max(dx, 0);
             dy = Math.max(dy, 0);
@@ -175,7 +181,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
      * 中点对焦
      */
     public void focusMidLocation() {
-        Log.e(TAG, "focusMidLocation: "+getMatrix());
+        TreeViewLog.e(TAG, "focusMidLocation: "+getMatrix());
         float[] centerM = new float[9];
         if(centerMatrix==null){
             centerMatrix = new Matrix();
@@ -183,7 +189,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         centerMatrix.getValues(centerM);
         float[] now = new float[9];
         getMatrix().getValues(now);
-        Log.e(TAG, "focusMidLocation: \n"
+        TreeViewLog.e(TAG, "focusMidLocation: \n"
                 + Arrays.toString(centerM)+"\n"
                 + Arrays.toString(now));
         if(now[0]>0&&now[4]>0){
@@ -205,26 +211,30 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         super.onSizeChanged(w, h, oldw, oldh);
         viewWidth = w;
         viewHeight = h;
+        drawInfo.setWindowWidth(w);
+        drawInfo.setWindowHeight(h);
     }
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
-        if (mTreeModel != null) {
-            drawTreeLine(canvas, mTreeModel.getRootNode());
-        }
         super.dispatchDraw(canvas);
+        if (mTreeModel != null) {
+            drawInfo.setCanvas(canvas);
+            drawTreeLine(mTreeModel.getRootNode());
+        }
     }
 
     /**
      * 绘制树形的连线
-     * @param canvas c
      * @param root root node
      */
-    private void drawTreeLine(Canvas canvas, NodeModel<?> root) {
+    private void drawTreeLine(NodeModel<?> root) {
         LinkedList<? extends NodeModel<?>> childNodes = root.getChildNodes();
         for (NodeModel<?> node : childNodes) {
-            adapter.onDrawLine(canvas, getTreeViewHolder(root), getTreeViewHolder(node), mPaint, mPath);
-            drawTreeLine(canvas, node);
+            drawInfo.setFromHolder(getTreeViewHolder(root));
+            drawInfo.setToHolder(getTreeViewHolder(node));
+            mTreeLayoutManager.performDrawLine(drawInfo);
+            drawTreeLine(node);
         }
     }
 
@@ -252,8 +262,8 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     }
 
     private void addNodeViewToGroup(NodeModel<?> node) {
-        TreeViewHolder treeViewHolder = adapter.onCreateViewHolder(this, node);
-        adapter.onBindViewHolder(treeViewHolder);
+        TreeViewHolder<?> treeViewHolder = adapter.onCreateViewHolder(this, (NodeModel)node);
+        adapter.onBindViewHolder((TreeViewHolder)treeViewHolder);
         View view = treeViewHolder.getView();
         //set the node click
         view.setOnClickListener(this::performTreeItemClick);
@@ -285,15 +295,15 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         }
     }
 
-    public void setTreeLayoutManager(ITreeLayoutManager ITreeLayoutManager) {
-        mITreeLayoutManager = ITreeLayoutManager;
+    public void setTreeLayoutManager(TreeLayoutManager TreeLayoutManager) {
+        mTreeLayoutManager = TreeLayoutManager;
     }
 
-    public TreeViewAdapter getAdapter() {
+    public TreeViewAdapter<?> getAdapter() {
         return adapter;
     }
 
-    public void setAdapter(TreeViewAdapter adapter) {
+    public void setAdapter(TreeViewAdapter<?> adapter) {
         this.adapter = adapter;
         this.adapter.setNotifier(this);
     }
@@ -317,7 +327,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     }
 
     @Override
-    public void onItemViewChange(NodeModel nodeModel){
+    public void onItemViewChange(NodeModel<?> nodeModel){
 
     }
 }

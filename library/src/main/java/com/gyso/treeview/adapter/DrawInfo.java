@@ -4,6 +4,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 
+import com.gyso.treeview.model.NodeModel;
+
 /**
  * @Author: 怪兽N
  * @Time: 2021/5/7  21:15
@@ -13,14 +15,16 @@ import android.graphics.Path;
  * In order to draw a custom line, there are too many draw info should be passed.
  * So, this class is estimated to package the draw element that need to draw a colorful line between two nodes.
  */
-public class DrawInfo<T> {
+public class DrawInfo {
     private Canvas canvas;
-    private TreeViewHolder<T> fromHolder;
-    private TreeViewHolder<T> toHolder;
+    private TreeViewHolder<?> fromHolder;
+    private TreeViewHolder<?> toHolder;
     private Paint paint;
     private Path path;
     private int spaceX;
     private int spaceY;
+    private int windowWidth;
+    private int windowHeight;
 
     public Canvas getCanvas() {
         return canvas;
@@ -30,19 +34,19 @@ public class DrawInfo<T> {
         this.canvas = canvas;
     }
 
-    public TreeViewHolder<T> getFromHolder() {
+    public TreeViewHolder<?> getFromHolder() {
         return fromHolder;
     }
 
-    public void setFromHolder(TreeViewHolder<T> fromHolder) {
-        this.fromHolder = fromHolder;
+    public void setFromHolder(TreeViewHolder<?> fromHolder) {
+        this.fromHolder =  fromHolder;
     }
 
-    public TreeViewHolder<T> getToHolder() {
+    public TreeViewHolder<?> getToHolder() {
         return toHolder;
     }
 
-    public void setToHolder(TreeViewHolder<T> toHolder) {
+    public void setToHolder(TreeViewHolder<?> toHolder) {
         this.toHolder = toHolder;
     }
 
@@ -60,5 +64,34 @@ public class DrawInfo<T> {
 
     public void setPath(Path path) {
         this.path = path;
+    }
+
+    public void setSpace(int spaceX,int spaceY) {
+        this.spaceX = spaceX;
+        this.spaceY = spaceY;
+    }
+
+    public int getSpaceX() {
+        return spaceX;
+    }
+
+    public int getSpaceY() {
+        return spaceY;
+    }
+
+    public int getWindowWidth() {
+        return windowWidth;
+    }
+
+    public void setWindowWidth(int windowWidth) {
+        this.windowWidth = windowWidth;
+    }
+
+    public int getWindowHeight() {
+        return windowHeight;
+    }
+
+    public void setWindowHeight(int windowHeight) {
+        this.windowHeight = windowHeight;
     }
 }

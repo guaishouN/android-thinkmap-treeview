@@ -2,7 +2,6 @@ package com.gyso.treeview.touch;
 
 import android.content.Context;
 import android.graphics.PointF;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -10,6 +9,7 @@ import android.view.ViewConfiguration;
 import androidx.dynamicanimation.animation.DynamicAnimation;
 import androidx.dynamicanimation.animation.FlingAnimation;
 import com.gyso.treeview.TreeViewContainer;
+import com.gyso.treeview.util.TreeViewLog;
 import com.gyso.treeview.util.ViewBox;
 
 /**
@@ -168,7 +168,7 @@ public class TouchEventHandler {
                 }
                 break;
             case MotionEvent.ACTION_OUTSIDE:
-                Log.e(TAG, "onTouchEvent: touch out side" );
+                TreeViewLog.e(TAG, "onTouchEvent: touch out side" );
                 break;
         }
         preMovingTouchEvent = MotionEvent.obtain(event);
