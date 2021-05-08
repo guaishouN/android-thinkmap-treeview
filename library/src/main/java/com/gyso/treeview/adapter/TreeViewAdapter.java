@@ -30,7 +30,7 @@ public abstract class TreeViewAdapter<T> {
     }
 
     /**
-     * get tree model
+     * Get tree model
      * @return tree model
      */
     public TreeModel<T> getTreeModel(){
@@ -38,7 +38,7 @@ public abstract class TreeViewAdapter<T> {
     }
 
     /**
-     * for create view holder by your self
+     * For create view holder by your self
      * @param viewGroup parent
      * @param model node
      * @return holder
@@ -50,6 +50,15 @@ public abstract class TreeViewAdapter<T> {
      * @param holder holder
      */
     public abstract void onBindViewHolder(@NonNull TreeViewHolder<T> holder);
+
+    /**
+     * Draw line between node and node by you decision.
+     * If you return an BaseLine, line will be draw by the return one instead of TreeViewLayoutManager's.
+     * @param drawInfo provides all you need to draw you line
+     * @return the line draw you want to use for different nodes
+     */
+    public abstract Baseline onDrawLine(DrawInfo drawInfo);
+
 
     public void setNotifier(TreeViewNotifier notifier){
         this.notifier = notifier;

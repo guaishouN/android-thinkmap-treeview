@@ -6,7 +6,7 @@ import android.util.SparseIntArray;
 import com.gyso.treeview.TreeViewContainer;
 import com.gyso.treeview.adapter.DrawInfo;
 import com.gyso.treeview.line.Baseline;
-import com.gyso.treeview.line.SimpleSmoothLine;
+import com.gyso.treeview.line.SmoothLine;
 import com.gyso.treeview.util.DensityUtils;
 import com.gyso.treeview.util.ViewBox;
 
@@ -21,7 +21,7 @@ public abstract class TreeLayoutManager {
     protected static final int DEFAULT_CONTENT_PADDING_DP = 100;
     public static final int  DEFAULT_SPACE_X_DP = 50;
     public static final int  DEFAULT_SPACE_Y_DP = 20;
-    public static final Baseline  DEFAULT_LINE = new SimpleSmoothLine();
+    public static final Baseline  DEFAULT_LINE = new SmoothLine();
 
 
     protected final ViewBox mContentViewBox;

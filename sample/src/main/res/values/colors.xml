@@ -5,4 +5,6 @@
     <color name="colorAccent">#03DAC5</color>
     <color name="colorBackground">#EEE9E9</color>
     <color name="textColor">#055287</color>
+    <color name="LineColor1">#E57373</color>
+    <color name="LineColor2">#F06292</color>
 </resources>

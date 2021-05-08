@@ -16,21 +16,21 @@ import com.gyso.treeview.util.DensityUtils;
 
 /**
  * @Author: 怪兽N
- * @Time: 2021/5/8  9:47
+ * @Time: 2021/5/8  15:55
  * @Email: 674149099@qq.com
  * @WeChat: guaishouN
  * @Describe:
- * Simple smooth line
+ * PointedLine, looks like needle
  */
-public class SimpleSmoothLine extends Baseline{
-    public static final int DEFAULT_LINE_WIDTH_DP = 3;
+public class PointedLine extends Baseline {
+    public static final int DEFAULT_LINE_WIDTH_DP = 20;
     private int lineColor = Color.parseColor("#055287");
     private int lineWidth = DEFAULT_LINE_WIDTH_DP;
-    public SimpleSmoothLine() {
+    public PointedLine() {
         super();
     }
 
-    public SimpleSmoothLine(int lineColor, int lineWidth_dp) {
+    public PointedLine(int lineColor, int lineWidth_dp) {
         this();
         this.lineColor = lineColor;
         this.lineWidth = lineWidth_dp;
@@ -51,6 +51,8 @@ public class SimpleSmoothLine extends Baseline{
         TreeViewHolder<?> toHolder = drawInfo.getToHolder();
         Paint mPaint = drawInfo.getPaint();
         Path mPath = drawInfo.getPath();
+        int spaceX = drawInfo.getSpaceX();
+        int spaceY = drawInfo.getSpaceY();
 
         //get view and node
         View fromView = fromHolder.getView();
@@ -62,29 +64,44 @@ public class SimpleSmoothLine extends Baseline{
         //set paint
         mPaint.reset();
         mPaint.setColor(lineColor);
-        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStyle(Paint.Style.FILL);
         mPaint.setStrokeWidth(DensityUtils.dp2px(context,lineWidth));
         mPaint.setAntiAlias(true);
 
         //setPath
+        int deltaY = fromView.getTop()-toView.getTop();
+        int distance = (int)Math.sqrt(deltaY*deltaY+spaceX*spaceX);
+        int baseWidth = (distance/spaceX)*lineWidth;
+
         mPath.reset();
-        PointF startPoint = PointPool.obtain(fromView.getRight(),(fromView.getTop()+fromView.getBottom())/2f);
-        PointF point1 = PointPool.obtain(startPoint.x+DensityUtils.dp2px(context,15),startPoint.y);
+        PointF startPoint = PointPool.obtain(fromView.getRight(),(fromView.getTop()+fromView.getBottom())/2f+(0.7F*lineWidth+0.3f*baseWidth)/2f);
         PointF endPoint =  PointPool.obtain(toView.getLeft(),(toView.getTop()+toView.getBottom())/2f);
-        PointF point2 = PointPool.obtain(startPoint.x,endPoint.y);
+        PointF midPoint1 = PointPool.obtain(startPoint.x+(endPoint.x-startPoint.x)/4f,startPoint.y);
+        PointF midPoint2 = PointPool.obtain(startPoint.x+(endPoint.x-startPoint.x)*2/4f,endPoint.y+baseWidth/5f);
         mPath.moveTo(startPoint.x,startPoint.y);
         mPath.cubicTo(
-                point1.x,point1.y,
-                point2.x,point2.y,
+                midPoint1.x,midPoint1.y,
+                midPoint2.x,midPoint2.y,
                 endPoint.x,endPoint.y);
+
+        PointF startPoint1 = PointPool.obtain(fromView.getRight(),(fromView.getTop()+fromView.getBottom())/2f-(0.7F*lineWidth+0.3f*baseWidth)/2f);
+        PointF midPoint3 = PointPool.obtain(startPoint1.x+(endPoint.x - startPoint1.x)*2/4f,endPoint.y-baseWidth/5f);
+        PointF midPoint4 = PointPool.obtain(startPoint1.x+(endPoint.x - startPoint1.x)/4f,startPoint1.y);
+        mPath.cubicTo(
+                midPoint3.x,midPoint3.y,
+                midPoint4.x,midPoint4.y,
+                startPoint1.x,startPoint1.y
+        );
 
         //draw
         canvas.drawPath(mPath,mPaint);
 
         //do not forget release
         PointPool.free(startPoint);
-        PointPool.free(point1);
-        PointPool.free(point2);
+        PointPool.free(midPoint1);
+        PointPool.free(midPoint2);
+        PointPool.free(midPoint3);
+        PointPool.free(midPoint4);
         PointPool.free(endPoint);
     }
 }

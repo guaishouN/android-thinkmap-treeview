@@ -2,14 +2,17 @@ package com.gyso.gysotreeviewapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.Color;
 import android.os.Bundle;
-
 import com.gyso.gysotreeviewapplication.base.Animal;
 import com.gyso.gysotreeviewapplication.base.AnimalTreeViewAdapter;
 import com.gyso.gysotreeviewapplication.databinding.ActivityMainBinding;
+import com.gyso.treeview.adapter.DrawInfo;
 import com.gyso.treeview.layout.RightTreeLayoutManager;
-import com.gyso.treeview.line.SimpleSmoothLine;
-import com.gyso.treeview.line.SimpleStraightLine;
+import com.gyso.treeview.line.Baseline;
+import com.gyso.treeview.line.DashLine;
+import com.gyso.treeview.line.PointedLine;
+import com.gyso.treeview.line.SmoothLine;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
 
@@ -42,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         //2 configure layout manager; unit dp
         int spaceX = 50;
         int spaceY = 20;
-        SimpleSmoothLine line = new SimpleSmoothLine();
+        Baseline line = getLine();
         RightTreeLayoutManager rightTreeLayoutManager = new RightTreeLayoutManager(this,spaceX,spaceY,line);
 
         //3 view setting
@@ -51,6 +54,13 @@ public class MainActivity extends AppCompatActivity {
 
         //4 nodes data setting
         setData(adapter);
+    }
+
+    private Baseline getLine() {
+        return new SmoothLine();
+        //return new StraightLine();
+        //return new PointedLine();
+        //return new DashLine(Color.parseColor("#4DB6AC"),8);
     }
 
     private void setData(AnimalTreeViewAdapter adapter){
@@ -75,7 +85,8 @@ public class MainActivity extends AppCompatActivity {
         NodeModel<Animal> sub13 = new NodeModel<>(new Animal(R.drawable.ic_15,"sub13"));
 
         //build relationship
-        treeModel.addNode(root,sub0,sub1,sub2,sub3);
+        treeModel.addNode(root,sub0,sub1,sub3);
+        treeModel.addNode(sub1,sub2);
         treeModel.addNode(sub0,sub4,sub5);
         treeModel.addNode(sub4,sub6);
         treeModel.addNode(sub5,sub7,sub8);

@@ -22,15 +22,15 @@ import com.gyso.treeview.util.DensityUtils;
  * @Describe:
  * Straight Line
  */
-public class SimpleStraightLine extends Baseline{
+public class StraightLine extends Baseline{
     public static final int DEFAULT_LINE_WIDTH_DP = 3;
     private int lineColor = Color.parseColor("#055287");
     private int lineWidth = DEFAULT_LINE_WIDTH_DP;
-    public SimpleStraightLine() {
+    public StraightLine() {
         super();
     }
 
-    public SimpleStraightLine(int lineColor, int lineWidth_dp) {
+    public StraightLine(int lineColor, int lineWidth_dp) {
         this();
         this.lineColor = lineColor;
         this.lineWidth = lineWidth_dp;

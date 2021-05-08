@@ -15,6 +15,7 @@ import com.gyso.treeview.adapter.DrawInfo;
 import com.gyso.treeview.adapter.TreeViewAdapter;
 import com.gyso.treeview.adapter.TreeViewHolder;
 import com.gyso.treeview.layout.TreeLayoutManager;
+import com.gyso.treeview.line.Baseline;
 import com.gyso.treeview.listener.TreeViewItemClick;
 import com.gyso.treeview.listener.TreeViewItemLongClick;
 import com.gyso.treeview.listener.TreeViewNotifier;
@@ -233,7 +234,12 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         for (NodeModel<?> node : childNodes) {
             drawInfo.setFromHolder(getTreeViewHolder(root));
             drawInfo.setToHolder(getTreeViewHolder(node));
-            mTreeLayoutManager.performDrawLine(drawInfo);
+            Baseline adapterDrawLine = adapter.onDrawLine(drawInfo);
+            if(adapterDrawLine!=null){
+                adapterDrawLine.draw(drawInfo);
+            }else{
+                mTreeLayoutManager.performDrawLine(drawInfo);
+            }
             drawTreeLine(node);
         }
     }
