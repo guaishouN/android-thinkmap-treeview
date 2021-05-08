@@ -133,6 +133,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
                 setTranslationY((winHeight-(viewHeight/scale))/2f);
             }
         }
+
         //仅记录一次
         if(centerMatrix==null&&winWidth>0&&winHeight>0){
             centerMatrix = new Matrix();
@@ -303,6 +304,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
 
     public void setTreeLayoutManager(TreeLayoutManager TreeLayoutManager) {
         mTreeLayoutManager = TreeLayoutManager;
+        drawInfo.setLayoutType(mTreeLayoutManager.getTreeLayoutType());
     }
 
     public TreeViewAdapter<?> getAdapter() {

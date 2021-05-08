@@ -13,18 +13,23 @@ import com.gyso.treeview.util.DensityUtils;
 import com.gyso.treeview.util.ViewBox;
 
 /**
- * guaishouN xw 674149099@qq.com
+ * @Author: 怪兽N
+ * @Time: 2021/5/8  19:06
+ * @Email: 674149099@qq.com
+ * @WeChat: guaishouN
+ * @Describe:
+ * Vertically down layout the tree view
  */
-public class RightTreeLayoutManager extends TreeLayoutManager {
-    private static final String TAG = RightTreeLayoutManager.class.getSimpleName();
+public class VerticalTreeLayoutManager extends TreeLayoutManager {
+    private static final String TAG = VerticalTreeLayoutManager.class.getSimpleName();
 
-    public RightTreeLayoutManager(Context context, int spaceX, int spaceY, Baseline baseline) {
+    public VerticalTreeLayoutManager(Context context, int spaceX, int spaceY, Baseline baseline) {
         super(context, spaceX, spaceY, baseline);
     }
 
     @Override
     public int getTreeLayoutType() {
-        return LAYOUT_TYPE_HORIZON_RIGHT;
+        return LAYOUT_TYPE_VERTICAL_DOWN;
     }
 
     @Override
@@ -90,20 +95,20 @@ public class RightTreeLayoutManager extends TreeLayoutManager {
         if(currentNodeView==null){
             throw new NullPointerException(" currentNodeView can not be null");
         }
-        int preMaxW = floorMax.get(node.floor);
-        int curW = currentNodeView.getMeasuredWidth();
-        if(preMaxW < curW){
-            floorMax.put(node.floor,curW);
-            int delta = spaceX +curW-preMaxW;
-            mContentViewBox.right += delta;
-        }
-
-        int preMaxH = deepMax.get(node.deep);
+        int preMaxH = floorMax.get(node.floor);
         int curH = currentNodeView.getMeasuredHeight();
         if(preMaxH < curH){
-            deepMax.put(node.deep,curH);
+            floorMax.put(node.floor,curH);
             int delta = spaceY +curH-preMaxH;
             mContentViewBox.bottom += delta;
+        }
+
+        int preMaxW = deepMax.get(node.deep);
+        int curW = currentNodeView.getMeasuredHeight();
+        if(preMaxW < curW){
+            deepMax.put(node.deep,curW);
+            int delta = spaceX +curW-preMaxW;
+            mContentViewBox.right += delta;
         }
     }
 
@@ -136,22 +141,21 @@ public class RightTreeLayoutManager extends TreeLayoutManager {
         NodeModel<?> parentNode = currentNode.getParentNode();
         TreeViewHolder<?> treeViewHolder = treeViewContainer.getTreeViewHolder(parentNode);
         View parentNodeView = treeViewHolder==null?null:treeViewHolder.getView();
-        int deep = currentNode.deep;
         int leafCount = currentNode.leafCount;
 
         if(currentNodeView==null){
             throw new NullPointerException(" currentNodeView can not be null");
         }
-        int height = deepMax.get(currentNode.deep, currentNodeView.getMeasuredHeight());
-        int width = floorMax.get(currentNode.floor, currentNodeView.getMeasuredWidth());
+        int width  = deepMax.get(currentNode.deep, currentNodeView.getMeasuredWidth());
+        int height = floorMax.get(currentNode.floor, currentNodeView.getMeasuredHeight());
 
-        int deltaHeight = 0;
+        int deltaWidth = 0;
         if(leafCount>1){
-            deltaHeight = (leafCount-1)*(height+ spaceY)/2;
+            deltaWidth = (leafCount-1)*(width+ spaceX)/2;
         }
 
-        int top  =deep*(height+ spaceY) + deltaHeight + mFixedDy+ paddingBox.top;
-        int left = spaceX +(parentNodeView==null?0:parentNodeView.getRight())+(currentNode.floor==0?(mFixedDx+paddingBox.left):0);
+        int top = spaceY +(parentNodeView==null?0:parentNodeView.getBottom())+(currentNode.floor==0?(mFixedDy+paddingBox.top):0);
+        int left  = currentNode.deep *(width+ spaceX) + deltaWidth + mFixedDx+ paddingBox.left;
         int bottom = top+height;
         int right = left+width;
 

@@ -15,6 +15,8 @@ import com.gyso.treeview.util.ViewBox;
  */
 
 public abstract class TreeLayoutManager {
+    public static final int LAYOUT_TYPE_HORIZON_RIGHT = 0;
+    public static final int LAYOUT_TYPE_VERTICAL_DOWN = 1;
     /**
      * the content padding, unit is dp;
      */
@@ -41,13 +43,13 @@ public abstract class TreeLayoutManager {
     protected final ViewBox paddingBox;
 
     /**
-     * the max Width in the same floor
+     * the max value of node in the same floor
      */
-    protected SparseIntArray floorMaxWidth = new SparseIntArray(10);
+    protected SparseIntArray floorMax = new SparseIntArray(10);
     /**
-     * the max height in the same deep
+     * the max value of node in the same deep
      */
-    protected SparseIntArray deepMaxHeight = new SparseIntArray(200);
+    protected SparseIntArray deepMax = new SparseIntArray(200);
     protected int winHeight;
     protected int winWidth;
 
@@ -98,6 +100,8 @@ public abstract class TreeLayoutManager {
     public abstract void performLayout(TreeViewContainer treeViewContainer);
 
     public abstract ViewBox getTreeLayoutBox();
+
+    public abstract int getTreeLayoutType();
 
     /**
      * draw line between node and node by you decision, you can get all draw element drawInfo;

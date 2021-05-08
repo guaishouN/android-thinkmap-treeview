@@ -25,6 +25,7 @@ public class DrawInfo {
     private int spaceY;
     private int windowWidth;
     private int windowHeight;
+    private int layoutType;
 
     public Canvas getCanvas() {
         return canvas;
@@ -93,5 +94,13 @@ public class DrawInfo {
 
     public void setWindowHeight(int windowHeight) {
         this.windowHeight = windowHeight;
+    }
+
+    public int getLayoutType() {
+        return layoutType;
+    }
+
+    public void setLayoutType(int layoutType) {
+        this.layoutType = layoutType;
     }
 }

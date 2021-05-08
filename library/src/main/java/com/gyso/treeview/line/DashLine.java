@@ -12,6 +12,7 @@ import android.view.View;
 import com.gyso.treeview.adapter.DrawInfo;
 import com.gyso.treeview.adapter.TreeViewHolder;
 import com.gyso.treeview.cache_pool.PointPool;
+import com.gyso.treeview.layout.TreeLayoutManager;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.util.DensityUtils;
 
@@ -53,6 +54,7 @@ public class DashLine extends Baseline{
         TreeViewHolder<?> toHolder = drawInfo.getToHolder();
         Paint mPaint = drawInfo.getPaint();
         Path mPath = drawInfo.getPath();
+        int layoutType = drawInfo.getLayoutType();
 
         //get view and node
         View fromView = fromHolder.getView();
@@ -71,23 +73,43 @@ public class DashLine extends Baseline{
 
         //setPath
         mPath.reset();
-        PointF startPoint = PointPool.obtain(fromView.getRight(),(fromView.getTop()+fromView.getBottom())/2f);
-        PointF point1 = PointPool.obtain(startPoint.x+DensityUtils.dp2px(context,15),startPoint.y);
-        PointF endPoint =  PointPool.obtain(toView.getLeft(),(toView.getTop()+toView.getBottom())/2f);
-        PointF point2 = PointPool.obtain(startPoint.x,endPoint.y);
-        mPath.moveTo(startPoint.x,startPoint.y);
-        mPath.cubicTo(
-                point1.x,point1.y,
-                point2.x,point2.y,
-                endPoint.x,endPoint.y);
+        if(layoutType== TreeLayoutManager.LAYOUT_TYPE_HORIZON_RIGHT){
+            PointF startPoint = PointPool.obtain(fromView.getRight(),(fromView.getTop()+fromView.getBottom())/2f);
+            PointF point1 = PointPool.obtain(startPoint.x+DensityUtils.dp2px(context,15),startPoint.y);
+            PointF endPoint =  PointPool.obtain(toView.getLeft(),(toView.getTop()+toView.getBottom())/2f);
+            PointF point2 = PointPool.obtain(startPoint.x,endPoint.y);
+            mPath.moveTo(startPoint.x,startPoint.y);
+            mPath.cubicTo(
+                    point1.x,point1.y,
+                    point2.x,point2.y,
+                    endPoint.x,endPoint.y);
+
+            //do not forget release
+            PointPool.free(startPoint);
+            PointPool.free(point1);
+            PointPool.free(point2);
+            PointPool.free(endPoint);
+        }else if(layoutType== TreeLayoutManager.LAYOUT_TYPE_VERTICAL_DOWN){
+            PointF startPoint = PointPool.obtain((fromView.getLeft()+fromView.getRight())/2f,fromView.getBottom());
+            PointF point1 = PointPool.obtain(startPoint.x,startPoint.y+DensityUtils.dp2px(context,15));
+            PointF endPoint =  PointPool.obtain((toView.getLeft()+toView.getRight())/2f,toView.getTop());
+            PointF point2 = PointPool.obtain(endPoint.x,startPoint.y);
+            mPath.moveTo(startPoint.x,startPoint.y);
+            mPath.cubicTo(
+                    point1.x,point1.y,
+                    point2.x,point2.y,
+                    endPoint.x,endPoint.y);
+
+            //do not forget release
+            PointPool.free(startPoint);
+            PointPool.free(point1);
+            PointPool.free(point2);
+            PointPool.free(endPoint);
+        }else{
+            return;
+        }
 
         //draw
         canvas.drawPath(mPath,mPaint);
-
-        //do not forget release
-        PointPool.free(startPoint);
-        PointPool.free(point1);
-        PointPool.free(point2);
-        PointPool.free(endPoint);
     }
 }

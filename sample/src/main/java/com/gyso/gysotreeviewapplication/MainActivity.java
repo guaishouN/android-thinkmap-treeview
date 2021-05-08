@@ -2,16 +2,12 @@ package com.gyso.gysotreeviewapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import com.gyso.gysotreeviewapplication.base.Animal;
 import com.gyso.gysotreeviewapplication.base.AnimalTreeViewAdapter;
 import com.gyso.gysotreeviewapplication.databinding.ActivityMainBinding;
-import com.gyso.treeview.adapter.DrawInfo;
-import com.gyso.treeview.layout.RightTreeLayoutManager;
+import com.gyso.treeview.layout.VerticalTreeLayoutManager;
 import com.gyso.treeview.line.Baseline;
-import com.gyso.treeview.line.DashLine;
-import com.gyso.treeview.line.PointedLine;
 import com.gyso.treeview.line.SmoothLine;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
@@ -43,14 +39,14 @@ public class MainActivity extends AppCompatActivity {
         AnimalTreeViewAdapter adapter = new AnimalTreeViewAdapter();
 
         //2 configure layout manager; unit dp
-        int spaceX = 50;
-        int spaceY = 20;
+        int spaceX = 20;
+        int spaceY = 50;
         Baseline line = getLine();
-        RightTreeLayoutManager rightTreeLayoutManager = new RightTreeLayoutManager(this,spaceX,spaceY,line);
-
+        //RightTreeLayoutManager treeLayoutManager = new RightTreeLayoutManager(this,spaceX,spaceY,line);
+        VerticalTreeLayoutManager treeLayoutManager = new VerticalTreeLayoutManager(this,spaceX,spaceY,line);
         //3 view setting
         binding.baseTreeView.setAdapter(adapter);
-        binding.baseTreeView.setTreeLayoutManager(rightTreeLayoutManager);
+        binding.baseTreeView.setTreeLayoutManager(treeLayoutManager);
 
         //4 nodes data setting
         setData(adapter);

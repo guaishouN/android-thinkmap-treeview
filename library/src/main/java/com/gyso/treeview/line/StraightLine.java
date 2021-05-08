@@ -11,6 +11,7 @@ import android.view.View;
 import com.gyso.treeview.adapter.DrawInfo;
 import com.gyso.treeview.adapter.TreeViewHolder;
 import com.gyso.treeview.cache_pool.PointPool;
+import com.gyso.treeview.layout.TreeLayoutManager;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.util.DensityUtils;
 
@@ -51,7 +52,7 @@ public class StraightLine extends Baseline{
         TreeViewHolder<?> toHolder = drawInfo.getToHolder();
         Paint mPaint = drawInfo.getPaint();
         Path mPath = drawInfo.getPath();
-
+        int layoutType = drawInfo.getLayoutType();
 
         //get view and node
         View fromView = fromHolder.getView();
@@ -69,16 +70,25 @@ public class StraightLine extends Baseline{
 
         //setPath
         mPath.reset();
-        PointF startPoint =  PointPool.obtain(fromView.getRight(),(fromView.getTop()+fromView.getBottom())/2f);
-        PointF endPoint =  PointPool.obtain(toView.getLeft(),(toView.getTop()+toView.getBottom())/2f);
-        mPath.moveTo(startPoint.x,startPoint.y);
-        mPath.lineTo(endPoint.x,endPoint.y);
+        if(layoutType == TreeLayoutManager.LAYOUT_TYPE_HORIZON_RIGHT){
+            PointF startPoint =  PointPool.obtain(fromView.getRight(),(fromView.getTop()+fromView.getBottom())/2f);
+            PointF endPoint =  PointPool.obtain(toView.getLeft(),(toView.getTop()+toView.getBottom())/2f);
+            mPath.moveTo(startPoint.x,startPoint.y);
+            mPath.lineTo(endPoint.x,endPoint.y);
+            //release
+            PointPool.free(startPoint);
+            PointPool.free(endPoint);
+        }else if (layoutType == TreeLayoutManager.LAYOUT_TYPE_VERTICAL_DOWN){
+            PointF startPoint =  PointPool.obtain((fromView.getLeft()+fromView.getRight())/2f,fromView.getBottom());
+            PointF endPoint =  PointPool.obtain((toView.getLeft()+toView.getRight())/2f,toView.getTop());
+            mPath.moveTo(startPoint.x,startPoint.y);
+            mPath.lineTo(endPoint.x,endPoint.y);
+            //release
+            PointPool.free(startPoint);
+            PointPool.free(endPoint);
+        }
 
         //draw
         canvas.drawPath(mPath,mPaint);
-
-        //release
-        PointPool.free(startPoint);
-        PointPool.free(endPoint);
     }
 }
