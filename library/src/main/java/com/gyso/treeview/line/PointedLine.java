@@ -11,6 +11,7 @@ import android.view.View;
 import com.gyso.treeview.adapter.DrawInfo;
 import com.gyso.treeview.adapter.TreeViewHolder;
 import com.gyso.treeview.cache_pool.PointPool;
+import com.gyso.treeview.layout.TreeLayoutManager;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.util.DensityUtils;
 
@@ -53,6 +54,7 @@ public class PointedLine extends Baseline {
         Path mPath = drawInfo.getPath();
         int spaceX = drawInfo.getSpaceX();
         int spaceY = drawInfo.getSpaceY();
+        int layoutType = drawInfo.getLayoutType();
 
         //get view and node
         View fromView = fromHolder.getView();
@@ -69,39 +71,76 @@ public class PointedLine extends Baseline {
         mPaint.setAntiAlias(true);
 
         //setPath
-        int deltaY = fromView.getTop()-toView.getTop();
-        int distance = (int)Math.sqrt(deltaY*deltaY+spaceX*spaceX);
-        int baseWidth = (distance/spaceX)*lineWidth;
-
         mPath.reset();
-        PointF startPoint = PointPool.obtain(fromView.getRight(),(fromView.getTop()+fromView.getBottom())/2f+(0.7F*lineWidth+0.3f*baseWidth)/2f);
-        PointF endPoint =  PointPool.obtain(toView.getLeft(),(toView.getTop()+toView.getBottom())/2f);
-        PointF midPoint1 = PointPool.obtain(startPoint.x+(endPoint.x-startPoint.x)/4f,startPoint.y);
-        PointF midPoint2 = PointPool.obtain(startPoint.x+(endPoint.x-startPoint.x)*2/4f,endPoint.y+baseWidth/5f);
-        mPath.moveTo(startPoint.x,startPoint.y);
-        mPath.cubicTo(
-                midPoint1.x,midPoint1.y,
-                midPoint2.x,midPoint2.y,
-                endPoint.x,endPoint.y);
+        if (layoutType == TreeLayoutManager.LAYOUT_TYPE_HORIZON_RIGHT) {
 
-        PointF startPoint1 = PointPool.obtain(fromView.getRight(),(fromView.getTop()+fromView.getBottom())/2f-(0.7F*lineWidth+0.3f*baseWidth)/2f);
-        PointF midPoint3 = PointPool.obtain(startPoint1.x+(endPoint.x - startPoint1.x)*2/4f,endPoint.y-baseWidth/5f);
-        PointF midPoint4 = PointPool.obtain(startPoint1.x+(endPoint.x - startPoint1.x)/4f,startPoint1.y);
-        mPath.cubicTo(
-                midPoint3.x,midPoint3.y,
-                midPoint4.x,midPoint4.y,
-                startPoint1.x,startPoint1.y
-        );
+            int deltaY = fromView.getTop()-toView.getTop();
+            int distance = (int)Math.sqrt(deltaY*deltaY+spaceX*spaceX);
+            int baseWidth = (distance/spaceX)*lineWidth;
+
+            PointF startPoint = PointPool.obtain(fromView.getRight(), (fromView.getTop() + fromView.getBottom()) / 2f + (0.7F * lineWidth + 0.3f * baseWidth) / 2f);
+            PointF endPoint = PointPool.obtain(toView.getLeft(), (toView.getTop() + toView.getBottom()) / 2f);
+            PointF midPoint1 = PointPool.obtain(startPoint.x + (endPoint.x - startPoint.x) / 4f, startPoint.y);
+            PointF midPoint2 = PointPool.obtain(startPoint.x + (endPoint.x - startPoint.x) * 2 / 4f, endPoint.y + baseWidth / 5f);
+            mPath.moveTo(startPoint.x, startPoint.y);
+            mPath.cubicTo(
+                    midPoint1.x, midPoint1.y,
+                    midPoint2.x, midPoint2.y,
+                    endPoint.x, endPoint.y+2);
+
+            mPath.lineTo(endPoint.x, endPoint.y-2);
+            PointF startPoint1 = PointPool.obtain(fromView.getRight(), (fromView.getTop() + fromView.getBottom()) / 2f - (0.7F * lineWidth + 0.3f * baseWidth) / 2f);
+            PointF midPoint3 = PointPool.obtain(startPoint1.x + (endPoint.x - startPoint1.x) * 2 / 4f, endPoint.y - baseWidth / 5f);
+            PointF midPoint4 = PointPool.obtain(startPoint1.x + (endPoint.x - startPoint1.x) / 4f, startPoint1.y);
+            mPath.cubicTo(
+                    midPoint3.x, midPoint3.y,
+                    midPoint4.x, midPoint4.y,
+                    startPoint1.x, startPoint1.y
+            );
+            //do not forget release
+            PointPool.free(startPoint);
+            PointPool.free(midPoint1);
+            PointPool.free(midPoint2);
+            PointPool.free(midPoint3);
+            PointPool.free(midPoint4);
+            PointPool.free(endPoint);
+        }else if (layoutType == TreeLayoutManager.LAYOUT_TYPE_VERTICAL_DOWN) {
+            int deltaX = fromView.getLeft()-toView.getLeft();
+            int distance = (int)Math.sqrt(deltaX*deltaX+spaceY*spaceY);
+            int baseWidth = (distance/spaceY)*lineWidth;
+
+            PointF startPoint = PointPool.obtain((fromView.getLeft() + fromView.getRight()) / 2f - (0.7F * lineWidth + 0.3f * baseWidth) / 2f, fromView.getBottom());
+            PointF endPoint = PointPool.obtain((toView.getLeft() + toView.getRight()) / 2f, toView.getTop());
+
+            PointF midPoint1 = PointPool.obtain(startPoint.x , startPoint.y+ (endPoint.y - startPoint.y) / 4f);
+            PointF midPoint2 = PointPool.obtain(endPoint.x - baseWidth / 5f, startPoint.y + (endPoint.y - startPoint.y) * 2 / 4f);
+            mPath.moveTo(startPoint.x, startPoint.y);
+            mPath.cubicTo(
+                    midPoint1.x, midPoint1.y,
+                    midPoint2.x, midPoint2.y,
+                    endPoint.x-2, endPoint.y);
+
+            mPath.lineTo(endPoint.x+2, endPoint.y);
+            PointF startPoint1 = PointPool.obtain((fromView.getLeft() + fromView.getRight()) / 2f + (0.7F * lineWidth + 0.3f * baseWidth) / 2f, fromView.getBottom());
+            PointF midPoint3 = PointPool.obtain(endPoint.x + baseWidth / 5f, startPoint1.y + (endPoint.y - startPoint1.y) * 2 / 4f);
+            PointF midPoint4 = PointPool.obtain(startPoint1.x, startPoint1.y + (endPoint.y - startPoint1.y) / 4f);
+            mPath.cubicTo(
+                    midPoint3.x, midPoint3.y,
+                    midPoint4.x, midPoint4.y,
+                    startPoint1.x, startPoint1.y
+            );
+            //do not forget release
+            PointPool.free(startPoint);
+            PointPool.free(midPoint1);
+            PointPool.free(midPoint2);
+            PointPool.free(midPoint3);
+            PointPool.free(midPoint4);
+            PointPool.free(endPoint);
+        } else {
+            return;
+        }
 
         //draw
         canvas.drawPath(mPath,mPaint);
-
-        //do not forget release
-        PointPool.free(startPoint);
-        PointPool.free(midPoint1);
-        PointPool.free(midPoint2);
-        PointPool.free(midPoint3);
-        PointPool.free(midPoint4);
-        PointPool.free(endPoint);
     }
 }

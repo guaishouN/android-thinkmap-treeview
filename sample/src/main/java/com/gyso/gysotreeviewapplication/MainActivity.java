@@ -6,8 +6,11 @@ import android.os.Bundle;
 import com.gyso.gysotreeviewapplication.base.Animal;
 import com.gyso.gysotreeviewapplication.base.AnimalTreeViewAdapter;
 import com.gyso.gysotreeviewapplication.databinding.ActivityMainBinding;
+import com.gyso.treeview.layout.RightTreeLayoutManager;
+import com.gyso.treeview.layout.TreeLayoutManager;
 import com.gyso.treeview.layout.VerticalTreeLayoutManager;
 import com.gyso.treeview.line.Baseline;
+import com.gyso.treeview.line.PointedLine;
 import com.gyso.treeview.line.SmoothLine;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
@@ -28,7 +31,8 @@ public class MainActivity extends AppCompatActivity {
      * To use a tree view, you should do 4 steps as follows:
      *      1 customs adapter
      *
-     *      2 configure layout manager. Space unit is dp. You can custom you line by extends {@link com.gyso.treeview.line.Baseline}
+     *      2 configure layout manager. Space unit is dp.
+     *      You can custom you line by extends {@link com.gyso.treeview.line.Baseline}
      *
      *      3 view setting
      *
@@ -39,11 +43,8 @@ public class MainActivity extends AppCompatActivity {
         AnimalTreeViewAdapter adapter = new AnimalTreeViewAdapter();
 
         //2 configure layout manager; unit dp
-        int spaceX = 20;
-        int spaceY = 50;
-        Baseline line = getLine();
-        //RightTreeLayoutManager treeLayoutManager = new RightTreeLayoutManager(this,spaceX,spaceY,line);
-        VerticalTreeLayoutManager treeLayoutManager = new VerticalTreeLayoutManager(this,spaceX,spaceY,line);
+        TreeLayoutManager treeLayoutManager = getTreeLayoutManager();
+
         //3 view setting
         binding.baseTreeView.setAdapter(adapter);
         binding.baseTreeView.setTreeLayoutManager(treeLayoutManager);
@@ -52,10 +53,18 @@ public class MainActivity extends AppCompatActivity {
         setData(adapter);
     }
 
+    private TreeLayoutManager getTreeLayoutManager() {
+        int space_50dp = 50;
+        int space_20dp = 20;
+        Baseline line = getLine();
+        //return new RightTreeLayoutManager(this,space_50dp,space_20dp,line);
+        return new VerticalTreeLayoutManager(this,space_20dp,space_50dp,line);
+    }
+
     private Baseline getLine() {
-        return new SmoothLine();
+        //return new SmoothLine();
         //return new StraightLine();
-        //return new PointedLine();
+        return new PointedLine();
         //return new DashLine(Color.parseColor("#4DB6AC"),8);
     }
 
