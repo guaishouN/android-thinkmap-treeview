@@ -15,4 +15,12 @@ public class Animal {
         this.headId = headId;
         this.name = name;
     }
+
+    @Override
+    public String toString() {
+        return "Animal{" +
+                "headId=" + headId +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

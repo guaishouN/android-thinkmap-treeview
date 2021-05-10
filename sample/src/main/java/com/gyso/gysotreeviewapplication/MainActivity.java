@@ -62,9 +62,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private Baseline getLine() {
-        //return new SmoothLine();
+        return new SmoothLine();
         //return new StraightLine();
-        return new PointedLine();
+        //return new PointedLine();
         //return new DashLine(Color.parseColor("#4DB6AC"),8);
     }
 
@@ -79,15 +79,22 @@ public class MainActivity extends AppCompatActivity {
         NodeModel<Animal> sub2 = new NodeModel<>(new Animal(R.drawable.ic_04,"sub2"));
         NodeModel<Animal> sub3 = new NodeModel<>(new Animal(R.drawable.ic_05,"sub3"));
         NodeModel<Animal> sub4 = new NodeModel<>(new Animal(R.drawable.ic_06,"sub4"));
-        NodeModel<Animal> sub5 = new NodeModel<>(new Animal(R.drawable.ic_07,"sub5"));
+        NodeModel<Animal> sub5 = new NodeModel<>(new Animal(R.drawable.ic_07,"sub5\nThis is some words.\nAndroid\nJava\nKotlin\nC++"));
         NodeModel<Animal> sub6 = new NodeModel<>(new Animal(R.drawable.ic_08,"sub6"));
         NodeModel<Animal> sub7 = new NodeModel<>(new Animal(R.drawable.ic_09,"sub7"));
         NodeModel<Animal> sub8 = new NodeModel<>(new Animal(R.drawable.ic_10,"sub8"));
         NodeModel<Animal> sub9 = new NodeModel<>(new Animal(R.drawable.ic_11,"sub9"));
-        NodeModel<Animal> sub10 = new NodeModel<>(new Animal(R.drawable.ic_12,"sub10"));
+        NodeModel<Animal> sub10 = new NodeModel<>(new Animal(R.drawable.ic_12,"sub10\nWhat is this."));
         NodeModel<Animal> sub11 = new NodeModel<>(new Animal(R.drawable.ic_13,"sub11"));
-        NodeModel<Animal> sub12 = new NodeModel<>(new Animal(R.drawable.ic_14,"sub12"));
+        NodeModel<Animal> sub12 = new NodeModel<>(new Animal(R.drawable.ic_14,"sub12\nThis is a wonderful tree view.\nThink Map\n"));
         NodeModel<Animal> sub13 = new NodeModel<>(new Animal(R.drawable.ic_15,"sub13"));
+        NodeModel<Animal> sub14 = new NodeModel<>(new Animal(R.drawable.ic_13,"sub14"));
+        NodeModel<Animal> sub15 = new NodeModel<>(new Animal(R.drawable.ic_14,"sub15\nTree View\nChinese is friendly!!\n"));
+        NodeModel<Animal> sub16 = new NodeModel<>(new Animal(R.drawable.ic_15,"sub16"));
+        NodeModel<Animal> sub17 = new NodeModel<>(new Animal(R.drawable.ic_08,"sub17\nHello World!\nAre you OK?\nMy name is HanMeiMei.\nI am fine.\nHello, Android!!\n"));
+        NodeModel<Animal> sub18 = new NodeModel<>(new Animal(R.drawable.ic_09,"sub18"));
+        NodeModel<Animal> sub19 = new NodeModel<>(new Animal(R.drawable.ic_10,"sub19"));
+        NodeModel<Animal> sub20 = new NodeModel<>(new Animal(R.drawable.ic_11,"sub20"));
 
         //build relationship
         treeModel.addNode(root,sub0,sub1,sub3);
@@ -97,7 +104,8 @@ public class MainActivity extends AppCompatActivity {
         treeModel.addNode(sub5,sub7,sub8);
         treeModel.addNode(sub6,sub9,sub10,sub11);
         treeModel.addNode(sub3,sub12,sub13);
-
+        treeModel.addNode(sub11,sub14,sub15,sub16);
+        treeModel.addNode(sub8,sub17,sub18,sub19,sub20);
         //set data
         adapter.setTreeModel(treeModel);
     }

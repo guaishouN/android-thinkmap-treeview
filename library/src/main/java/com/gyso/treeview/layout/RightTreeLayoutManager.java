@@ -10,6 +10,7 @@ import com.gyso.treeview.model.ITraversal;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
 import com.gyso.treeview.util.DensityUtils;
+import com.gyso.treeview.util.TreeViewLog;
 import com.gyso.treeview.util.ViewBox;
 
 /**
@@ -61,6 +62,24 @@ public class RightTreeLayoutManager extends TreeLayoutManager {
                     }
                     mFixedDx = (fixedViewBox.getWidth()-mContentViewBox.getWidth())/2;
                     mFixedDy = (fixedViewBox.getHeight()-mContentViewBox.getHeight())/2;
+
+                    //compute floor start position
+                    for (int i = 0; i <= floorMax.size(); i++) {
+                        int fn = (i == floorMax.size())?floorMax.size():floorMax.keyAt(i);
+                        int preStart = floorStart.get(fn - 1, 0);
+                        int preMax = floorMax.get(fn - 1, 0);
+                        int startPos = (fn==0?(mFixedDx + paddingBox.left):spaceParentToChild) + preStart + preMax;
+                        floorStart.put(fn,startPos);
+                    }
+
+                    //compute deep start position
+                    for (int i = 0; i <= deepMax.size(); i++) {
+                        int dn = (i == deepMax.size())?deepMax.size():deepMax.keyAt(i);
+                        int preStart = deepStart.get(dn - 1, 0);
+                        int preMax = deepMax.get(dn - 1, 0);
+                        int startPos = (dn==0?(mFixedDy + paddingBox.top):spacePeerToPeer) + preStart + preMax;
+                        deepStart.put(dn,startPos);
+                    }
                 }
             };
             mTreeModel.doTraversalNodes(traversal);
@@ -131,29 +150,27 @@ public class RightTreeLayoutManager extends TreeLayoutManager {
     }
 
     private void layoutNodes(NodeModel<?> currentNode, TreeViewContainer treeViewContainer){
+        TreeViewLog.e(TAG,"onLayout: "+currentNode);
         TreeViewHolder<?> currentHolder = treeViewContainer.getTreeViewHolder(currentNode);
         View currentNodeView =  currentHolder==null?null:currentHolder.getView();
-        NodeModel<?> parentNode = currentNode.getParentNode();
-        TreeViewHolder<?> treeViewHolder = treeViewContainer.getTreeViewHolder(parentNode);
-        View parentNodeView = treeViewHolder==null?null:treeViewHolder.getView();
         int deep = currentNode.deep;
+        int floor = currentNode.floor;
         int leafCount = currentNode.leafCount;
 
         if(currentNodeView==null){
             throw new NullPointerException(" currentNodeView can not be null");
         }
-        int height = deepMax.get(currentNode.deep, currentNodeView.getMeasuredHeight());
-        int width = floorMax.get(currentNode.floor, currentNodeView.getMeasuredWidth());
 
+        int currentWidth = currentNodeView.getMeasuredWidth();
+        int currentHeight = currentNodeView.getMeasuredHeight();
         int deltaHeight = 0;
         if(leafCount>1){
-            deltaHeight = (leafCount-1)*(height+ spacePeerToPeer)/2;
+            deltaHeight = (deepStart.get(deep + leafCount) - deepStart.get(deep)-currentHeight)/2;
         }
-
-        int top  =deep*(height+ spacePeerToPeer) + deltaHeight + mFixedDy+ paddingBox.top;
-        int left = spaceParentToChild +(parentNodeView==null?0:parentNodeView.getRight())+(currentNode.floor==0?(mFixedDx+paddingBox.left):0);
-        int bottom = top+height;
-        int right = left+width;
+        int top  = deepStart.get(deep)+deltaHeight;
+        int left = floorStart.get(floor);
+        int bottom = top+currentHeight;
+        int right = left+currentWidth;
 
         currentNodeView.layout(left,top,right,bottom);
     }

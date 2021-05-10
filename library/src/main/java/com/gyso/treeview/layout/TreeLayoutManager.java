@@ -45,11 +45,23 @@ public abstract class TreeLayoutManager {
     /**
      * the max value of node in the same floor
      */
-    protected SparseIntArray floorMax = new SparseIntArray(10);
+    protected SparseIntArray floorMax = new SparseIntArray(200);
+
     /**
      * the max value of node in the same deep
      */
     protected SparseIntArray deepMax = new SparseIntArray(200);
+
+    /**
+     * the start value of node in the same floor
+     */
+    protected SparseIntArray floorStart = new SparseIntArray(200);
+
+    /**
+     * the start value of node in the same deep
+     */
+    protected SparseIntArray deepStart = new SparseIntArray(200);
+
     protected int winHeight;
     protected int winWidth;
 

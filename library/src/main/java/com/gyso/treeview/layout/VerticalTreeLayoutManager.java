@@ -66,6 +66,24 @@ public class VerticalTreeLayoutManager extends TreeLayoutManager {
                     }
                     mFixedDx = (fixedViewBox.getWidth()-mContentViewBox.getWidth())/2;
                     mFixedDy = (fixedViewBox.getHeight()-mContentViewBox.getHeight())/2;
+
+                    //compute floor start position
+                    for (int i = 0; i <= floorMax.size(); i++) {
+                        int fn = (i == floorMax.size())?floorMax.size():floorMax.keyAt(i);
+                        int preStart = floorStart.get(fn - 1, 0);
+                        int preMax = floorMax.get(fn - 1, 0);
+                        int startPos = (fn==0?(mFixedDy + paddingBox.top):spaceParentToChild) + preStart + preMax;
+                        floorStart.put(fn,startPos);
+                    }
+
+                    //compute deep start position
+                    for (int i = 0; i <= deepMax.size(); i++) {
+                        int dn = (i == deepMax.size())?deepMax.size():deepMax.keyAt(i);
+                        int preStart = deepStart.get(dn - 1, 0);
+                        int preMax = deepMax.get(dn - 1, 0);
+                        int startPos = (dn==0?(mFixedDx + paddingBox.left):spacePeerToPeer) + preStart + preMax;
+                        deepStart.put(dn,startPos);
+                    }
                 }
             };
             mTreeModel.doTraversalNodes(traversal);
@@ -138,9 +156,8 @@ public class VerticalTreeLayoutManager extends TreeLayoutManager {
     private void layoutNodes(NodeModel<?> currentNode, TreeViewContainer treeViewContainer){
         TreeViewHolder<?> currentHolder = treeViewContainer.getTreeViewHolder(currentNode);
         View currentNodeView =  currentHolder==null?null:currentHolder.getView();
-        NodeModel<?> parentNode = currentNode.getParentNode();
-        TreeViewHolder<?> treeViewHolder = treeViewContainer.getTreeViewHolder(parentNode);
-        View parentNodeView = treeViewHolder==null?null:treeViewHolder.getView();
+        int deep = currentNode.deep;
+        int floor = currentNode.floor;
         int leafCount = currentNode.leafCount;
 
         if(currentNodeView==null){
@@ -149,17 +166,14 @@ public class VerticalTreeLayoutManager extends TreeLayoutManager {
 
         int currentWidth = currentNodeView.getMeasuredWidth();
         int currentHeight = currentNodeView.getMeasuredHeight();
-        int preDeepMaxWidth  = deepMax.get(currentNode.deep-1, currentWidth);
-        int preFloorMaxHeight = floorMax.get(currentNode.floor-1, currentHeight);
-
 
         int deltaWidth = 0;
         if(leafCount>1){
-            deltaWidth = (leafCount-1)*(preDeepMaxWidth + spacePeerToPeer)/2;
+            deltaWidth = (deepStart.get(deep + leafCount) - deepStart.get(deep)-currentWidth)/2;
         }
 
-        int top = spaceParentToChild +(parentNodeView==null?0:parentNodeView.getBottom())+(currentNode.floor==0?(mFixedDy+paddingBox.top):0);
-        int left  = currentNode.deep*(spacePeerToPeer+currentWidth)+deltaWidth + mFixedDx+ paddingBox.left;
+        int top = floorStart.get(floor);
+        int left  = deepStart.get(deep)+deltaWidth;;
         int bottom = top+currentHeight;
         int right = left+currentWidth;
 
