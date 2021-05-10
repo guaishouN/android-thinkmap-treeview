@@ -94,7 +94,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
             mTreeLayoutManager.setViewport(winHeight,winWidth);
             mTreeLayoutManager.performMeasure(this);
             ViewBox viewBox = mTreeLayoutManager.getTreeLayoutBox();
-            drawInfo.setSpace(mTreeLayoutManager.getSpaceX(),mTreeLayoutManager.getSpaceY());
+            drawInfo.setSpace(mTreeLayoutManager.getSpacePeerToPeer(),mTreeLayoutManager.getSpaceParentToChild());
             int specWidth = MeasureSpec.makeMeasureSpec(Math.max(winWidth, viewBox.getWidth()), MeasureSpec.EXACTLY);
             int specHeight = MeasureSpec.makeMeasureSpec(Math.max(winHeight,viewBox.getHeight()),MeasureSpec.EXACTLY);
             setMeasuredDimension(specWidth,specHeight);

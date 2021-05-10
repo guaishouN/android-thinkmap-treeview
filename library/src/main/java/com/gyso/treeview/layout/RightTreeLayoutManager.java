@@ -18,8 +18,8 @@ import com.gyso.treeview.util.ViewBox;
 public class RightTreeLayoutManager extends TreeLayoutManager {
     private static final String TAG = RightTreeLayoutManager.class.getSimpleName();
 
-    public RightTreeLayoutManager(Context context, int spaceX, int spaceY, Baseline baseline) {
-        super(context, spaceX, spaceY, baseline);
+    public RightTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, Baseline baseline) {
+        super(context, spaceParentToChild, spacePeerToPeer, baseline);
     }
 
     @Override
@@ -94,7 +94,7 @@ public class RightTreeLayoutManager extends TreeLayoutManager {
         int curW = currentNodeView.getMeasuredWidth();
         if(preMaxW < curW){
             floorMax.put(node.floor,curW);
-            int delta = spaceX +curW-preMaxW;
+            int delta = spaceParentToChild +curW-preMaxW;
             mContentViewBox.right += delta;
         }
 
@@ -102,7 +102,7 @@ public class RightTreeLayoutManager extends TreeLayoutManager {
         int curH = currentNodeView.getMeasuredHeight();
         if(preMaxH < curH){
             deepMax.put(node.deep,curH);
-            int delta = spaceY +curH-preMaxH;
+            int delta = spacePeerToPeer +curH-preMaxH;
             mContentViewBox.bottom += delta;
         }
     }
@@ -147,11 +147,11 @@ public class RightTreeLayoutManager extends TreeLayoutManager {
 
         int deltaHeight = 0;
         if(leafCount>1){
-            deltaHeight = (leafCount-1)*(height+ spaceY)/2;
+            deltaHeight = (leafCount-1)*(height+ spacePeerToPeer)/2;
         }
 
-        int top  =deep*(height+ spaceY) + deltaHeight + mFixedDy+ paddingBox.top;
-        int left = spaceX +(parentNodeView==null?0:parentNodeView.getRight())+(currentNode.floor==0?(mFixedDx+paddingBox.left):0);
+        int top  =deep*(height+ spacePeerToPeer) + deltaHeight + mFixedDy+ paddingBox.top;
+        int left = spaceParentToChild +(parentNodeView==null?0:parentNodeView.getRight())+(currentNode.floor==0?(mFixedDx+paddingBox.left):0);
         int bottom = top+height;
         int right = left+width;
 

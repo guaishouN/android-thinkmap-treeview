@@ -4,8 +4,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 
-import com.gyso.treeview.model.NodeModel;
-
 /**
  * @Author: 怪兽N
  * @Time: 2021/5/7  21:15
@@ -21,8 +19,8 @@ public class DrawInfo {
     private TreeViewHolder<?> toHolder;
     private Paint paint;
     private Path path;
-    private int spaceX;
-    private int spaceY;
+    private int spacePeerToPeer;
+    private int spaceParentToChild;
     private int windowWidth;
     private int windowHeight;
     private int layoutType;
@@ -67,17 +65,17 @@ public class DrawInfo {
         this.path = path;
     }
 
-    public void setSpace(int spaceX,int spaceY) {
-        this.spaceX = spaceX;
-        this.spaceY = spaceY;
+    public void setSpace(int spacePeerToPeer,int spaceParentToChild) {
+        this.spacePeerToPeer = spacePeerToPeer;
+        this.spaceParentToChild = spaceParentToChild;
     }
 
-    public int getSpaceX() {
-        return spaceX;
+    public int getSpacePeerToPeer() {
+        return spacePeerToPeer;
     }
 
-    public int getSpaceY() {
-        return spaceY;
+    public int getSpaceParentToChild() {
+        return spaceParentToChild;
     }
 
     public int getWindowWidth() {

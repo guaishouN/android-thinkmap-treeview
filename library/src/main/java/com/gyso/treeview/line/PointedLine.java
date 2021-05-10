@@ -52,8 +52,8 @@ public class PointedLine extends Baseline {
         TreeViewHolder<?> toHolder = drawInfo.getToHolder();
         Paint mPaint = drawInfo.getPaint();
         Path mPath = drawInfo.getPath();
-        int spaceX = drawInfo.getSpaceX();
-        int spaceY = drawInfo.getSpaceY();
+        int spacePeer = drawInfo.getSpacePeerToPeer();
+        int spacePc = drawInfo.getSpaceParentToChild();
         int layoutType = drawInfo.getLayoutType();
 
         //get view and node
@@ -75,8 +75,8 @@ public class PointedLine extends Baseline {
         if (layoutType == TreeLayoutManager.LAYOUT_TYPE_HORIZON_RIGHT) {
 
             int deltaY = fromView.getTop()-toView.getTop();
-            int distance = (int)Math.sqrt(deltaY*deltaY+spaceX*spaceX);
-            int baseWidth = (distance/spaceX)*lineWidth;
+            int distance = (int)Math.sqrt(deltaY*deltaY+spacePeer*spacePeer);
+            int baseWidth = (distance/spacePeer)*lineWidth;
 
             PointF startPoint = PointPool.obtain(fromView.getRight(), (fromView.getTop() + fromView.getBottom()) / 2f + (0.7F * lineWidth + 0.3f * baseWidth) / 2f);
             PointF endPoint = PointPool.obtain(toView.getLeft(), (toView.getTop() + toView.getBottom()) / 2f);
@@ -106,8 +106,8 @@ public class PointedLine extends Baseline {
             PointPool.free(endPoint);
         }else if (layoutType == TreeLayoutManager.LAYOUT_TYPE_VERTICAL_DOWN) {
             int deltaX = fromView.getLeft()-toView.getLeft();
-            int distance = (int)Math.sqrt(deltaX*deltaX+spaceY*spaceY);
-            int baseWidth = (distance/spaceY)*lineWidth;
+            int distance = (int)Math.sqrt(deltaX*deltaX+spacePc*spacePc);
+            int baseWidth = (distance/spacePc)*lineWidth;
 
             PointF startPoint = PointPool.obtain((fromView.getLeft() + fromView.getRight()) / 2f - (0.7F * lineWidth + 0.3f * baseWidth) / 2f, fromView.getBottom());
             PointF endPoint = PointPool.obtain((toView.getLeft() + toView.getRight()) / 2f, toView.getTop());

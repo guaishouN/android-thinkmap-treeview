@@ -21,14 +21,14 @@ public abstract class TreeLayoutManager {
      * the content padding, unit is dp;
      */
     protected static final int DEFAULT_CONTENT_PADDING_DP = 100;
-    public static final int  DEFAULT_SPACE_X_DP = 50;
-    public static final int  DEFAULT_SPACE_Y_DP = 20;
+    public static final int DEFAULT_SPACE_PARENT_CHILD_DP = 50;
+    public static final int DEFAULT_SPACE_PEER_PEER_DP = 20;
     public static final Baseline  DEFAULT_LINE = new SmoothLine();
 
 
     protected final ViewBox mContentViewBox;
-    protected int spaceY;
-    protected int spaceX;
+    protected int spaceParentToChild;
+    protected int spacePeerToPeer;
 
     /**
      * the fixedViewBox means that the fixedViewBox's width/height is the same as the given viewPort's.
@@ -56,38 +56,38 @@ public abstract class TreeLayoutManager {
     private Baseline baseline;
 
     public TreeLayoutManager(Context context) {
-        this(context,DEFAULT_SPACE_X_DP,DEFAULT_SPACE_Y_DP,DEFAULT_LINE);
+        this(context, DEFAULT_SPACE_PARENT_CHILD_DP, DEFAULT_SPACE_PEER_PEER_DP,DEFAULT_LINE);
     }
-    public TreeLayoutManager(Context context,int spaceX, int spaceY){
-        this(context,spaceX,spaceY,DEFAULT_LINE);
+    public TreeLayoutManager(Context context, int spacePeerToPeer, int spaceParentToChild){
+        this(context, spacePeerToPeer, spaceParentToChild,DEFAULT_LINE);
     }
     public TreeLayoutManager(Context context,Baseline baseline){
-        this(context,DEFAULT_SPACE_X_DP,DEFAULT_SPACE_Y_DP, baseline);
+        this(context, DEFAULT_SPACE_PARENT_CHILD_DP, DEFAULT_SPACE_PEER_PEER_DP, baseline);
     }
 
-    public TreeLayoutManager(Context context,int spaceX, int spaceY, Baseline baseline) {
+    public TreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, Baseline baseline) {
         mContentViewBox = new ViewBox();
         fixedViewBox = new ViewBox();
         paddingBox = new ViewBox();
-        this.spaceX = DensityUtils.dp2px(context,spaceX);
-        this.spaceY = DensityUtils.dp2px(context,spaceY);
+        this.spaceParentToChild = DensityUtils.dp2px(context, spaceParentToChild);
+        this.spacePeerToPeer = DensityUtils.dp2px(context, spacePeerToPeer);
         this.baseline = baseline;
     }
 
-    public int getSpaceY() {
-        return spaceY;
+    public int getSpaceParentToChild() {
+        return spaceParentToChild;
     }
 
-    public void setSpaceY(int spaceY) {
-        this.spaceY = spaceY;
+    public void setSpaceParentToChild(int spaceParentToChild) {
+        this.spaceParentToChild = spaceParentToChild;
     }
 
-    public int getSpaceX() {
-        return spaceX;
+    public int getSpacePeerToPeer() {
+        return spacePeerToPeer;
     }
 
-    public void setSpaceX(int spaceX) {
-        this.spaceX = spaceX;
+    public void setSpacePeerToPeer(int spacePeerToPeer) {
+        this.spacePeerToPeer = spacePeerToPeer;
     }
 
     public void setViewport(int winHeight, int winWidth) {

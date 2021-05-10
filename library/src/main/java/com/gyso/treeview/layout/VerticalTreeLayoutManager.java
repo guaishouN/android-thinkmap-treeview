@@ -23,8 +23,8 @@ import com.gyso.treeview.util.ViewBox;
 public class VerticalTreeLayoutManager extends TreeLayoutManager {
     private static final String TAG = VerticalTreeLayoutManager.class.getSimpleName();
 
-    public VerticalTreeLayoutManager(Context context, int spaceX, int spaceY, Baseline baseline) {
-        super(context, spaceX, spaceY, baseline);
+    public VerticalTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, Baseline baseline) {
+        super(context, spaceParentToChild, spacePeerToPeer, baseline);
     }
 
     @Override
@@ -99,7 +99,7 @@ public class VerticalTreeLayoutManager extends TreeLayoutManager {
         int curH = currentNodeView.getMeasuredHeight();
         if(preMaxH < curH){
             floorMax.put(node.floor,curH);
-            int delta = spaceY +curH-preMaxH;
+            int delta = spaceParentToChild +curH-preMaxH;
             mContentViewBox.bottom += delta;
         }
 
@@ -107,7 +107,7 @@ public class VerticalTreeLayoutManager extends TreeLayoutManager {
         int curW = currentNodeView.getMeasuredWidth();
         if(preMaxW < curW){
             deepMax.put(node.deep,curW);
-            int delta = spaceX +curW-preMaxW;
+            int delta = spacePeerToPeer +curW-preMaxW;
             mContentViewBox.right += delta;
         }
     }
@@ -146,18 +146,22 @@ public class VerticalTreeLayoutManager extends TreeLayoutManager {
         if(currentNodeView==null){
             throw new NullPointerException(" currentNodeView can not be null");
         }
-        int width  = deepMax.get(currentNode.deep, currentNodeView.getMeasuredWidth());
-        int height = floorMax.get(currentNode.floor, currentNodeView.getMeasuredHeight());
+
+        int currentWidth = currentNodeView.getMeasuredWidth();
+        int currentHeight = currentNodeView.getMeasuredHeight();
+        int preDeepMaxWidth  = deepMax.get(currentNode.deep-1, currentWidth);
+        int preFloorMaxHeight = floorMax.get(currentNode.floor-1, currentHeight);
+
 
         int deltaWidth = 0;
         if(leafCount>1){
-            deltaWidth = (leafCount-1)*(width+ spaceX)/2;
+            deltaWidth = (leafCount-1)*(preDeepMaxWidth + spacePeerToPeer)/2;
         }
 
-        int top = spaceY +(parentNodeView==null?0:parentNodeView.getBottom())+(currentNode.floor==0?(mFixedDy+paddingBox.top):0);
-        int left  = currentNode.deep *(width+ spaceX) + deltaWidth + mFixedDx+ paddingBox.left;
-        int bottom = top+height;
-        int right = left+width;
+        int top = spaceParentToChild +(parentNodeView==null?0:parentNodeView.getBottom())+(currentNode.floor==0?(mFixedDy+paddingBox.top):0);
+        int left  = currentNode.deep*(spacePeerToPeer+currentWidth)+deltaWidth + mFixedDx+ paddingBox.left;
+        int bottom = top+currentHeight;
+        int right = left+currentWidth;
 
         currentNodeView.layout(left,top,right,bottom);
     }
