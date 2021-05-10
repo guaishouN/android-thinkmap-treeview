@@ -57,8 +57,8 @@ public class MainActivity extends AppCompatActivity {
         int space_50dp = 50;
         int space_20dp = 20;
         Baseline line = getLine();
-        //return new RightTreeLayoutManager(this,space_50dp,space_20dp,line);
-        return new VerticalTreeLayoutManager(this,space_50dp,space_20dp,line);
+        return new RightTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new VerticalTreeLayoutManager(this,space_50dp,space_20dp,line);
     }
 
     private Baseline getLine() {

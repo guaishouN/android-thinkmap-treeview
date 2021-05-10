@@ -110,5 +110,5 @@ adapter.setTreeModel(treeModel);
 
 这个项目如果有人用就会持续更新下去。喜欢点个赞，谢谢。
 
-关于实现，[我的CSDN](https://blog.csdn.net/guaisou?spm=1000.2115.3001.5343&type=blog)会逐渐更新。
+关于实现，[我的CSDN](https://blog.csdn.net/guaisou/article/details/116611140)会逐渐更新。
 
