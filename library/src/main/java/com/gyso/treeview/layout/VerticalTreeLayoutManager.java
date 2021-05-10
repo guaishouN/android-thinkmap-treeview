@@ -104,7 +104,7 @@ public class VerticalTreeLayoutManager extends TreeLayoutManager {
         }
 
         int preMaxW = deepMax.get(node.deep);
-        int curW = currentNodeView.getMeasuredHeight();
+        int curW = currentNodeView.getMeasuredWidth();
         if(preMaxW < curW){
             deepMax.put(node.deep,curW);
             int delta = spaceX +curW-preMaxW;
