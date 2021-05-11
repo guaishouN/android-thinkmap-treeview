@@ -8,9 +8,9 @@ A custom tree view for Android,  designed for easy drawing some tree nodes (e.g.
 
 [Releases & downloads](https://github.com/guaishouN/android-tree-view.git)
 
-<img src=".\images\Screenshot_2021-05-10-20-55-35-885_com.gyso.gysotreeviewapplication.jpg" style="zoom: 33%;" />
+<img src=".\images\Screenshot_2021-05-10-20-55-35-885_com.gyso.gysotreeviewapplication.jpg" width="33%" />
 
-<img src=".\images\Screenshot_2021-05-10-21-09-12-787_com.gyso.gysotreeviewapplication.jpg" style="zoom:33%;" />
+<img src=".\images\Screenshot_2021-05-10-21-09-12-787_com.gyso.gysotreeviewapplication.jpg"  width="33%" />
 
 #### Steps for use
 
