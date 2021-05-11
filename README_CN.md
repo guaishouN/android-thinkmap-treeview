@@ -10,7 +10,7 @@ Tree View; Mind map; Think map; tree map; 树状图；思维导图；
 
 <img src=".\images\Screenshot_2021-05-10-20-55-35-885_com.gyso.gysotreeviewapplication.jpg" style="zoom: 33%;" />
 
-<img src="E:\giteeEdairy\images\Screenshot_2021-05-10-21-09-12-787_com.gyso.gysotreeviewapplication.jpg" style="zoom:33%;" />
+<img src=".\images\Screenshot_2021-05-10-21-09-12-787_com.gyso.gysotreeviewapplication.jpg" style="zoom:33%;" />
 
 #### 使用步骤：
 
