@@ -17,21 +17,21 @@ import com.gyso.treeview.util.DensityUtils;
 
 /**
  * @Author: 怪兽N
- * @Time: 2021/5/8  9:47
+ * @Time: 2021/5/18  16:47
  * @Email: 674149099@qq.com
  * @WeChat: guaishouN
  * @Describe:
- * Simple smooth line
+ * AngledLine between two nodes
  */
-public class SmoothLine extends BaseLine {
+public class AngledLine extends BaseLine {
     public static final int DEFAULT_LINE_WIDTH_DP = 3;
     private int lineColor = Color.parseColor("#055287");
     private int lineWidth = DEFAULT_LINE_WIDTH_DP;
-    public SmoothLine() {
+    public AngledLine() {
         super();
     }
 
-    public SmoothLine(int lineColor, int lineWidth_dp) {
+    public AngledLine(int lineColor, int lineWidth_dp) {
         this();
         this.lineColor = lineColor;
         this.lineWidth = lineWidth_dp;
@@ -44,7 +44,6 @@ public class SmoothLine extends BaseLine {
     public void setLineWidth(int lineWidth) {
         this.lineWidth = lineWidth;
     }
-
     @Override
     public void draw(DrawInfo drawInfo) {
         Canvas canvas = drawInfo.getCanvas();
@@ -53,6 +52,8 @@ public class SmoothLine extends BaseLine {
         Paint mPaint = drawInfo.getPaint();
         Path mPath = drawInfo.getPath();
         int layoutType = drawInfo.getLayoutType();
+        int spacePeerToPeer = drawInfo.getSpacePeerToPeer();
+        int spaceParentToChild = drawInfo.getSpaceParentToChild();
 
         //get view and node
         View fromView = fromHolder.getView();
@@ -72,14 +73,13 @@ public class SmoothLine extends BaseLine {
         mPath.reset();
         if(layoutType== TreeLayoutManager.LAYOUT_TYPE_HORIZON_RIGHT){
             PointF startPoint = PointPool.obtain(fromView.getRight(),(fromView.getTop()+fromView.getBottom())/2f);
-            PointF point1 = PointPool.obtain(startPoint.x+DensityUtils.dp2px(context,15),startPoint.y);
+            PointF point1 = PointPool.obtain(startPoint.x+spaceParentToChild/3f,startPoint.y);
             PointF endPoint =  PointPool.obtain(toView.getLeft(),(toView.getTop()+toView.getBottom())/2f);
-            PointF point2 = PointPool.obtain(startPoint.x,endPoint.y);
+            PointF point2 = PointPool.obtain(startPoint.x+spaceParentToChild/3f,endPoint.y);
             mPath.moveTo(startPoint.x,startPoint.y);
-            mPath.cubicTo(
-                    point1.x,point1.y,
-                    point2.x,point2.y,
-                    endPoint.x,endPoint.y);
+            mPath.lineTo(point1.x,point1.y);
+            mPath.lineTo(point2.x,point2.y);
+            mPath.lineTo(endPoint.x,endPoint.y);
 
             //do not forget release
             PointPool.free(startPoint);
@@ -87,15 +87,14 @@ public class SmoothLine extends BaseLine {
             PointPool.free(point2);
             PointPool.free(endPoint);
         }else if(layoutType== TreeLayoutManager.LAYOUT_TYPE_VERTICAL_DOWN){
-            PointF startPoint = PointPool.obtain((fromView.getLeft()+fromView.getRight())/2f,fromView.getBottom());
-            PointF point1 = PointPool.obtain(startPoint.x,startPoint.y+DensityUtils.dp2px(context,15));
+            PointF startPoint =  PointPool.obtain((fromView.getLeft()+fromView.getRight())/2f,fromView.getBottom());
+            PointF point1 = PointPool.obtain(startPoint.x,startPoint.y+spaceParentToChild/3f);
             PointF endPoint =  PointPool.obtain((toView.getLeft()+toView.getRight())/2f,toView.getTop());
-            PointF point2 = PointPool.obtain(endPoint.x,startPoint.y);
+            PointF point2 = PointPool.obtain(endPoint.x,startPoint.y+spaceParentToChild/3f);
             mPath.moveTo(startPoint.x,startPoint.y);
-            mPath.cubicTo(
-                    point1.x,point1.y,
-                    point2.x,point2.y,
-                    endPoint.x,endPoint.y);
+            mPath.lineTo(point1.x,point1.y);
+            mPath.lineTo(point2.x,point2.y);
+            mPath.lineTo(endPoint.x,endPoint.y);
 
             //do not forget release
             PointPool.free(startPoint);

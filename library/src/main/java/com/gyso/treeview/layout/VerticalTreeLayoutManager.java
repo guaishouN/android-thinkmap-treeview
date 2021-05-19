@@ -5,7 +5,7 @@ import android.view.View;
 
 import com.gyso.treeview.TreeViewContainer;
 import com.gyso.treeview.adapter.TreeViewHolder;
-import com.gyso.treeview.line.Baseline;
+import com.gyso.treeview.line.BaseLine;
 import com.gyso.treeview.model.ITraversal;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
@@ -23,7 +23,7 @@ import com.gyso.treeview.util.ViewBox;
 public class VerticalTreeLayoutManager extends TreeLayoutManager {
     private static final String TAG = VerticalTreeLayoutManager.class.getSimpleName();
 
-    public VerticalTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, Baseline baseline) {
+    public VerticalTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
         super(context, spaceParentToChild, spacePeerToPeer, baseline);
     }
 

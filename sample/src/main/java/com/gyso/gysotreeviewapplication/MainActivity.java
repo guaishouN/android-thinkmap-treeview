@@ -9,8 +9,8 @@ import com.gyso.gysotreeviewapplication.databinding.ActivityMainBinding;
 import com.gyso.treeview.layout.RightTreeLayoutManager;
 import com.gyso.treeview.layout.TreeLayoutManager;
 import com.gyso.treeview.layout.VerticalTreeLayoutManager;
-import com.gyso.treeview.line.Baseline;
-import com.gyso.treeview.line.PointedLine;
+import com.gyso.treeview.line.AngledLine;
+import com.gyso.treeview.line.BaseLine;
 import com.gyso.treeview.line.SmoothLine;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
      *      1 customs adapter
      *
      *      2 configure layout manager. Space unit is dp.
-     *      You can custom you line by extends {@link com.gyso.treeview.line.Baseline}
+     *      You can custom you line by extends {@link BaseLine}
      *
      *      3 view setting
      *
@@ -56,16 +56,17 @@ public class MainActivity extends AppCompatActivity {
     private TreeLayoutManager getTreeLayoutManager() {
         int space_50dp = 50;
         int space_20dp = 20;
-        Baseline line = getLine();
-        return new RightTreeLayoutManager(this,space_50dp,space_20dp,line);
-        //return new VerticalTreeLayoutManager(this,space_50dp,space_20dp,line);
+        BaseLine line = getLine();
+        //return new RightTreeLayoutManager(this,space_50dp,space_20dp,line);
+        return new VerticalTreeLayoutManager(this,space_50dp,space_20dp,line);
     }
 
-    private Baseline getLine() {
-        return new SmoothLine();
+    private BaseLine getLine() {
+        //return new SmoothLine();
         //return new StraightLine();
         //return new PointedLine();
         //return new DashLine(Color.parseColor("#4DB6AC"),8);
+        return new AngledLine();
     }
 
     private void setData(AnimalTreeViewAdapter adapter){

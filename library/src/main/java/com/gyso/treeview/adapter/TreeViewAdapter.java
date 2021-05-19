@@ -1,13 +1,10 @@
 package com.gyso.treeview.adapter;
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Path;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 
-import com.gyso.treeview.line.Baseline;
+import com.gyso.treeview.line.BaseLine;
 import com.gyso.treeview.listener.TreeViewNotifier;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
@@ -57,7 +54,7 @@ public abstract class TreeViewAdapter<T> {
      * @param drawInfo provides all you need to draw you line
      * @return the line draw you want to use for different nodes
      */
-    public abstract Baseline onDrawLine(DrawInfo drawInfo);
+    public abstract BaseLine onDrawLine(DrawInfo drawInfo);
 
 
     public void setNotifier(TreeViewNotifier notifier){

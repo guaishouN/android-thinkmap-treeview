@@ -24,7 +24,7 @@ import com.gyso.treeview.util.DensityUtils;
  * @Describe:
  * DashPathEffect line
  */
-public class DashLine extends Baseline{
+public class DashLine extends BaseLine {
     public static final int DEFAULT_LINE_WIDTH_DP = 3;
     private int lineColor = Color.parseColor("#E57373");
     private int lineWidth = DEFAULT_LINE_WIDTH_DP;

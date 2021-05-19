@@ -23,7 +23,7 @@ import com.gyso.treeview.util.DensityUtils;
  * @Describe:
  * PointedLine, looks like needle
  */
-public class PointedLine extends Baseline {
+public class PointedLine extends BaseLine {
     public static final int DEFAULT_LINE_WIDTH_DP = 20;
     private int lineColor = Color.parseColor("#055287");
     private int lineWidth = DEFAULT_LINE_WIDTH_DP;

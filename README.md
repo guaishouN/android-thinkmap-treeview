@@ -59,7 +59,7 @@ To use a tree view, you should do **4 steps** as follows:
    }
    ```
    
-2. configure layout manager. Space unit is dp. You can custom you line by extends {@link com.gyso.treeview.line.Baseline}
+2. configure layout manager. Space unit is dp. You can custom you line by extends {@link com.gyso.treeview.line.BaseLine}
 
    ```java
    int space_50dp = 50;

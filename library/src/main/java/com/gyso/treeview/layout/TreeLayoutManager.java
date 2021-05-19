@@ -5,7 +5,7 @@ import android.util.SparseIntArray;
 
 import com.gyso.treeview.TreeViewContainer;
 import com.gyso.treeview.adapter.DrawInfo;
-import com.gyso.treeview.line.Baseline;
+import com.gyso.treeview.line.BaseLine;
 import com.gyso.treeview.line.SmoothLine;
 import com.gyso.treeview.util.DensityUtils;
 import com.gyso.treeview.util.ViewBox;
@@ -23,7 +23,7 @@ public abstract class TreeLayoutManager {
     protected static final int DEFAULT_CONTENT_PADDING_DP = 100;
     public static final int DEFAULT_SPACE_PARENT_CHILD_DP = 50;
     public static final int DEFAULT_SPACE_PEER_PEER_DP = 20;
-    public static final Baseline  DEFAULT_LINE = new SmoothLine();
+    public static final BaseLine DEFAULT_LINE = new SmoothLine();
 
 
     protected final ViewBox mContentViewBox;
@@ -65,7 +65,7 @@ public abstract class TreeLayoutManager {
     protected int winHeight;
     protected int winWidth;
 
-    private Baseline baseline;
+    private BaseLine baseline;
 
     public TreeLayoutManager(Context context) {
         this(context, DEFAULT_SPACE_PARENT_CHILD_DP, DEFAULT_SPACE_PEER_PEER_DP,DEFAULT_LINE);
@@ -73,11 +73,11 @@ public abstract class TreeLayoutManager {
     public TreeLayoutManager(Context context, int spacePeerToPeer, int spaceParentToChild){
         this(context, spacePeerToPeer, spaceParentToChild,DEFAULT_LINE);
     }
-    public TreeLayoutManager(Context context,Baseline baseline){
+    public TreeLayoutManager(Context context, BaseLine baseline){
         this(context, DEFAULT_SPACE_PARENT_CHILD_DP, DEFAULT_SPACE_PEER_PEER_DP, baseline);
     }
 
-    public TreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, Baseline baseline) {
+    public TreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
         mContentViewBox = new ViewBox();
         fixedViewBox = new ViewBox();
         paddingBox = new ViewBox();

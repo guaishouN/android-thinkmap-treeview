@@ -14,7 +14,7 @@ import com.gyso.gysotreeviewapplication.databinding.NodeBaseLayoutBinding;
 import com.gyso.treeview.adapter.DrawInfo;
 import com.gyso.treeview.adapter.TreeViewAdapter;
 import com.gyso.treeview.adapter.TreeViewHolder;
-import com.gyso.treeview.line.Baseline;
+import com.gyso.treeview.line.BaseLine;
 import com.gyso.treeview.line.DashLine;
 import com.gyso.treeview.model.NodeModel;
 
@@ -47,17 +47,17 @@ public class AnimalTreeViewAdapter extends TreeViewAdapter<Animal> {
     }
 
     @Override
-    public Baseline onDrawLine(DrawInfo drawInfo) {
+    public BaseLine onDrawLine(DrawInfo drawInfo) {
         // TODO If you return an BaseLine, line will be draw by the return one instead of TreeViewLayoutManager's
-        TreeViewHolder<?> toHolder = drawInfo.getToHolder();
-        NodeModel<?> node = toHolder.getNode();
-        Object value = node.getValue();
-        if(value instanceof Animal){
-            Animal animal = (Animal) value;
-            if("sub4".compareToIgnoreCase(animal.name)<=0){
-                return dashLine;
-            }
-        }
+//        TreeViewHolder<?> toHolder = drawInfo.getToHolder();
+//        NodeModel<?> node = toHolder.getNode();
+//        Object value = node.getValue();
+//        if(value instanceof Animal){
+//            Animal animal = (Animal) value;
+//            if("sub4".compareToIgnoreCase(animal.name)<=0){
+//                return dashLine;
+//            }
+//        }
         return null;
     }
 }

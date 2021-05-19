@@ -10,7 +10,7 @@ import com.gyso.treeview.adapter.DrawInfo;
  * @Describe:
  * line to connect the fromNodeView and toNodeView
  */
-public abstract class Baseline{
+public abstract class BaseLine {
     /**
      * this method will be invoke when the tree view is onDispatchDraw
     */

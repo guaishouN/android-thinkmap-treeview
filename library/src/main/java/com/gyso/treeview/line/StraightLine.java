@@ -23,7 +23,7 @@ import com.gyso.treeview.util.DensityUtils;
  * @Describe:
  * Straight Line
  */
-public class StraightLine extends Baseline{
+public class StraightLine extends BaseLine {
     public static final int DEFAULT_LINE_WIDTH_DP = 3;
     private int lineColor = Color.parseColor("#055287");
     private int lineWidth = DEFAULT_LINE_WIDTH_DP;

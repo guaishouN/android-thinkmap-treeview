@@ -14,15 +14,45 @@ import android.graphics.Path;
  * So, this class is estimated to package the draw element that need to draw a colorful line between two nodes.
  */
 public class DrawInfo {
+    /**
+     * canvas
+     */
     private Canvas canvas;
+    /**
+     * node from view
+     */
     private TreeViewHolder<?> fromHolder;
+    /**
+     * node to view
+     */
     private TreeViewHolder<?> toHolder;
+    /**
+     * paint, before use you should reset
+     */
     private Paint paint;
+    /**
+     * path, before use you should reset
+     */
     private Path path;
+    /**
+     * space between Peer and Peer, means child and child
+     */
     private int spacePeerToPeer;
+    /**
+     * space between parent and child
+     */
     private int spaceParentToChild;
+    /**
+     * viewport width
+     */
     private int windowWidth;
+    /**
+     * viewport height
+     */
     private int windowHeight;
+    /**
+     * layout type {@link com.gyso.treeview.layout.TreeLayoutManager#LAYOUT_TYPE_HORIZON_RIGHT #LAYOUT_TYPE_VERTICAL_DOWN}
+     */
     private int layoutType;
 
     public Canvas getCanvas() {
