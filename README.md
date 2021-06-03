@@ -86,7 +86,7 @@ To use a tree view, you should do **4 steps** as follows:
    ```java
    //Create a TreeModel by using a root node.
    NodeModel<Animal> node0 = new NodeModel<>(new Animal(R.drawable.ic_01,"root"));
-   TreeModel<Animal> treeModel = new TreeModel<>(root);
+   TreeModel<Animal> treeModel = new TreeModel<>(node0);
    
    //Other nodes.
    NodeModel<Animal> node1 = new NodeModel<>(new Animal(R.drawable.ic_02,"sub0"));
