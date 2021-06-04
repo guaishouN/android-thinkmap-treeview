@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import com.gyso.treeview.adapter.TreeViewAdapter;
 import com.gyso.treeview.cache_pool.PointPool;
 import com.gyso.treeview.layout.TreeLayoutManager;
+import com.gyso.treeview.listener.TreeViewDragMoveListener;
 import com.gyso.treeview.listener.TreeViewItemClick;
 import com.gyso.treeview.listener.TreeViewItemLongClick;
 import com.gyso.treeview.touch.TouchEventHandler;
@@ -42,6 +43,7 @@ public class GysoTreeView extends FrameLayout {
         treeViewContainer.setLayoutParams(layoutParams);
         addView(treeViewContainer);
         treeViewGestureHandler = new TouchEventHandler(getContext(), treeViewContainer);
+        treeViewGestureHandler.setTouchScaleListener(scale -> treeViewContainer.treeScaleChange(scale));
     }
 
     @Override
@@ -85,10 +87,15 @@ public class GysoTreeView extends FrameLayout {
         treeViewContainer.setTreeViewItemLongClick(treeViewItemLongClick);
     }
 
+    public void setOnDragMoveListener(TreeViewDragMoveListener dragMoveListener) {
+        treeViewContainer.setOnDragMoveListener(dragMoveListener);
+    }
+
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         PointPool.freeAll();
         TreeViewLog.d(TAG, "onDetachedFromWindow: ");
     }
+
 }

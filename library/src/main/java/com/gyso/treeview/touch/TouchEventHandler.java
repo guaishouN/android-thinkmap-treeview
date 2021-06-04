@@ -6,9 +6,12 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
+
 import androidx.dynamicanimation.animation.DynamicAnimation;
 import androidx.dynamicanimation.animation.FlingAnimation;
+
 import com.gyso.treeview.TreeViewContainer;
+import com.gyso.treeview.listener.TreeViewTouchScaleListener;
 import com.gyso.treeview.util.TreeViewLog;
 import com.gyso.treeview.util.ViewBox;
 
@@ -38,11 +41,17 @@ public class TouchEventHandler {
     private FlingAnimation flingX = null;
     private ViewBox layoutLocationInParent = new ViewBox();
     private final ViewBox viewportBox = new ViewBox();
-    private PointF preFocusCenter  = new PointF();
+    private PointF preFocusCenter = new PointF();
     private PointF postFocusCenter = new PointF();
     private PointF preTranslate = new PointF();
     private float preScaleFactor = 1f;
     private final DynamicAnimation.OnAnimationUpdateListener flingAnimateListener;
+
+    private TreeViewTouchScaleListener touchScaleListener;
+
+    public void setTouchScaleListener(TreeViewTouchScaleListener touchScaleListener) {
+        this.touchScaleListener = touchScaleListener;
+    }
 
     public TouchEventHandler(Context context, View view) {
         this.mView = view;
@@ -50,49 +59,51 @@ public class TouchEventHandler {
         mGestureDetector = new GestureDetector(context,
                 new GestureDetector.SimpleOnGestureListener() {
                     @Override
-                   public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
                         flingX = new FlingAnimation(mView, DynamicAnimation.TRANSLATION_X);
                         flingX.setStartVelocity(velocityX)
-                               .addUpdateListener(flingAnimateListener)
-                               .start();
+                                .addUpdateListener(flingAnimateListener)
+                                .start();
 
                         flingY = new FlingAnimation(mView, DynamicAnimation.TRANSLATION_Y);
                         flingY.setStartVelocity(velocityY)
-                               .addUpdateListener(flingAnimateListener)
-                              .start();
+                                .addUpdateListener(flingAnimateListener)
+                                .start();
                         return false;
                     }
                 });
         ViewConfiguration vc = ViewConfiguration.get(view.getContext());
-        mTouchSlop = vc.getScaledTouchSlop()*0.8f;
+        mTouchSlop = vc.getScaledTouchSlop() * 0.8f;
     }
 
     /**
      * set window height and width
      * Note: this window means the viewport for show the tree view, and no the phone window
+     *
      * @param winHeight win height
-     * @param winWidth win width
+     * @param winWidth  win width
      */
-    public void setViewport(int winWidth, int winHeight){
-        viewportBox.setValues(0,0,winWidth,winHeight);
+    public void setViewport(int winWidth, int winHeight) {
+        viewportBox.setValues(0, 0, winWidth, winHeight);
     }
 
     /**
      * to detect whether should intercept the touch event
+     *
      * @param event event
      * @return true for intercept
      */
-    public boolean detectInterceptTouchEvent(MotionEvent event){
+    public boolean detectInterceptTouchEvent(MotionEvent event) {
         final int action = event.getAction() & MotionEvent.ACTION_MASK;
         onTouchEvent(event);
-        if (action == MotionEvent.ACTION_DOWN){
+        if (action == MotionEvent.ACTION_DOWN) {
             preInterceptTouchEvent = MotionEvent.obtain(event);
             mIsMoving = false;
         }
         if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
             mIsMoving = false;
         }
-        if(action == MotionEvent.ACTION_MOVE && mTouchSlop < calculateMoveDistance(event, preInterceptTouchEvent)){
+        if (action == MotionEvent.ACTION_MOVE && mTouchSlop < calculateMoveDistance(event, preInterceptTouchEvent)) {
             mIsMoving = true;
         }
         return mIsMoving;
@@ -100,24 +111,25 @@ public class TouchEventHandler {
 
     /**
      * handler the touch event, drag and scale
+     *
      * @param event touch event
      * @return true for has consume
      */
     public boolean onTouchEvent(MotionEvent event) {
         mGestureDetector.onTouchEvent(event);
         //Log.e(TAG, "onTouchEvent:"+event);
-        int action =  event.getAction() & MotionEvent.ACTION_MASK;
+        int action = event.getAction() & MotionEvent.ACTION_MASK;
         switch (action) {
             case MotionEvent.ACTION_DOWN:
                 mode = TOUCH_MODE_SINGLE;
                 preMovingTouchEvent = MotionEvent.obtain(event);
-                if(mView instanceof TreeViewContainer){
-                    minScale = ((TreeViewContainer)mView).getMinScale();
+                if (mView instanceof TreeViewContainer) {
+                    minScale = ((TreeViewContainer) mView).getMinScale();
                 }
-                if(flingX!=null){
+                if (flingX != null) {
                     flingX.cancel();
                 }
-                if(flingY!=null){
+                if (flingY != null) {
                     flingY.cancel();
                 }
                 break;
@@ -130,34 +142,37 @@ public class TouchEventHandler {
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
                 mode++;
-                if (mode >= TOUCH_MODE_DOUBLE){
+                if (mode >= TOUCH_MODE_DOUBLE) {
                     scaleFactor = preScaleFactor = mView.getScaleX();
-                    preTranslate.set( mView.getTranslationX(),mView.getTranslationY());
+                    preTranslate.set(mView.getTranslationX(), mView.getTranslationY());
                     scaleBaseR = (float) distanceBetweenFingers(event);
-                    centerPointBetweenFingers(event,preFocusCenter);
-                    centerPointBetweenFingers(event,postFocusCenter);
+                    centerPointBetweenFingers(event, preFocusCenter);
+                    centerPointBetweenFingers(event, postFocusCenter);
                 }
                 break;
 
             case MotionEvent.ACTION_MOVE:
                 if (mode >= TOUCH_MODE_DOUBLE) {
                     float scaleNewR = (float) distanceBetweenFingers(event);
-                    centerPointBetweenFingers(event,postFocusCenter);
-                    if (scaleBaseR <= 0){
+                    centerPointBetweenFingers(event, postFocusCenter);
+                    if (scaleBaseR <= 0) {
                         break;
                     }
                     scaleFactor = (scaleNewR / scaleBaseR) * preScaleFactor * 0.15f + scaleFactor * 0.85f;
                     if (scaleFactor >= MAX_SCALE) {
                         scaleFactor = MAX_SCALE;
-                    }else if (scaleFactor <= minScale) {
+                    } else if (scaleFactor <= minScale) {
                         scaleFactor = minScale;
+                    }
+                    if (touchScaleListener != null) {
+                        touchScaleListener.onTouchScale(scaleFactor);
                     }
                     mView.setPivotX(0);
                     mView.setPivotY(0);
                     mView.setScaleX(scaleFactor);
                     mView.setScaleY(scaleFactor);
-                    float tx = postFocusCenter.x-(preFocusCenter.x-preTranslate.x)*scaleFactor / preScaleFactor;
-                    float ty = postFocusCenter.y-(preFocusCenter.y-preTranslate.y)*scaleFactor / preScaleFactor;
+                    float tx = postFocusCenter.x - (preFocusCenter.x - preTranslate.x) * scaleFactor / preScaleFactor;
+                    float ty = postFocusCenter.y - (preFocusCenter.y - preTranslate.y) * scaleFactor / preScaleFactor;
                     mView.setTranslationX(tx);
                     mView.setTranslationY(ty);
                     keepWithinBoundaries();
@@ -168,7 +183,7 @@ public class TouchEventHandler {
                 }
                 break;
             case MotionEvent.ACTION_OUTSIDE:
-                TreeViewLog.e(TAG, "onTouchEvent: touch out side" );
+                TreeViewLog.e(TAG, "onTouchEvent: touch out side");
                 break;
         }
         preMovingTouchEvent = MotionEvent.obtain(event);
@@ -178,17 +193,18 @@ public class TouchEventHandler {
     /**
      * calculate move distance between two events
      */
-   private float calculateMoveDistance(MotionEvent event1 , MotionEvent event2){
-       if (event1==null || event2==null){
-           return 0f;
-       }
-       float disX = Math.abs(event1.getRawX() - event2.getRawX());
-       float disY = Math.abs(event1.getRawX() - event2.getRawX());
-       return (float) Math.sqrt(disX * disX + disY * disY);
+    private float calculateMoveDistance(MotionEvent event1, MotionEvent event2) {
+        if (event1 == null || event2 == null) {
+            return 0f;
+        }
+        float disX = Math.abs(event1.getRawX() - event2.getRawX());
+        float disY = Math.abs(event1.getRawX() - event2.getRawX());
+        return (float) Math.sqrt(disX * disX + disY * disY);
     }
 
     /**
      * moving by single point, means that translate
+     *
      * @param deltaX dx
      * @param deltaY dy
      */
@@ -229,21 +245,23 @@ public class TouchEventHandler {
      * calculate the bound when moving
      * while add (dX,dY), the view to viewport
      */
-    private void calculateBound(){
+    private void calculateBound() {
         View v = mView;
-        float left = v.getLeft()*v.getScaleX()+v.getTranslationX();
-        float top = v.getTop()*v.getScaleY()+v.getTranslationY();
-        float right = v.getRight()*v.getScaleX()+v.getTranslationX();
-        float bottom = v.getBottom()*v.getScaleY()+v.getTranslationY();
-        layoutLocationInParent.setValues((int)top,(int)left,(int)right,(int)bottom);
+        float left = v.getLeft() * v.getScaleX() + v.getTranslationX();
+        float top = v.getTop() * v.getScaleY() + v.getTranslationY();
+        float right = v.getRight() * v.getScaleX() + v.getTranslationX();
+        float bottom = v.getBottom() * v.getScaleY() + v.getTranslationY();
+        layoutLocationInParent.setValues((int) top, (int) left, (int) right, (int) bottom);
     }
+
     /**
      * 计算两个手指之间的距离
+     *
      * @param event touch event
      * @return 两个手指之间的距离
      */
     private double distanceBetweenFingers(MotionEvent event) {
-        if (event.getPointerCount()>1){
+        if (event.getPointerCount() > 1) {
             float disX = Math.abs(event.getX(0) - event.getX(1));
             float disY = Math.abs(event.getY(0) - event.getY(1));
             return Math.sqrt(disX * disX + disY * disY);
@@ -261,6 +279,6 @@ public class TouchEventHandler {
         float yPoint0 = event.getY(0);
         float xPoint1 = event.getX(1);
         float yPoint1 = event.getY(1);
-        point.set((xPoint0 + xPoint1) / 2f,(yPoint0 + yPoint1) / 2f);
+        point.set((xPoint0 + xPoint1) / 2f, (yPoint0 + yPoint1) / 2f);
     }
 }
