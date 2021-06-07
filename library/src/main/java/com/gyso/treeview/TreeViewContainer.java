@@ -55,6 +55,8 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     private static final String TAG = TreeViewContainer.class.getSimpleName();
     public static final Object IS_EDIT_DRAGGING = new Object();
     public static final double DRAG_HIT_SLOP = 50;
+    public static final float Z_NOR = 0f;
+    public static final float Z_SELECT = 10f;
     public TreeModel<?> mTreeModel;
     private DrawInfo drawInfo;
     private TreeLayoutManager mTreeLayoutManager;
@@ -313,6 +315,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         TreeViewHolder<?> treeViewHolder = adapter.onCreateViewHolder(this, (NodeModel)node);
         adapter.onBindViewHolder((TreeViewHolder)treeViewHolder);
         View view = treeViewHolder.getView();
+        view.setElevation(Z_NOR);
         this.addView(view);
         view.setTag(R.id.item_holder,treeViewHolder);
         if(nodeViewMap !=null ){
@@ -327,6 +330,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
             TreeViewLog.d(TAG, "tryCaptureView: ");
             if(isEditMode){
                 child.setTag(R.id.edit_and_dragging,IS_EDIT_DRAGGING);
+                child.setElevation(Z_SELECT);
                 dragBlock = new DragBlock(child);
                 return true;
             }
@@ -372,12 +376,31 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         @Override
         public void onViewReleased(@NonNull  View releasedChild, float xvel, float yvel) {
             TreeViewLog.d(TAG, "onViewReleased: ");
+            Object fTag = releasedChild.getTag(R.id.the_hit_target);
+            boolean getHit = fTag != null;
+            if(getHit){
+                TreeViewHolder<?> targetHolder = getTreeViewHolder((NodeModel)fTag);
+                NodeModel<?> targetHolderNode = targetHolder.getNode();
+
+                TreeViewHolder<?> releasedChildHolder = (TreeViewHolder<?>)releasedChild.getTag(R.id.item_holder);
+                NodeModel<?> releasedChildHolderNode = releasedChildHolder.getNode();
+
+                if(releasedChildHolderNode.getParentNode()!=null){
+                    //mTreeModel.removeNode(releasedChildHolderNode.getParentNode(),releasedChildHolderNode);
+                }
+
+                //mTreeModel.addNode(targetHolderNode,releasedChildHolderNode);
+
+                requestLayout();
+            }
+            releasedChild.setElevation(Z_NOR);
             releasedChild.setTag(R.id.edit_and_dragging,null);
             releasedChild.setTag(R.id.the_hit_target, null);
             if(dragBlock!=null){
                 dragBlock.release();
                 dragBlock=null;
             }
+            invalidate();
         }
     };
 
@@ -428,15 +451,19 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         boolean getHit = fTag != null;
         if(getHit){
             //draw
+            double srcR = Math.hypot(view.getWidth(), view.getHeight());
             TreeViewHolder<?> holder = getTreeViewHolder((NodeModel)fTag);
-            TreeViewLog.d(TAG, "draw target : "+ holder.getNode().getValue());
             View targetView = holder.getView();
-            Rect rect = new Rect(targetView.getLeft(),targetView.getTop(),targetView.getRight(),targetView.getBottom());
+            double tarR = Math.hypot(targetView.getWidth(), targetView.getHeight());
+            double fR = Math.max(srcR, tarR) / 2;
+
             mPaint.reset();
-            mPaint.setColor(Color.RED);
+            mPaint.setColor(Color.parseColor("#4FF1286C"));
             mPaint.setStrokeWidth(20);
             mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-            drawInfo.getCanvas().drawRect(rect,mPaint);
+            PointF centerPoint = getCenterPoint(view);
+            drawInfo.getCanvas().drawCircle(centerPoint.x,centerPoint.y,(float)fR,mPaint);
+            PointPool.free(centerPoint);
         }
     }
 

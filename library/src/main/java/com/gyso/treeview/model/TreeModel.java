@@ -29,12 +29,17 @@ public class TreeModel<T> implements Serializable {
     private boolean finishTraversal = false;
     /**
      * add the node in some father node
+     * @param parent
+     * @param childNodes
      */
     @SafeVarargs
-    public final void addNode(NodeModel<T> parent, NodeModel<T>... childNodes) {
+    public final void addNode(NodeModel<?> parent, NodeModel<?>... childNodes) {
         if(parent!=null&&childNodes!=null && childNodes.length>0){
-            List<NodeModel<T>> nodeModels = Arrays.asList(childNodes);
-            parent.addChildNodes(nodeModels);
+            List<NodeModel<T>> nodeModels = new LinkedList<>();
+            for (int i = 0; i < childNodes.length; i++) {
+                nodeModels.add((NodeModel<T>)childNodes[i]);
+            }
+            ((NodeModel<T>)parent).addChildNodes(nodeModels);
             List<NodeModel<T>> floorList = getFloorList(nodeModels.get(0).floor);
             floorList.addAll(nodeModels);
         }
@@ -45,9 +50,9 @@ public class TreeModel<T> implements Serializable {
      * @param parent p node
      * @param childNode c node
      */
-    public void removeNode(NodeModel<T> parent, NodeModel<T> childNode) {
+    public void removeNode(NodeModel<?> parent, NodeModel<?> childNode) {
         if(parent!=null&&childNode!=null){
-            parent.removeChildNode(childNode);
+            ((NodeModel<T>)parent).removeChildNode((NodeModel<T>)childNode);
             List<NodeModel<T>> floorList = getFloorList(childNode.floor);
             floorList.remove(childNode);
         }
