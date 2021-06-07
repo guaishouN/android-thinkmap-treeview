@@ -143,7 +143,7 @@ public class NodeModel<T> implements Serializable {
     }
 
     public void removeChildNode(NodeModel<T> aChild){
-        if(childNodes.indexOf(aChild)>-1){
+        if(childNodes.contains(aChild)){
             NodeModel<T> tNodeModel = childNodes.get(childNodes.indexOf(aChild));
             if(tNodeModel!=null){
                 aChild.setFloor(tNodeModel.floor);

@@ -1,5 +1,7 @@
 package com.gyso.treeview.util;
 
+import android.view.View;
+
 public class ViewBox {
 
     public int top;
@@ -9,6 +11,20 @@ public class ViewBox {
 
     //node count
     public int nodeCount;
+
+    public ViewBox(){
+
+    }
+    public ViewBox(View view){
+        this(view.getTop(),view.getLeft(),view.getBottom(),view.getRight());
+    }
+
+    private ViewBox(int top, int left, int bottom, int right) {
+        this.top = top;
+        this.left = left;
+        this.right = right;
+        this.bottom = bottom;
+    }
 
     public void setValues(int top, int left, int right, int bottom) {
         this.top = top;

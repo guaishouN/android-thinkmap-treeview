@@ -9,5 +9,5 @@ import java.io.Serializable;
 
 public interface ITraversal<T> extends Serializable {
     void next(T next);
-    void finish();
+    default void finish(){}
 }

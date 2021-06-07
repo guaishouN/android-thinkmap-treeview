@@ -9,8 +9,6 @@ import androidx.annotation.Nullable;
 import com.gyso.treeview.adapter.TreeViewAdapter;
 import com.gyso.treeview.cache_pool.PointPool;
 import com.gyso.treeview.layout.TreeLayoutManager;
-import com.gyso.treeview.listener.TreeViewItemClick;
-import com.gyso.treeview.listener.TreeViewItemLongClick;
 import com.gyso.treeview.touch.TouchEventHandler;
 import com.gyso.treeview.util.TreeViewLog;
 
@@ -26,7 +24,8 @@ import com.gyso.treeview.util.TreeViewLog;
 public class GysoTreeView extends FrameLayout {
     public static final String TAG = GysoTreeView.class.getSimpleName();
     private final TreeViewContainer treeViewContainer;
-    private TouchEventHandler treeViewGestureHandler;
+    private final TouchEventHandler treeViewGestureHandler;
+    private boolean disallowIntercept = false;
     public GysoTreeView(@NonNull Context context) {
         this(context, null,0);
     }
@@ -45,15 +44,22 @@ public class GysoTreeView extends FrameLayout {
     }
 
     @Override
+    public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+        super.requestDisallowInterceptTouchEvent(disallowIntercept);
+        this.disallowIntercept = disallowIntercept;
+        TreeViewLog.e(TAG, "requestDisallowInterceptTouchEvent:"+disallowIntercept);
+    }
+
+    @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
         TreeViewLog.e(TAG, "onInterceptTouchEvent: "+MotionEvent.actionToString(event.getAction()));
-        return treeViewGestureHandler.detectInterceptTouchEvent(event) || super.onInterceptTouchEvent(event);
+        return (!disallowIntercept && treeViewGestureHandler.detectInterceptTouchEvent(event)) || super.onInterceptTouchEvent(event);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         TreeViewLog.e(TAG, "onTouchEvent: "+MotionEvent.actionToString(event.getAction()));
-        return treeViewGestureHandler.onTouchEvent(event);
+        return !disallowIntercept && treeViewGestureHandler.onTouchEvent(event);
     }
 
     @Override
@@ -77,12 +83,8 @@ public class GysoTreeView extends FrameLayout {
         treeViewContainer.focusMidLocation();
     }
 
-    public void setTreeViewItemClick(TreeViewItemClick treeViewItemClick) {
-        treeViewContainer.setTreeViewItemClick(treeViewItemClick);
-    }
-
-    public void setTreeViewItemLongClick(TreeViewItemLongClick treeViewItemLongClick) {
-        treeViewContainer.setTreeViewItemLongClick(treeViewItemLongClick);
+    public void setEditMode(boolean isEditMode) {
+        treeViewContainer.setEditMode(isEditMode);
     }
 
     @Override

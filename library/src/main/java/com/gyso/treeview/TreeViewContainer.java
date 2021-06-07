@@ -1,26 +1,42 @@
 package com.gyso.treeview;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PixelFormat;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.view.WindowManager;
+import android.widget.ImageView;
+
+import androidx.annotation.NonNull;
+import androidx.customview.widget.ViewDragHelper;
 
 import com.gyso.treeview.adapter.DrawInfo;
 import com.gyso.treeview.adapter.TreeViewAdapter;
 import com.gyso.treeview.adapter.TreeViewHolder;
+import com.gyso.treeview.cache_pool.PointPool;
 import com.gyso.treeview.layout.TreeLayoutManager;
 import com.gyso.treeview.line.BaseLine;
 import com.gyso.treeview.listener.TreeViewItemClick;
 import com.gyso.treeview.listener.TreeViewItemLongClick;
 import com.gyso.treeview.listener.TreeViewNotifier;
+import com.gyso.treeview.model.ITraversal;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
+import com.gyso.treeview.touch.DragBlock;
 import com.gyso.treeview.util.TreeViewLog;
 import com.gyso.treeview.util.ViewBox;
 
@@ -37,11 +53,11 @@ import java.util.Map;
 
 public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     private static final String TAG = TreeViewContainer.class.getSimpleName();
-    public  TreeModel<?> mTreeModel;
+    public static final Object IS_EDIT_DRAGGING = new Object();
+    public static final double DRAG_HIT_SLOP = 50;
+    public TreeModel<?> mTreeModel;
     private DrawInfo drawInfo;
     private TreeLayoutManager mTreeLayoutManager;
-    private TreeViewItemClick mTreeViewItemClick;
-    private TreeViewItemLongClick mTreeViewItemLongClick;
     private int viewWidth;
     private int viewHeight;
     private int winWidth;
@@ -53,19 +69,22 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     private Matrix centerMatrix;
     private TreeViewAdapter<?> adapter;
 
+    private boolean isEditMode;
+
+    private final ViewDragHelper dragHelper;
+
     public TreeViewContainer(Context context) {
         this(context, null, 0);
-        init();
     }
 
     public TreeViewContainer(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
-        init();
     }
 
     public TreeViewContainer(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
+        dragHelper = ViewDragHelper.create(this, dragCallback);
     }
 
     private void init() {
@@ -209,6 +228,21 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     }
 
     @Override
+    public boolean onInterceptTouchEvent(MotionEvent event) {
+        TreeViewLog.e(TAG, "onInterceptTouchEvent: "+MotionEvent.actionToString(event.getAction()));
+        return isEditMode && dragHelper.shouldInterceptTouchEvent(event);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        TreeViewLog.e(TAG, "onTouchEvent: "+MotionEvent.actionToString(event.getAction()));
+        if(isEditMode) {
+            dragHelper.processTouchEvent(event);
+        }
+        return isEditMode;
+    }
+
+    @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         viewWidth = w;
@@ -234,7 +268,14 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         LinkedList<? extends NodeModel<?>> childNodes = root.getChildNodes();
         for (NodeModel<?> node : childNodes) {
             drawInfo.setFromHolder(getTreeViewHolder(root));
-            drawInfo.setToHolder(getTreeViewHolder(node));
+            TreeViewHolder<?> toHolder = getTreeViewHolder(node);
+            drawInfo.setToHolder(toHolder);
+            drawDragBackGround(toHolder.getView());
+            if(isEditMode && toHolder.getView().getTag(R.id.edit_and_dragging)==IS_EDIT_DRAGGING){
+               //Is editing and dragging, so not draw line.
+                drawTreeLine(node);
+               continue;
+            }
             BaseLine adapterDrawLine = adapter.onDrawLine(drawInfo);
             if(adapterDrawLine!=null){
                 adapterDrawLine.draw(drawInfo);
@@ -272,33 +313,142 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         TreeViewHolder<?> treeViewHolder = adapter.onCreateViewHolder(this, (NodeModel)node);
         adapter.onBindViewHolder((TreeViewHolder)treeViewHolder);
         View view = treeViewHolder.getView();
-        //set the node click
-        view.setOnClickListener(this::performTreeItemClick);
-        view.setOnLongClickListener(this::preformTreeItemLongClick);
         this.addView(view);
+        view.setTag(R.id.item_holder,treeViewHolder);
         if(nodeViewMap !=null ){
             nodeViewMap.put(node,treeViewHolder);
         }
     }
 
-    public void setTreeViewItemClick(TreeViewItemClick treeViewItemClick) {
-        mTreeViewItemClick = treeViewItemClick;
-    }
-
-    public void setTreeViewItemLongClick(TreeViewItemLongClick treeViewItemLongClick) {
-        mTreeViewItemLongClick = treeViewItemLongClick;
-    }
-
-    private boolean preformTreeItemLongClick(View v) {
-        if (mTreeViewItemLongClick != null) {
-            mTreeViewItemLongClick.onLongClick(v);
+    private final ViewDragHelper.Callback dragCallback = new ViewDragHelper.Callback(){
+        private DragBlock dragBlock=null;
+        @Override
+        public boolean tryCaptureView(@NonNull View child, int pointerId) {
+            TreeViewLog.d(TAG, "tryCaptureView: ");
+            if(isEditMode){
+                child.setTag(R.id.edit_and_dragging,IS_EDIT_DRAGGING);
+                dragBlock = new DragBlock(child);
+                return true;
+            }
+            return false;
         }
-        return mTreeViewItemLongClick != null;
+
+        @Override
+        public int getViewHorizontalDragRange(@NonNull  View child) {
+            TreeViewLog.d(TAG, "getViewHorizontalDragRange: ");
+            return getWidth();
+        }
+
+        @Override
+        public int getViewVerticalDragRange(@NonNull  View child) {
+            TreeViewLog.d(TAG, "getViewVerticalDragRange: ");
+            return getHeight();
+        }
+
+        @Override
+        public int clampViewPositionHorizontal(@NonNull  View child, int left, int dx) {
+            TreeViewLog.d(TAG, "clampViewPositionHorizontal: ");
+            final int oldLeft = child.getLeft();
+            if(dragBlock!=null){
+                dragBlock.drag(dx,0);
+                estimateToHitTarget(child);
+                invalidate();
+            }
+            return oldLeft;
+        }
+
+        @Override
+        public int clampViewPositionVertical(@NonNull  View child, int top, int dy) {
+            TreeViewLog.d(TAG, "clampViewPositionVertical: ");
+            final int oldTop = child.getTop();
+            if(dragBlock!=null){
+                dragBlock.drag(0,dy);
+                estimateToHitTarget(child);
+                invalidate();
+            }
+            return oldTop;
+        }
+
+        @Override
+        public void onViewReleased(@NonNull  View releasedChild, float xvel, float yvel) {
+            TreeViewLog.d(TAG, "onViewReleased: ");
+            releasedChild.setTag(R.id.edit_and_dragging,null);
+            releasedChild.setTag(R.id.the_hit_target, null);
+            if(dragBlock!=null){
+                dragBlock.release();
+                dragBlock=null;
+            }
+        }
+    };
+
+    /**
+     * find the hit node
+     * @param srcView src view
+     */
+    private boolean estimateToHitTarget(View srcView) {
+        PointF src = getCenterPoint(srcView);
+        //hasHitOne
+        Object tag = srcView.getTag(R.id.the_hit_target);
+
+        if(tag instanceof NodeModel){
+            TreeViewHolder<?> holder = getTreeViewHolder((NodeModel)tag);
+            PointF opa = getCenterPoint(holder.getView());
+            double v = Math.hypot(opa.x - src.x, opa.y - src.y);
+            boolean keepHitting = DRAG_HIT_SLOP-v>0;
+            TreeViewLog.d(TAG, "keep hitting: "+keepHitting);
+            if(!keepHitting){
+                srcView.setTag(R.id.the_hit_target,null);
+            }
+            PointPool.free(opa);
+        }
+
+        if(srcView.getTag(R.id.the_hit_target)==null){
+            mTreeModel.doTraversalNodes((ITraversal<NodeModel<?>>) next -> {
+                TreeViewHolder<?> holder = getTreeViewHolder(next);
+                TreeViewLog.d(TAG, "try target : "+ holder.getNode().getValue());
+                PointF op = getCenterPoint(holder.getView());
+                double v = Math.hypot(op.x - src.x, op.y - src.y);
+                boolean hasHit = DRAG_HIT_SLOP-v>0;
+                if(hasHit && holder.getView()!=srcView){
+                    TreeViewLog.d(TAG, "hit target : "+ holder.getNode().getValue());
+                    mTreeModel.setFinishTraversal(true);
+                    srcView.setTag(R.id.the_hit_target, holder.getNode());
+                }
+                PointPool.free(op);
+            });
+        }
+
+        PointPool.free(src);
+
+        return srcView.getTag(R.id.the_hit_target)!=null;
     }
 
-    private void performTreeItemClick(View view) {
-        if (mTreeViewItemClick != null) {
-            mTreeViewItemClick.onItemClick(view);
+    private void drawDragBackGround(View view){
+        Object fTag = view.getTag(R.id.the_hit_target);
+        boolean getHit = fTag != null;
+        if(getHit){
+            //draw
+            TreeViewHolder<?> holder = getTreeViewHolder((NodeModel)fTag);
+            TreeViewLog.d(TAG, "draw target : "+ holder.getNode().getValue());
+            View targetView = holder.getView();
+            Rect rect = new Rect(targetView.getLeft(),targetView.getTop(),targetView.getRight(),targetView.getBottom());
+            mPaint.reset();
+            mPaint.setColor(Color.RED);
+            mPaint.setStrokeWidth(20);
+            mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+            drawInfo.getCanvas().drawRect(rect,mPaint);
+        }
+    }
+
+    private PointF getCenterPoint(View view){
+        return PointPool.obtain(view.getX()+view.getWidth()/2f, view.getY()+view.getHeight()/2f);
+    }
+
+    protected void setEditMode(boolean isEditMode) {
+        this.isEditMode = isEditMode;
+        ViewParent parent = getParent();
+        if (parent instanceof View) {
+            parent.requestDisallowInterceptTouchEvent(isEditMode);
         }
     }
 

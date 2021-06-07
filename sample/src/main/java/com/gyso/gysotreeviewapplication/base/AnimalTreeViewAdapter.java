@@ -28,6 +28,12 @@ import com.gyso.treeview.model.NodeModel;
  */
 public class AnimalTreeViewAdapter extends TreeViewAdapter<Animal> {
     private DashLine dashLine =  new DashLine(Color.parseColor("#F06292"),6);
+    private OnItemClickListener listener;
+
+    public void setOnItemListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
+
     @Override
     public TreeViewHolder<Animal> onCreateViewHolder(@NonNull ViewGroup viewGroup, NodeModel<Animal> node) {
         NodeBaseLayoutBinding nodeBinding = NodeBaseLayoutBinding.inflate(LayoutInflater.from(viewGroup.getContext()),viewGroup,false);
@@ -44,6 +50,11 @@ public class AnimalTreeViewAdapter extends TreeViewAdapter<Animal> {
         Animal animal = node.value;
         nameView.setText(animal.name);
         headView.setImageResource(animal.headId);
+        headView.setOnClickListener(v -> {
+            if(listener!=null){
+                listener.onItemClick(v);
+            }
+        });
     }
 
     @Override
@@ -59,5 +70,9 @@ public class AnimalTreeViewAdapter extends TreeViewAdapter<Animal> {
 //            }
 //        }
         return null;
+    }
+
+    public interface OnItemClickListener{
+        void onItemClick(View item);
     }
 }

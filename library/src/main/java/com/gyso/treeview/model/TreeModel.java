@@ -22,10 +22,11 @@ public class TreeModel<T> implements Serializable {
      */
     private NodeModel<T> rootNode;
     private SparseArray<LinkedList<NodeModel<T>>> arrayByFloor = new SparseArray<>(10);
-    private transient ITraversal<NodeModel<?>> ITraversal;
+    private transient ITraversal<NodeModel<?>> iTraversal;
     public TreeModel(NodeModel<T> rootNode) {
         this.rootNode = rootNode;
     }
+    private boolean finishTraversal = false;
     /**
      * add the node in some father node
      */
@@ -90,14 +91,17 @@ public class TreeModel<T> implements Serializable {
     /**
      *child nodes will ergodic in the last
      */
-    public void ergodicTreeByQueue() {
+    private void ergodicTreeByQueue() {
         Deque<NodeModel<T>> queue = new ArrayDeque<>();
         NodeModel<T> rootNode = getRootNode();
         queue.add(rootNode);
         while (!queue.isEmpty()) {
             rootNode = queue.poll();
-            if (ITraversal != null) {
-                ITraversal.next(rootNode);
+            if (iTraversal != null) {
+                iTraversal.next(rootNode);
+            }
+            if(this.finishTraversal){
+                break;
             }
             if(rootNode==null){
                 continue;
@@ -107,8 +111,9 @@ public class TreeModel<T> implements Serializable {
                 queue.addAll(childNodes);
             }
         }
-        if (ITraversal != null) {
-            ITraversal.finish();
+        if (iTraversal != null) {
+            iTraversal.finish();
+            this.finishTraversal = false;
         }
     }
 
@@ -124,12 +129,18 @@ public class TreeModel<T> implements Serializable {
         }
         return nodeModels;
     }
+
+    public void setFinishTraversal(boolean finishTraversal) {
+        this.finishTraversal = finishTraversal;
+    }
+
     /**
      * when ergodic this tree, it will call back on {@link ITraversal)}
      * @param ITraversal node
      */
     public void doTraversalNodes(ITraversal<NodeModel<?>> ITraversal) {
-        this.ITraversal = ITraversal;
+        this.iTraversal = ITraversal;
+        this.finishTraversal = false;
         ergodicTreeByQueue();
     }
 }

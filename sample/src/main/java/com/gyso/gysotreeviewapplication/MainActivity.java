@@ -1,19 +1,20 @@
 package com.gyso.gysotreeviewapplication;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 import com.gyso.gysotreeviewapplication.base.Animal;
 import com.gyso.gysotreeviewapplication.base.AnimalTreeViewAdapter;
 import com.gyso.gysotreeviewapplication.databinding.ActivityMainBinding;
-import com.gyso.treeview.layout.RightTreeLayoutManager;
 import com.gyso.treeview.layout.TreeLayoutManager;
 import com.gyso.treeview.layout.VerticalTreeLayoutManager;
 import com.gyso.treeview.line.AngledLine;
 import com.gyso.treeview.line.BaseLine;
-import com.gyso.treeview.line.SmoothLine;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
@@ -37,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
      *      3 view setting
      *
      *      4 nodes data setting
+     *
+     *      5 others
      */
     private void initWidgets() {
         //1 customs adapter
@@ -51,6 +54,14 @@ public class MainActivity extends AppCompatActivity {
 
         //4 nodes data setting
         setData(adapter);
+
+        final AtomicBoolean isEditMode = new AtomicBoolean(false);
+        //5 others
+        adapter.setOnItemListener(item -> {
+            isEditMode.set(!isEditMode.get());
+            binding.baseTreeView.setEditMode(isEditMode.get());
+            Toast.makeText(this,"editor "+isEditMode.get(),Toast.LENGTH_SHORT).show();
+        });
     }
 
     private TreeLayoutManager getTreeLayoutManager() {
