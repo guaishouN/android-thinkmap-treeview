@@ -116,7 +116,8 @@ public class MainActivity extends AppCompatActivity {
         treeModel.addNode(sub5,sub7,sub8);
         treeModel.addNode(sub6,sub9,sub10,sub11);
         treeModel.addNode(sub3,sub12,sub13);
-        treeModel.addNode(sub11,sub14,sub15,sub16);
+        treeModel.addNode(sub11,sub14,sub15);
+        treeModel.addNode(sub10,sub16);
         treeModel.addNode(sub8,sub17,sub18,sub19,sub20);
         //set data
         adapter.setTreeModel(treeModel);

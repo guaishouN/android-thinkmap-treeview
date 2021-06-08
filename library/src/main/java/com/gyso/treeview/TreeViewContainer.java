@@ -103,6 +103,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        TreeViewLog.e(TAG,"onMeasure");
         final int size = getChildCount();
         for (int i = 0; i < size; i++) {
             measureChild(getChildAt(i), widthMeasureSpec, heightMeasureSpec);
@@ -127,6 +128,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        TreeViewLog.e(TAG,"onLayout");
         if (mTreeLayoutManager != null && mTreeModel != null) {
             mTreeLayoutManager.performLayout(this);
             fixWindow();
@@ -386,12 +388,12 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
                 NodeModel<?> releasedChildHolderNode = releasedChildHolder.getNode();
 
                 if(releasedChildHolderNode.getParentNode()!=null){
-                    //mTreeModel.removeNode(releasedChildHolderNode.getParentNode(),releasedChildHolderNode);
+                    mTreeModel.removeNode(releasedChildHolderNode.getParentNode(),releasedChildHolderNode);
                 }
 
-                //mTreeModel.addNode(targetHolderNode,releasedChildHolderNode);
+                mTreeModel.addNode(targetHolderNode,releasedChildHolderNode);
 
-                requestLayout();
+                onDataSetChange();
             }
             releasedChild.setElevation(Z_NOR);
             releasedChild.setTag(R.id.edit_and_dragging,null);
@@ -505,7 +507,8 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         mTreeModel = adapter.getTreeModel();
         removeAllViews();
         if(mTreeModel!=null){
-            nodeViewMap = new HashMap<>(getChildCount());
+            nodeViewMap = nodeViewMap==null? new HashMap<>():nodeViewMap;
+            nodeViewMap.clear();
             addNoteViews();
             mTreeModel.calculateTreeNodesDeep();
         }

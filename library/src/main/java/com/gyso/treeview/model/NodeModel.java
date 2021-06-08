@@ -110,7 +110,7 @@ public class NodeModel<T> implements Serializable {
     /**
      * @param aChild node
      */
-    public boolean addChildNode(NodeModel<T> aChild){
+    private boolean addChildNode(NodeModel<T> aChild){
         boolean isExist = childNodes.contains(aChild);
         if(!isExist){
             aChild.setParentNode(this);
@@ -143,13 +143,22 @@ public class NodeModel<T> implements Serializable {
     }
 
     public void removeChildNode(NodeModel<T> aChild){
-        if(childNodes.contains(aChild)){
-            NodeModel<T> tNodeModel = childNodes.get(childNodes.indexOf(aChild));
-            if(tNodeModel!=null){
-                aChild.setFloor(tNodeModel.floor);
-            }
-        }
         childNodes.remove(aChild);
+
+        int removeCount = Math.max(1,aChild.leafCount);
+        leafCount -= removeCount;
+
+        NodeModel<T> parentNode = getParentNode();
+
+        while (parentNode!=null){
+            parentNode.leafCount -=removeCount;
+            //if current become a leaf
+            if(childNodes.isEmpty()){
+                parentNode.leafCount++;
+            }
+            parentNode = parentNode.getParentNode();
+        }
+        aChild.setParentNode(null);
     }
 
     public boolean isFocus() {

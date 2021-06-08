@@ -3,6 +3,8 @@ package com.gyso.treeview.model;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.gyso.treeview.util.TreeViewLog;
+
 import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.Arrays;
@@ -63,9 +65,17 @@ public class TreeModel<T> implements Serializable {
     }
 
     /**
+     * calculate the num of all tree nodes' leaf
+     */
+    public void calculateTreeNodesLeaves(){
+
+    }
+
+    /**
      * calculate the deep of all tree nodes
      */
     public void calculateTreeNodesDeep(){
+        TreeViewLog.e(TAG,"calculateTreeNodesDeep start");
         Stack<NodeModel<T>> stack = new Stack<>();
         NodeModel<T> rootNode = getRootNode();
         stack.add(rootNode);
@@ -85,12 +95,13 @@ public class TreeModel<T> implements Serializable {
                     cur.deep = parentNode.deep;
                 }
             }
-            Log.e(TAG,"calculateTreeNodesDeep--->"+cur.toString());
+            TreeViewLog.e(TAG,"calculateTreeNodesDeep--->"+cur.toString());
             LinkedList<NodeModel<T>> childNodes = cur.getChildNodes();
             for (int i = childNodes.size()-1; i >=0; i--) {
                 stack.add(childNodes.get(i));
             }
         }
+        TreeViewLog.e(TAG,"calculateTreeNodesDeep end");
     }
 
     /**
