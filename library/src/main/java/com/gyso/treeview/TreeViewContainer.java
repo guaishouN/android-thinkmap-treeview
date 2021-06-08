@@ -1,37 +1,29 @@
 package com.gyso.treeview;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PixelFormat;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.view.WindowManager;
-import android.widget.ImageView;
-
+import android.view.animation.Interpolator;
+import android.widget.OverScroller;
 import androidx.annotation.NonNull;
 import androidx.customview.widget.ViewDragHelper;
-
 import com.gyso.treeview.adapter.DrawInfo;
 import com.gyso.treeview.adapter.TreeViewAdapter;
 import com.gyso.treeview.adapter.TreeViewHolder;
 import com.gyso.treeview.cache_pool.PointPool;
 import com.gyso.treeview.layout.TreeLayoutManager;
 import com.gyso.treeview.line.BaseLine;
-import com.gyso.treeview.listener.TreeViewItemClick;
-import com.gyso.treeview.listener.TreeViewItemLongClick;
 import com.gyso.treeview.listener.TreeViewNotifier;
 import com.gyso.treeview.model.ITraversal;
 import com.gyso.treeview.model.NodeModel;
@@ -39,7 +31,6 @@ import com.gyso.treeview.model.TreeModel;
 import com.gyso.treeview.touch.DragBlock;
 import com.gyso.treeview.util.TreeViewLog;
 import com.gyso.treeview.util.ViewBox;
-
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
@@ -70,7 +61,17 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     private Path mPath;
     private Matrix centerMatrix;
     private TreeViewAdapter<?> adapter;
+    private DragBlock dragBlock=null;
 
+    /**
+     * Interpolator defining the animation curve for mScroller
+     */
+    private static final Interpolator sInterpolator = t -> {
+        t -= 1.0f;
+        return t * t * t * t * t + 1.0f;
+    };
+
+    private OverScroller mScroller;
     private boolean isEditMode;
 
     private final ViewDragHelper dragHelper;
@@ -87,6 +88,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         super(context, attrs, defStyleAttr);
         init();
         dragHelper = ViewDragHelper.create(this, dragCallback);
+        mScroller = new OverScroller(context, sInterpolator);
     }
 
     private void init() {
@@ -275,7 +277,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
             TreeViewHolder<?> toHolder = getTreeViewHolder(node);
             drawInfo.setToHolder(toHolder);
             drawDragBackGround(toHolder.getView());
-            if(isEditMode && toHolder.getView().getTag(R.id.edit_and_dragging)==IS_EDIT_DRAGGING){
+            if(isEditMode && toHolder.getView().getTag(R.id.edit_and_dragging) == IS_EDIT_DRAGGING){
                //Is editing and dragging, so not draw line.
                 drawTreeLine(node);
                continue;
@@ -326,7 +328,6 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     }
 
     private final ViewDragHelper.Callback dragCallback = new ViewDragHelper.Callback(){
-        private DragBlock dragBlock=null;
         @Override
         public boolean tryCaptureView(@NonNull View child, int pointerId) {
             TreeViewLog.d(TAG, "tryCaptureView: ");
@@ -386,25 +387,36 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
 
                 TreeViewHolder<?> releasedChildHolder = (TreeViewHolder<?>)releasedChild.getTag(R.id.item_holder);
                 NodeModel<?> releasedChildHolderNode = releasedChildHolder.getNode();
-
                 if(releasedChildHolderNode.getParentNode()!=null){
                     mTreeModel.removeNode(releasedChildHolderNode.getParentNode(),releasedChildHolderNode);
                 }
-
                 mTreeModel.addNode(targetHolderNode,releasedChildHolderNode);
-
                 onDataSetChange();
+                if(dragBlock!=null){
+                    dragBlock.release();
+                    dragBlock=null;
+                }
+            }else{
+                //recover
+                if(dragBlock!=null){
+                    dragBlock.smoothRecover(releasedChild,mScroller);
+                }
             }
+
             releasedChild.setElevation(Z_NOR);
             releasedChild.setTag(R.id.edit_and_dragging,null);
             releasedChild.setTag(R.id.the_hit_target, null);
-            if(dragBlock!=null){
-                dragBlock.release();
-                dragBlock=null;
-            }
             invalidate();
         }
     };
+
+    @Override
+    public void computeScroll() {
+        if(dragBlock!=null && mScroller.computeScrollOffset()){
+            dragBlock.computeScroll(mScroller);
+            invalidate();
+        }
+    }
 
     /**
      * find the hit node
