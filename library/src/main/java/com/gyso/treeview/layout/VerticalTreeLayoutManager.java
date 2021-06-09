@@ -134,17 +134,7 @@ public class VerticalTreeLayoutManager extends TreeLayoutManager {
     public void performLayout(final TreeViewContainer treeViewContainer) {
         final TreeModel<?> mTreeModel = treeViewContainer.getTreeModel();
         if (mTreeModel != null) {
-            mTreeModel.doTraversalNodes(new ITraversal<NodeModel<?>>() {
-                @Override
-                public void next(NodeModel<?> next) {
-                    layoutNodes(next, treeViewContainer);
-                }
-
-                @Override
-                public void finish() {
-
-                }
-            });
+            mTreeModel.doTraversalNodes((ITraversal<NodeModel<?>>) next -> layoutNodes(next, treeViewContainer));
         }
     }
 
@@ -167,16 +157,17 @@ public class VerticalTreeLayoutManager extends TreeLayoutManager {
         int currentWidth = currentNodeView.getMeasuredWidth();
         int currentHeight = currentNodeView.getMeasuredHeight();
 
+        int verticalCenterFix = Math.abs(currentWidth - deepMax.get(deep))/2;
+
         int deltaWidth = 0;
         if(leafCount>1){
-            deltaWidth = (deepStart.get(deep + leafCount) - deepStart.get(deep)-currentWidth)/2;
+            deltaWidth = (deepStart.get(deep + leafCount) - deepStart.get(deep)-currentWidth)/2-verticalCenterFix;
         }
 
         int top = floorStart.get(floor);
-        int left  = deepStart.get(deep)+deltaWidth;;
+        int left  = deepStart.get(deep)+verticalCenterFix+deltaWidth;
         int bottom = top+currentHeight;
         int right = left+currentWidth;
-
         currentNodeView.layout(left,top,right,bottom);
     }
 }

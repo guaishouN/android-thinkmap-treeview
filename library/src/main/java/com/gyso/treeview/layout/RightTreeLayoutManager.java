@@ -163,11 +163,14 @@ public class RightTreeLayoutManager extends TreeLayoutManager {
 
         int currentWidth = currentNodeView.getMeasuredWidth();
         int currentHeight = currentNodeView.getMeasuredHeight();
+        int horizonCenterFix = Math.abs(currentHeight - deepMax.get(deep))/2;
+
         int deltaHeight = 0;
         if(leafCount>1){
-            deltaHeight = (deepStart.get(deep + leafCount) - deepStart.get(deep)-currentHeight)/2;
+            deltaHeight = (deepStart.get(deep + leafCount) - deepStart.get(deep)-currentHeight)/2-horizonCenterFix;
         }
-        int top  = deepStart.get(deep)+deltaHeight;
+
+        int top  = deepStart.get(deep)+horizonCenterFix+deltaHeight;
         int left = floorStart.get(floor);
         int bottom = top+currentHeight;
         int right = left+currentWidth;

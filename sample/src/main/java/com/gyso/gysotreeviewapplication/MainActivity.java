@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.gyso.gysotreeviewapplication.base.Animal;
 import com.gyso.gysotreeviewapplication.base.AnimalTreeViewAdapter;
 import com.gyso.gysotreeviewapplication.databinding.ActivityMainBinding;
+import com.gyso.treeview.layout.RightTreeLayoutManager;
 import com.gyso.treeview.layout.TreeLayoutManager;
 import com.gyso.treeview.layout.VerticalTreeLayoutManager;
 import com.gyso.treeview.line.AngledLine;
@@ -68,8 +69,8 @@ public class MainActivity extends AppCompatActivity {
         int space_50dp = 50;
         int space_20dp = 20;
         BaseLine line = getLine();
-        //return new RightTreeLayoutManager(this,space_50dp,space_20dp,line);
-        return new VerticalTreeLayoutManager(this,space_50dp,space_20dp,line);
+        return new RightTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new VerticalTreeLayoutManager(this,space_50dp,space_20dp,line);
     }
 
     private BaseLine getLine() {
