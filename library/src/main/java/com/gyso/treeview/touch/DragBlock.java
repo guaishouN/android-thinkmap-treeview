@@ -1,8 +1,13 @@
 package com.gyso.treeview.touch;
 
 import android.graphics.PointF;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.SystemClock;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.view.animation.Interpolator;
 import android.widget.OverScroller;
 
 import com.gyso.treeview.R;
@@ -28,18 +33,34 @@ import java.util.Map;
  */
 public class DragBlock {
     private final List<View> tmp;
-    private TreeViewContainer container = null;
-    private Map<View, ViewBox> originPositionMap = new HashMap<>();
+    private volatile boolean isDragging;
+    private final TreeViewContainer container;
+    private final Map<View, ViewBox> originPositionMap;
+    private final OverScroller mScroller;
     private PointF prePointF = null;
-    public DragBlock(View view){
+    /**
+     * Interpolator defining the animation curve for mScroller
+     */
+    private static final Interpolator sInterpolator = t -> {
+        t -= 1.0f;
+        return t * t * t * t * t + 1.0f;
+    };
+
+    public DragBlock(TreeViewContainer parent){
         tmp = new ArrayList<>();
-        ViewParent parent = view.getParent();
-        if(parent instanceof TreeViewContainer){
-            container = (TreeViewContainer)parent;
+        container = parent;
+        this.mScroller = new OverScroller(container.getContext(), sInterpolator);
+        originPositionMap = new HashMap<>();
+    }
+
+    public boolean load(View view){
+        if(originPositionMap.isEmpty() && tmp.isEmpty()){
+            tmp.add(view);
+            originPositionMap.put(view,new ViewBox(view));
+            addItem(view);
+            return true;
         }
-        tmp.add(view);
-        originPositionMap.put(view,new ViewBox(view));
-        addItem(view);
+        return false;
     }
 
     private void addItem(View view){
@@ -57,6 +78,10 @@ public class DragBlock {
     }
 
     public void drag(int dx, int dy){
+        if(!mScroller.isFinished()){
+            return;
+        }
+        this.isDragging = true;
         for (int i = 0; i < tmp.size(); i++) {
             View view = tmp.get(i);
             view.offsetLeftAndRight(dx);
@@ -64,36 +89,49 @@ public class DragBlock {
         }
     }
 
-    public void release(){
-        container = null;
-        originPositionMap.clear();
-        PointPool.free(prePointF);
-        tmp.clear();
-        System.gc();
+    public void setDragging(boolean dragging) {
+        isDragging = dragging;
     }
 
-    public void smoothRecover(View referenceView, OverScroller mScroller) {
+    private void autoRelease(){
+        if(mScroller.isFinished() && !isDragging){
+            originPositionMap.clear();
+            tmp.clear();
+            System.gc();
+        }
+    }
+
+    public void smoothRecover(View referenceView) {
+        if(!mScroller.isFinished()){
+            return;
+        }
         ViewBox rBox = originPositionMap.get(referenceView);
+        if(rBox ==null){
+            return;
+        }
         prePointF=PointPool.obtain(0f,0f);
         mScroller.startScroll(0,0,referenceView.getLeft()-rBox.left,referenceView.getTop()-rBox.top);
     }
 
-    public void computeScroll(OverScroller mScroller) {
-        if(mScroller.isFinished()){
-            return;
+    public boolean computeScroll() {
+        boolean isSuc = mScroller.computeScrollOffset();
+        if(isSuc){
+            PointF curPointF = PointPool.obtain(mScroller.getCurrX(), mScroller.getCurrY());
+            mScroller.getCurrY();
+            for (int i = 0; i < tmp.size(); i++) {
+                View view = tmp.get(i);
+                int dx = (int)(curPointF.x-prePointF.x);
+                int dy = (int)(curPointF.y-prePointF.y);
+                view.offsetLeftAndRight(-dx);
+                view.offsetTopAndBottom(-dy);
+            }
+            if(prePointF!=null){
+                prePointF.set(curPointF);
+            }
+            PointPool.free(curPointF);
+            return true;
         }
-        PointF curPointF = PointPool.obtain(mScroller.getCurrX(), mScroller.getCurrY());
-        mScroller.getCurrY();
-        for (int i = 0; i < tmp.size(); i++) {
-            View view = tmp.get(i);
-            int dx = (int)(curPointF.x-prePointF.x);
-            int dy = (int)(curPointF.y-prePointF.y);
-            view.offsetLeftAndRight(-dx);
-            view.offsetTopAndBottom(-dy);
-        }
-        if(prePointF!=null){
-            prePointF.set(curPointF);
-        }
-        PointPool.free(curPointF);
+        autoRelease();
+        return false;
     }
 }

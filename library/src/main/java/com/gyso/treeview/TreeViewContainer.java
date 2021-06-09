@@ -14,8 +14,7 @@ import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.view.animation.Interpolator;
-import android.widget.OverScroller;
+
 import androidx.annotation.NonNull;
 import androidx.customview.widget.ViewDragHelper;
 import com.gyso.treeview.adapter.DrawInfo;
@@ -61,19 +60,8 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     private Path mPath;
     private Matrix centerMatrix;
     private TreeViewAdapter<?> adapter;
-    private DragBlock dragBlock=null;
-
-    /**
-     * Interpolator defining the animation curve for mScroller
-     */
-    private static final Interpolator sInterpolator = t -> {
-        t -= 1.0f;
-        return t * t * t * t * t + 1.0f;
-    };
-
-    private OverScroller mScroller;
+    private final DragBlock dragBlock;
     private boolean isEditMode;
-
     private final ViewDragHelper dragHelper;
 
     public TreeViewContainer(Context context) {
@@ -87,8 +75,8 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     public TreeViewContainer(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
+        dragBlock = new DragBlock(this);
         dragHelper = ViewDragHelper.create(this, dragCallback);
-        mScroller = new OverScroller(context, sInterpolator);
     }
 
     private void init() {
@@ -331,10 +319,9 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         @Override
         public boolean tryCaptureView(@NonNull View child, int pointerId) {
             TreeViewLog.d(TAG, "tryCaptureView: ");
-            if(isEditMode){
+            if(isEditMode && dragBlock.load(child)){
                 child.setTag(R.id.edit_and_dragging,IS_EDIT_DRAGGING);
                 child.setElevation(Z_SELECT);
-                dragBlock = new DragBlock(child);
                 return true;
             }
             return false;
@@ -343,24 +330,22 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         @Override
         public int getViewHorizontalDragRange(@NonNull  View child) {
             TreeViewLog.d(TAG, "getViewHorizontalDragRange: ");
-            return getWidth();
+            return Integer.MAX_VALUE;
         }
 
         @Override
         public int getViewVerticalDragRange(@NonNull  View child) {
             TreeViewLog.d(TAG, "getViewVerticalDragRange: ");
-            return getHeight();
+            return Integer.MAX_VALUE;
         }
 
         @Override
         public int clampViewPositionHorizontal(@NonNull  View child, int left, int dx) {
             TreeViewLog.d(TAG, "clampViewPositionHorizontal: ");
             final int oldLeft = child.getLeft();
-            if(dragBlock!=null){
-                dragBlock.drag(dx,0);
-                estimateToHitTarget(child);
-                invalidate();
-            }
+            dragBlock.drag(dx,0);
+            estimateToHitTarget(child);
+            invalidate();
             return oldLeft;
         }
 
@@ -368,11 +353,9 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         public int clampViewPositionVertical(@NonNull  View child, int top, int dy) {
             TreeViewLog.d(TAG, "clampViewPositionVertical: ");
             final int oldTop = child.getTop();
-            if(dragBlock!=null){
-                dragBlock.drag(0,dy);
-                estimateToHitTarget(child);
-                invalidate();
-            }
+            dragBlock.drag(0,dy);
+            estimateToHitTarget(child);
+            invalidate();
             return oldTop;
         }
 
@@ -392,17 +375,11 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
                 }
                 mTreeModel.addNode(targetHolderNode,releasedChildHolderNode);
                 onDataSetChange();
-                if(dragBlock!=null){
-                    dragBlock.release();
-                    dragBlock=null;
-                }
             }else{
                 //recover
-                if(dragBlock!=null){
-                    dragBlock.smoothRecover(releasedChild,mScroller);
-                }
+                dragBlock.smoothRecover(releasedChild);
             }
-
+            dragBlock.setDragging(false);
             releasedChild.setElevation(Z_NOR);
             releasedChild.setTag(R.id.edit_and_dragging,null);
             releasedChild.setTag(R.id.the_hit_target, null);
@@ -412,8 +389,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
 
     @Override
     public void computeScroll() {
-        if(dragBlock!=null && mScroller.computeScrollOffset()){
-            dragBlock.computeScroll(mScroller);
+        if(dragBlock.computeScroll()){
             invalidate();
         }
     }
