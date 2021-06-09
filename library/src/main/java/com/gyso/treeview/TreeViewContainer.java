@@ -133,23 +133,26 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         float hr = 1f*viewHeight/winHeight;
         float wr = 1f*viewWidth/winWidth;
         scale = Math.max(hr, wr);
-        if(Math.abs(scale-1)>0.01f){
-            //setPivotX((winWidth*scale-viewWidth)/(2*(scale-1)));
-            //setPivotY((winHeight*scale-viewHeight)/(2*(scale-1)));
-            setPivotX(0);
-            setPivotY(0);
-            setScaleX(1f/scale);
-            setScaleY(1f/scale);
-            minScale = 1f/scale;
-            if (scale>1) {
-                setTranslationX((winWidth-(viewWidth/scale))/2f);
-                setTranslationY((winHeight-(viewHeight/scale))/2f);
+        minScale = 1f/scale;
+
+        //when first init
+        if(centerMatrix==null&&winWidth>0&&winHeight>0){
+            if(Math.abs(scale-1)>0.01f){
+                //setPivotX((winWidth*scale-viewWidth)/(2*(scale-1)));
+                //setPivotY((winHeight*scale-viewHeight)/(2*(scale-1)));
+                setPivotX(0);
+                setPivotY(0);
+                setScaleX(1f/scale);
+                setScaleY(1f/scale);
+                if (scale>1) {
+                    setTranslationX((winWidth-(viewWidth/scale))/2f);
+                    setTranslationY((winHeight-(viewHeight/scale))/2f);
+                }
             }
+            centerMatrix = new Matrix();
         }
 
-        //仅记录一次
-        if(centerMatrix==null&&winWidth>0&&winHeight>0){
-            centerMatrix = new Matrix();
+        if(centerMatrix!=null){
             centerMatrix.set(getMatrix());
             float[] centerM = new float[9];
             centerMatrix.getValues(centerM);
@@ -199,7 +202,8 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         TreeViewLog.e(TAG, "focusMidLocation: "+getMatrix());
         float[] centerM = new float[9];
         if(centerMatrix==null){
-            centerMatrix = new Matrix();
+            TreeViewLog.e(TAG, "no centerMatrix!!!");
+            return;
         }
         centerMatrix.getValues(centerM);
         float[] now = new float[9];
@@ -374,7 +378,8 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
                     mTreeModel.removeNode(releasedChildHolderNode.getParentNode(),releasedChildHolderNode);
                 }
                 mTreeModel.addNode(targetHolderNode,releasedChildHolderNode);
-                onDataSetChange();
+                mTreeModel.calculateTreeNodesDeep();
+                requestLayout();
             }else{
                 //recover
                 dragBlock.smoothRecover(releasedChild);
