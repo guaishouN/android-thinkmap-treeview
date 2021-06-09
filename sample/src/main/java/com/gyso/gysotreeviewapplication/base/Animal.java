@@ -18,9 +18,6 @@ public class Animal {
 
     @Override
     public String toString() {
-        return "Animal{" +
-                "headId=" + headId +
-                ", name='" + name + '\'' +
-                '}';
+        return "Animal["+name+"]";
     }
 }

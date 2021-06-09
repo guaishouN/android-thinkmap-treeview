@@ -79,12 +79,8 @@ public class GysoTreeView extends FrameLayout {
         treeViewContainer.setTreeLayoutManager(TreeLayoutManager);
     }
 
-    public void focusMidLocation(){
-        treeViewContainer.focusMidLocation();
-    }
-
-    public void setEditMode(boolean isEditMode) {
-        treeViewContainer.setEditMode(isEditMode);
+    public TreeViewEditor getEditor(){
+        return new TreeViewEditor(treeViewContainer);
     }
 
     @Override

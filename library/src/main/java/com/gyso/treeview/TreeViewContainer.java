@@ -1,5 +1,6 @@
 package com.gyso.treeview;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -57,11 +58,10 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     private float minScale = 1f;
     private Map<NodeModel<?>, TreeViewHolder<?>> nodeViewMap =null;
     private Paint mPaint;
-    private Path mPath;
     private Matrix centerMatrix;
     private TreeViewAdapter<?> adapter;
     private final DragBlock dragBlock;
-    private boolean isEditMode;
+    private boolean isDraggingNodeMode;
     private final ViewDragHelper dragHelper;
 
     public TreeViewContainer(Context context) {
@@ -84,7 +84,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         setClipToPadding(false);
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
-        mPath = new Path();
+        Path mPath = new Path();
         mPath.reset();
         drawInfo = new DrawInfo();
         drawInfo.setPaint(mPaint);
@@ -134,32 +134,29 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         float wr = 1f*viewWidth/winWidth;
         scale = Math.max(hr, wr);
         minScale = 1f/scale;
-
-        //when first init
-        if(centerMatrix==null&&winWidth>0&&winHeight>0){
-            if(Math.abs(scale-1)>0.01f){
-                //setPivotX((winWidth*scale-viewWidth)/(2*(scale-1)));
-                //setPivotY((winHeight*scale-viewHeight)/(2*(scale-1)));
-                setPivotX(0);
-                setPivotY(0);
-                setScaleX(1f/scale);
-                setScaleY(1f/scale);
-                if (scale>1) {
-                    setTranslationX((winWidth-(viewWidth/scale))/2f);
-                    setTranslationY((winHeight-(viewHeight/scale))/2f);
-                }
+        if(Math.abs(scale-1)>0.01f){
+            //setPivotX((winWidth*scale-viewWidth)/(2*(scale-1)));
+            //setPivotY((winHeight*scale-viewHeight)/(2*(scale-1)));
+            setPivotX(0);
+            setPivotY(0);
+            setScaleX(1f/scale);
+            setScaleY(1f/scale);
+            if (scale>1) {
+                setTranslationX((winWidth-(viewWidth/scale))/2f);
+                setTranslationY((winHeight-(viewHeight/scale))/2f);
             }
+        }
+        //when first init
+        if(centerMatrix==null){
             centerMatrix = new Matrix();
         }
 
-        if(centerMatrix!=null){
-            centerMatrix.set(getMatrix());
-            float[] centerM = new float[9];
-            centerMatrix.getValues(centerM);
-            centerM[2]=getX();
-            centerM[5]=getY();
-            centerMatrix.setValues(centerM);
-        }
+        centerMatrix.set(getMatrix());
+        float[] centerM = new float[9];
+        centerMatrix.getValues(centerM);
+        centerM[2]=getX();
+        centerM[5]=getY();
+        centerMatrix.setValues(centerM);
 
         //if child both w h is smaller than win than move to center
         int dx = (winWidth- mTreeLayoutManager.getTreeLayoutBox().getWidth())/2;
@@ -228,16 +225,17 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
         TreeViewLog.e(TAG, "onInterceptTouchEvent: "+MotionEvent.actionToString(event.getAction()));
-        return isEditMode && dragHelper.shouldInterceptTouchEvent(event);
+        return isDraggingNodeMode && dragHelper.shouldInterceptTouchEvent(event);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         TreeViewLog.e(TAG, "onTouchEvent: "+MotionEvent.actionToString(event.getAction()));
-        if(isEditMode) {
+        if(isDraggingNodeMode) {
             dragHelper.processTouchEvent(event);
         }
-        return isEditMode;
+        return isDraggingNodeMode;
     }
 
     @Override
@@ -269,7 +267,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
             TreeViewHolder<?> toHolder = getTreeViewHolder(node);
             drawInfo.setToHolder(toHolder);
             drawDragBackGround(toHolder.getView());
-            if(isEditMode && toHolder.getView().getTag(R.id.edit_and_dragging) == IS_EDIT_DRAGGING){
+            if(isDraggingNodeMode && toHolder.getView().getTag(R.id.edit_and_dragging) == IS_EDIT_DRAGGING){
                //Is editing and dragging, so not draw line.
                 drawTreeLine(node);
                continue;
@@ -323,7 +321,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         @Override
         public boolean tryCaptureView(@NonNull View child, int pointerId) {
             TreeViewLog.d(TAG, "tryCaptureView: ");
-            if(isEditMode && dragBlock.load(child)){
+            if(isDraggingNodeMode && dragBlock.load(child)){
                 child.setTag(R.id.edit_and_dragging,IS_EDIT_DRAGGING);
                 child.setElevation(Z_SELECT);
                 return true;
@@ -466,8 +464,8 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         return PointPool.obtain(view.getX()+view.getWidth()/2f, view.getY()+view.getHeight()/2f);
     }
 
-    protected void setEditMode(boolean isEditMode) {
-        this.isEditMode = isEditMode;
+    protected void requestMoveNodeByDragging(boolean isEditMode) {
+        this.isDraggingNodeMode = isEditMode;
         ViewParent parent = getParent();
         if (parent instanceof View) {
             parent.requestDisallowInterceptTouchEvent(isEditMode);

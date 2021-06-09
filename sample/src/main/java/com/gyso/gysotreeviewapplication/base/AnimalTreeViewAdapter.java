@@ -47,12 +47,12 @@ public class AnimalTreeViewAdapter extends TreeViewAdapter<Animal> {
         NodeModel<Animal> node = holder.getNode();
         TextView nameView = itemView.findViewById(R.id.name);
         ImageView headView = itemView.findViewById(R.id.portrait);
-        Animal animal = node.value;
+        final Animal animal = node.value;
         nameView.setText(animal.name);
         headView.setImageResource(animal.headId);
         headView.setOnClickListener(v -> {
             if(listener!=null){
-                listener.onItemClick(v);
+                listener.onItemClick(v,node);
             }
         });
     }
@@ -73,6 +73,6 @@ public class AnimalTreeViewAdapter extends TreeViewAdapter<Animal> {
     }
 
     public interface OnItemClickListener{
-        void onItemClick(View item);
+        void onItemClick(View item, NodeModel<Animal> node);
     }
 }
