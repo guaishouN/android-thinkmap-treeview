@@ -67,10 +67,9 @@ public class TreeViewEditor {
      * @param nodeToRemove node to remove
      */
     public void removeNode(NodeModel<?> nodeToRemove){
-        TreeViewAdapter<?> adapter = getAdapter();
-        if(adapter!=null){
-            adapter.getTreeModel().removeNode(nodeToRemove.getParentNode(),nodeToRemove);
-            adapter.notifyDataSetChange();
+        TreeViewContainer container = getContainer();
+        if(container!=null){
+            container.onRemoveNodes(nodeToRemove);
         }
     }
 }

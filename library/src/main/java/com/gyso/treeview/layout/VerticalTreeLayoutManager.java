@@ -169,5 +169,6 @@ public class VerticalTreeLayoutManager extends TreeLayoutManager {
         int bottom = top+currentHeight;
         int right = left+currentWidth;
         currentNodeView.layout(left,top,right,bottom);
+
     }
 }

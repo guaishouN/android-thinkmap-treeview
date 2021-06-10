@@ -2,6 +2,7 @@ package com.gyso.treeview.layout;
 
 import android.content.Context;
 import android.util.SparseIntArray;
+import android.view.View;
 
 import com.gyso.treeview.TreeViewContainer;
 import com.gyso.treeview.adapter.DrawInfo;
@@ -125,5 +126,13 @@ public abstract class TreeLayoutManager {
      */
     public void performDrawLine(DrawInfo drawInfo){
         baseline.draw(drawInfo);
+    }
+
+    /**
+     * when child node view is layout, your should call to record current location
+     * @param child
+     */
+    public void onChildNodeViewLayout(View child){
+
     }
 }

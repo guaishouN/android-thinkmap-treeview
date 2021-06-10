@@ -1,5 +1,6 @@
 package com.gyso.treeview;
 
+import android.animation.LayoutTransition;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -10,17 +11,21 @@ import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.TouchDelegate;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-
+import android.view.animation.Interpolator;
+import android.view.animation.PathInterpolator;
 import androidx.annotation.NonNull;
 import androidx.customview.widget.ViewDragHelper;
 import com.gyso.treeview.adapter.DrawInfo;
 import com.gyso.treeview.adapter.TreeViewAdapter;
 import com.gyso.treeview.adapter.TreeViewHolder;
+import com.gyso.treeview.cache_pool.HolderPool;
 import com.gyso.treeview.cache_pool.PointPool;
 import com.gyso.treeview.layout.TreeLayoutManager;
 import com.gyso.treeview.line.BaseLine;
@@ -29,6 +34,7 @@ import com.gyso.treeview.model.ITraversal;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
 import com.gyso.treeview.touch.DragBlock;
+import com.gyso.treeview.util.Interpolators;
 import com.gyso.treeview.util.TreeViewLog;
 import com.gyso.treeview.util.ViewBox;
 import java.util.ArrayDeque;
@@ -44,10 +50,12 @@ import java.util.Map;
 
 public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     private static final String TAG = TreeViewContainer.class.getSimpleName();
+    private static boolean isDebug = BuildConfig.isDebug;
     public static final Object IS_EDIT_DRAGGING = new Object();
-    public static final double DRAG_HIT_SLOP = 50;
+    public static final double DRAG_HIT_SLOP = 60;
     public static final float Z_NOR = 0f;
     public static final float Z_SELECT = 10f;
+    private static final int DEFAULT_DURATION = 2000;
     public TreeModel<?> mTreeModel;
     private DrawInfo drawInfo;
     private TreeLayoutManager mTreeLayoutManager;
@@ -63,6 +71,9 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     private final DragBlock dragBlock;
     private boolean isDraggingNodeMode;
     private final ViewDragHelper dragHelper;
+    private final SparseArray<HolderPool> holderPools = new SparseArray<>();
+    private final ViewConfiguration viewConf;
+    private LayoutTransition mLayoutTransition;
 
     public TreeViewContainer(Context context) {
         this(context, null, 0);
@@ -77,6 +88,8 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         init();
         dragBlock = new DragBlock(this);
         dragHelper = ViewDragHelper.create(this, dragCallback);
+        viewConf = ViewConfiguration.get(context);
+        TreeViewLog.e(TAG,"TreeViewContainer constructor");
     }
 
     private void init() {
@@ -89,6 +102,9 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         drawInfo = new DrawInfo();
         drawInfo.setPaint(mPaint);
         drawInfo.setPath(mPath);
+        if(isDebug){
+            setBackgroundColor(getResources().getColor(R.color.debug_container_color));
+        }
     }
 
     @Override
@@ -306,7 +322,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     }
 
     private void addNodeViewToGroup(NodeModel<?> node) {
-        TreeViewHolder<?> treeViewHolder = adapter.onCreateViewHolder(this, (NodeModel)node);
+        TreeViewHolder<?> treeViewHolder = createHolder(node);
         adapter.onBindViewHolder((TreeViewHolder)treeViewHolder);
         View view = treeViewHolder.getView();
         view.setElevation(Z_NOR);
@@ -503,6 +519,64 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
             addNoteViews();
             mTreeModel.calculateTreeNodesDeep();
         }
+    }
+
+    @SuppressLint("ObjectAnimatorBinding")
+    @Override
+    public void onVisibilityAggregated(boolean isVisible) {
+        super.onVisibilityAggregated(isVisible);
+        TreeViewLog.e(TAG,"onVisibilityAggregated");
+        if(mLayoutTransition==null){
+            mLayoutTransition = new LayoutTransition();
+            mLayoutTransition.setDuration(DEFAULT_DURATION);
+        }
+        setLayoutTransition(mLayoutTransition);
+    }
+
+    @Override
+    public void onRemoveNodes(NodeModel<?>... nodeModels) {
+        if(adapter!=null){
+            for (NodeModel<?> nodeToRemove : nodeModels) {
+                adapter.getTreeModel().removeNode(nodeToRemove.getParentNode(), nodeToRemove);
+            }
+            mTreeModel.calculateTreeNodesDeep();
+            for (NodeModel<?> nodeToRemove : nodeModels) {
+                nodeToRemove.selfTraverse(next -> {
+                    //remove view
+                    TreeViewHolder<?> holder = getTreeViewHolder(next);
+                    if(holder != null){
+                        removeView(holder.getView());
+                        recycleHolder(holder);
+                    }
+                });
+            }
+        }
+    }
+
+    private TreeViewHolder<?> createHolder(NodeModel<?> node) {
+        int type = adapter.getHolderType(node);
+        HolderPool holderPool = holderPools.get(type);
+        if(holderPool==null){
+            holderPool = new HolderPool();
+            holderPools.put(type,holderPool);
+        }else {
+            TreeViewHolder<?> holder = holderPool.obtain();
+            if(holder!=null){
+                holder.setNode(node);
+                return holder;
+            }
+        }
+        return adapter.onCreateViewHolder(this, (NodeModel)node);
+    }
+
+    private void recycleHolder(TreeViewHolder<?> holder){
+        int type = adapter.getHolderType(holder.getNode());
+        HolderPool holderPool = holderPools.get(type);
+        if(holderPool==null){
+            holderPool = new HolderPool();
+            holderPools.put(type,holderPool);
+        }
+        holderPool.free(holder);
     }
 
     @Override

@@ -10,7 +10,13 @@
         android:id="@+id/base_tree_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorBackground"/>
+        android:background="@color/colorBackground">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name">
+        </TextView>
+    </com.gyso.treeview.GysoTreeView>
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -15,8 +15,8 @@ import com.gyso.treeview.model.NodeModel;
  * View holder
  */
 public class TreeViewHolder<T> {
-    private final View view;
-    private final NodeModel<T> node;
+    private View view;
+    private NodeModel<T> node;
     public TreeViewHolder(View view, @NonNull NodeModel<T> node) {
         this.view = view;
         this.node = node;
@@ -28,5 +28,13 @@ public class TreeViewHolder<T> {
 
     public View getView() {
         return view;
+    }
+
+    public void setView(View view) {
+        this.view = view;
+    }
+
+    public void setNode(NodeModel<?> node) {
+        this.node = (NodeModel<T>)node;
     }
 }

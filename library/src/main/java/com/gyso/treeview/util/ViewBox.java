@@ -9,9 +9,6 @@ public class ViewBox {
     public int right;
     public int bottom;
 
-    //node count
-    public int nodeCount;
-
     public ViewBox(){
 
     }

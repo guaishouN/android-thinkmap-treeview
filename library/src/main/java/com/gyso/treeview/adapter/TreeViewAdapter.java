@@ -56,6 +56,14 @@ public abstract class TreeViewAdapter<T> {
      */
     public abstract BaseLine onDrawLine(DrawInfo drawInfo);
 
+    /**
+     * for recycling holder, exactly for recycling views
+     * @param node
+     * @return
+     */
+    public int getHolderType(NodeModel<?> node){
+        return 0;
+    }
 
     public void setNotifier(TreeViewNotifier notifier){
         this.notifier = notifier;

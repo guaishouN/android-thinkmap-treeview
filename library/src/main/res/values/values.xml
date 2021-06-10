@@ -3,4 +3,5 @@
     <item type="id" name="edit_and_dragging"/>
     <item type="id" name="item_holder"/>
     <item type="id" name="the_hit_target"/>
+    <color name="debug_container_color">#E1BEE7</color>
 </resources>

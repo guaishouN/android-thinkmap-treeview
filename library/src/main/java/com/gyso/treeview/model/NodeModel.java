@@ -128,7 +128,7 @@ public class NodeModel<T> implements Serializable {
      * traverse
      * @param node to deal node
      */
-    private void traverse(NodeModel<T> node, INext<T> next){
+    public void traverse(NodeModel<T> node, INext<T> next){
         if(node==null || next==null){
             return;
         }
@@ -140,6 +140,17 @@ public class NodeModel<T> implements Serializable {
             LinkedList<NodeModel<T>> childNodes = tmp.getChildNodes();
             stack.addAll(childNodes);
         }
+    }
+
+    /**
+     * traverse bys self
+     * @param next callback
+     */
+    public void selfTraverse(INext<T> next){
+        if(next==null){
+            return;
+        }
+        traverse(this,next);
     }
 
     public void removeChildNode(NodeModel<T> aChild){
@@ -185,7 +196,7 @@ public class NodeModel<T> implements Serializable {
         this.hidden = hidden;
     }
 
-    private interface INext<E>{
+    public interface INext<E>{
         void next(NodeModel<E> node);
     }
 
