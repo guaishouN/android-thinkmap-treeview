@@ -1,10 +1,20 @@
 # GysoTreeView
 
-【[中文](./README_CN.md)】【[英文](./README.md)】
+【[中文](./README_CN.md)】【[English](./README.md)】
 
 Tree View; Mind map; Think map; tree map; 树状图；思维导图；
 
 A custom tree view for Android,  designed for easy drawing some tree nodes (e.g. thind mind and tree nodes). Includes smoothly zoom, move, limit and center fix animation support, and allows easy extension so you can add your own child node's customs view and touch event detection.
+
+### Funtions
+
+- Smoothly zoom, move
+- Fix your window view port
+- Custom your subview for special node
+- Custom lines between nodes
+- Dynamic remove nodes
+- Dynamic add nodes
+- Drag to rebuild the nodes' relationship
 
 [Releases & downloads](https://github.com/guaishouN/android-tree-view.git)
 
@@ -23,7 +33,7 @@ public class Animal {
 }
 ```
 
-To use a tree view, you should do **4 steps** as follows:
+To use a tree view, you should do **5 steps** as follows:
 
 
 
@@ -82,7 +92,6 @@ To use a tree view, you should do **4 steps** as follows:
    ```
 
 4. nodes data setting
-
    ```java
    //Create a TreeModel by using a root node.
    NodeModel<Animal> node0 = new NodeModel<>(new Animal(R.drawable.ic_01,"root"));
@@ -105,8 +114,30 @@ To use a tree view, you should do **4 steps** as follows:
    //finally set this treeModel to the adapter
    adapter.setTreeModel(treeModel);
    ```
-
    
+5. If your want to edit your tree view, please use an editor.
+
+```java
+final TreeViewEditor editor = binding.baseTreeView.getEditor();
+
+//add nodes
+NodeModel<Animal> a = new NodeModel<>(new Animal(R.drawable.ic_13,"add-" + atomicInteger.getAndIncrement()));
+NodeModel<Animal> b = new NodeModel<>(new Animal(R.drawable.ic_10,"add-" + atomicInteger.getAndIncrement()));
+NodeModel<Animal> c = new NodeModel<>(new Animal(R.drawable.ic_11,"add-" + atomicInteger.getAndIncrement()));
+editor.addChildNodes(targetNode,a,b,c);
+
+//remove node
+editor.removeNode(toRemoveNode);
+
+//view center in window viewport
+editor.focusMidLocation()
+    
+//drag to move and build new relationship
+editor.requestMoveNodeByDragging(isChecked);
+```
+
+
+
 
 #### Notes & limitations
 

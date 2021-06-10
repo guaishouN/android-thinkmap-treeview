@@ -1,10 +1,28 @@
 # GysoTreeView
 
-【[中文](./README_CN.md)】【[英文](./README.md)】
+【[中文](./README_CN.md)】【[English](./README.md)】
 
 Tree View; Mind map; Think map; tree map; 树状图；思维导图；
 
-目前没发现比较好的Android树状图开源控件，于是决定自己写一个开源控件，对比了一下市面上关于思维导图或者树状图显示（如xMind，mind master等）的app，本文开源框架并不逊色。本控件实现了丝滑的放缩、移动、自动动画回归屏幕中心、子节点布局自定义等优点。
+目前没发现比较好的Android树状图开源控件，于是决定自己写一个开源控件，对比了一下市面上关于思维导图或者树状图显示（如xMind，mind master等）的app，本文开源框架并不逊色。
+
+### 特点
+
+- 丝滑的跟随手指放缩，拖动，及惯性滑动
+
+- 自动动画回归屏幕中心
+
+- 支持子节点复杂布局自定义，并且节点布局点击事件与滑动不冲突
+
+- 节点间的连接线自定义
+
+- 可删除动态节点
+
+- 可动态添加节点
+
+- 支持拖动调整节点关系
+
+  
 
 [github控件连接](https://github.com/guaishouN/android-tree-view.git)
 
@@ -103,6 +121,29 @@ treeModel.add(node2, node5);
 //finally set this treeModel to the adapter
 adapter.setTreeModel(treeModel);
 ```
+
+5 如果你想编辑这个树状图
+
+```java
+final TreeViewEditor editor = binding.baseTreeView.getEditor();
+
+//add nodes
+NodeModel<Animal> a = new NodeModel<>(new Animal(R.drawable.ic_13,"add-" + atomicInteger.getAndIncrement()));
+NodeModel<Animal> b = new NodeModel<>(new Animal(R.drawable.ic_10,"add-" + atomicInteger.getAndIncrement()));
+NodeModel<Animal> c = new NodeModel<>(new Animal(R.drawable.ic_11,"add-" + atomicInteger.getAndIncrement()));
+editor.addChildNodes(targetNode,a,b,c);
+
+//remove node
+editor.removeNode(toRemoveNode);
+
+//view center in window viewport
+editor.focusMidLocation()
+    
+//drag to move and build new relationship
+editor.requestMoveNodeByDragging(isChecked);
+```
+
+
 
 #### 写在最后
 
