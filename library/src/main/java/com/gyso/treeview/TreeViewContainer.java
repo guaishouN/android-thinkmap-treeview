@@ -55,7 +55,8 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     public static final double DRAG_HIT_SLOP = 60;
     public static final float Z_NOR = 0f;
     public static final float Z_SELECT = 10f;
-    private static final int DEFAULT_DURATION = 2000;
+    public static final int DEFAULT_FOCUS_DURATION = 2000;
+
     public TreeModel<?> mTreeModel;
     private DrawInfo drawInfo;
     private TreeLayoutManager mTreeLayoutManager;
@@ -137,7 +138,6 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         TreeViewLog.e(TAG,"onLayout");
         if (mTreeLayoutManager != null && mTreeModel != null) {
             mTreeLayoutManager.performLayout(this);
-            fixWindow();
         }
     }
 
@@ -225,11 +225,11 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
                 + Arrays.toString(centerM)+"\n"
                 + Arrays.toString(now));
         if(now[0]>0&&now[4]>0){
-            animate().scaleX(centerM[0]).
-                    translationX(centerM[2])
-                    .scaleY(centerM[4]).
-                    translationY(centerM[5])
-                    .setDuration(500)
+            animate().scaleX(centerM[0])
+                    .translationX(centerM[2])
+                    .scaleY(centerM[4])
+                    .translationY(centerM[5])
+                    .setDuration(DEFAULT_FOCUS_DURATION)
                     .start();
         }
     }
@@ -257,10 +257,12 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
+        TreeViewLog.e(TAG,"onSizeChanged w["+w+"]h["+h+"]oldw["+oldw+"]oldh["+oldh+"]");
         viewWidth = w;
         viewHeight = h;
         drawInfo.setWindowWidth(w);
         drawInfo.setWindowHeight(h);
+        fixWindow();
     }
 
     @Override
@@ -521,21 +523,24 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         }
     }
 
-    @SuppressLint("ObjectAnimatorBinding")
     @Override
-    public void onVisibilityAggregated(boolean isVisible) {
-        super.onVisibilityAggregated(isVisible);
-        TreeViewLog.e(TAG,"onVisibilityAggregated");
-        if(mLayoutTransition==null){
-            mLayoutTransition = new LayoutTransition();
-            mLayoutTransition.setDuration(DEFAULT_DURATION);
+    public void onAddNodes(NodeModel<?> parent, NodeModel<?>... childNodes) {
+        if(adapter!=null){
+            recordAnchorLocationOnViewPort(false, parent);
+            mTreeModel.addNode(parent,childNodes);
+            mTreeModel.calculateTreeNodesDeep();
+            parent.selfTraverse(node->{
+                if(node!=parent){
+                    addNodeViewToGroup(node);
+                }
+            });
         }
-        setLayoutTransition(mLayoutTransition);
     }
 
     @Override
     public void onRemoveNodes(NodeModel<?>... nodeModels) {
         if(adapter!=null){
+            recordAnchorLocationOnViewPort(true, nodeModels);
             for (NodeModel<?> nodeToRemove : nodeModels) {
                 adapter.getTreeModel().removeNode(nodeToRemove.getParentNode(), nodeToRemove);
             }
@@ -549,6 +554,47 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
                         recycleHolder(holder);
                     }
                 });
+            }
+        }
+    }
+
+    /**
+     * Prepare moving, adding or removing nodes, record the last one node as an anchor node on view port, so that make it looks smooth change
+     * Note:
+     *     The last one will been choose as target node.
+     *
+     *  @param nodeModels nodes[nodes.length-1] as the target one
+     */
+    private void recordAnchorLocationOnViewPort(boolean isRemove, NodeModel<?>... nodeModels) {
+        if(nodeModels==null || nodeModels.length==0){
+            return;
+        }
+        NodeModel<?> targetNode = nodeModels[nodeModels.length-1];
+        if(targetNode!=null && isRemove){
+            //if remove, parent will be the target node
+            targetNode = targetNode.getParentNode();
+        }
+        if(targetNode!=null){
+            setTag(R.id.target_node,targetNode);
+            TreeViewHolder<?> targetHolder = getTreeViewHolder(targetNode);
+            if(targetHolder!=null){
+                View targetHolderView = targetHolder.getView();
+                ViewBox targetBox = ViewBox.getViewBox(targetHolderView);
+                //get target location on view port
+                ViewBox targetBoxOnViewport = targetBox.convert(getMatrix());
+                setTag(R.id.target_location_on_viewport,targetBoxOnViewport);
+
+                //The relative locations of other nodes
+                Map<NodeModel<?>,ViewBox> relativeLocationMap = new HashMap<>();
+                mTreeModel.doTraversalNodes(node->{
+                    TreeViewHolder<?> oneHolder = getTreeViewHolder(node);
+                    ViewBox relativeBox =
+                            oneHolder!=null?
+                            ViewBox.getViewBox(oneHolder.getView()).subtract(targetBox):
+                            new ViewBox();
+                    relativeLocationMap.put(node,relativeBox);
+                });
+                setTag(R.id.relative_locations,relativeLocationMap);
             }
         }
     }

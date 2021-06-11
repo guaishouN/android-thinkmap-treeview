@@ -14,4 +14,5 @@ public interface TreeViewNotifier{
     void onDataSetChange();
     void onRemoveNodes(NodeModel<?>... nodeModel);
     void onItemViewChange(NodeModel<?> nodeModel);
+    void onAddNodes(NodeModel<?> parent, NodeModel<?>... childNodes);
 }

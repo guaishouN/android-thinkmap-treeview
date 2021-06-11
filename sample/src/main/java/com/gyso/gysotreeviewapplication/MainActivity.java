@@ -88,8 +88,10 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this,"Ohs, your targetNode is null", Toast.LENGTH_SHORT).show();
                 return;
             }
+            NodeModel<Animal> a = new NodeModel<>(new Animal(R.drawable.ic_10,"add-" + atomicInteger.getAndIncrement()));
             NodeModel<Animal> b = new NodeModel<>(new Animal(R.drawable.ic_10,"add-" + atomicInteger.getAndIncrement()));
-            editor.addChildNodes(targetNode,b);
+            NodeModel<Animal> c = new NodeModel<>(new Animal(R.drawable.ic_10,"add-" + atomicInteger.getAndIncrement()));
+            editor.addChildNodes(targetNode,b,a,c);
 
 
             //add to remove demo cache

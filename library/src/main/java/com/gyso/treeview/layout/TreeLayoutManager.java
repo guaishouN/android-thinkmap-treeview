@@ -128,11 +128,4 @@ public abstract class TreeLayoutManager {
         baseline.draw(drawInfo);
     }
 
-    /**
-     * when child node view is layout, your should call to record current location
-     * @param child
-     */
-    public void onChildNodeViewLayout(View child){
-
-    }
 }
