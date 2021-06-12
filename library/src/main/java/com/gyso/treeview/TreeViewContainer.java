@@ -395,6 +395,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
                 }
                 mTreeModel.addNode(targetHolderNode,releasedChildHolderNode);
                 mTreeModel.calculateTreeNodesDeep();
+                recordAnchorLocationOnViewPort(false,targetHolderNode);
                 requestLayout();
             }else{
                 //recover
@@ -529,11 +530,9 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
             recordAnchorLocationOnViewPort(false, parent);
             mTreeModel.addNode(parent,childNodes);
             mTreeModel.calculateTreeNodesDeep();
-            parent.selfTraverse(node->{
-                if(node!=parent){
-                    addNodeViewToGroup(node);
-                }
-            });
+            for (NodeModel<?> node:childNodes) {
+                addNodeViewToGroup(node);
+            }
         }
     }
 
