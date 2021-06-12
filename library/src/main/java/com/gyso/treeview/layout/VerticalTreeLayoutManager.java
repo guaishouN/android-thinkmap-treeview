@@ -271,13 +271,29 @@ public class VerticalTreeLayoutManager extends TreeLayoutManager {
         int bottom = top+currentHeight;
         int right = left+currentWidth;
 
-        Object tag = treeViewContainer.getTag(R.id.target_node);
-        if(tag instanceof NodeModel){
+        Object targetNodeTag = treeViewContainer.getTag(R.id.target_node);
+        if(targetNodeTag instanceof NodeModel){
             ViewBox finalLocation = new ViewBox(top, left, bottom, right);
             currentNodeView.setTag(R.id.node_final_location, finalLocation);
-            if(tag.equals(currentNode)){
-                treeViewContainer.setTag(R.id.target_node_final_location, finalLocation);
+            if(targetNodeTag.equals(currentNode)){
                 TreeViewLog.e(TAG,"Get target location!");
+                treeViewContainer.setTag(R.id.target_node_final_location, finalLocation);
+                Object targetLocationOnViewPortTag =treeViewContainer.getTag(R.id.target_location_on_viewport);
+                if(targetLocationOnViewPortTag instanceof ViewBox){
+                    ViewBox targetLocationOnViewPort=(ViewBox)targetLocationOnViewPortTag;
+                    //finalLocation*M=targetLocationOnViewPort
+                    //scale
+                    float scale = targetLocationOnViewPort.getWidth() * 1f / finalLocation.getWidth();
+                    treeViewContainer.setPivotX(0);
+                    treeViewContainer.setPivotY(0);
+                    treeViewContainer.setScaleX(scale);
+                    treeViewContainer.setScaleY(scale);
+                    //translate
+                    float dx = targetLocationOnViewPort.left-finalLocation.left*scale;
+                    float dy = targetLocationOnViewPort.top-finalLocation.top*scale;
+                    treeViewContainer.setTranslationX(dx);
+                    treeViewContainer.setTranslationY(dy);
+                }
             }
         }
         else{

@@ -74,7 +74,6 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     private final ViewDragHelper dragHelper;
     private final SparseArray<HolderPool> holderPools = new SparseArray<>();
     private final ViewConfiguration viewConf;
-    private LayoutTransition mLayoutTransition;
 
     public TreeViewContainer(Context context) {
         this(context, null, 0);
@@ -157,35 +156,12 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
             setPivotY(0);
             setScaleX(1f/scale);
             setScaleY(1f/scale);
-            if (scale>1) {
-                setTranslationX((winWidth-(viewWidth/scale))/2f);
-                setTranslationY((winHeight-(viewHeight/scale))/2f);
-            }
         }
         //when first init
         if(centerMatrix==null){
             centerMatrix = new Matrix();
         }
-
         centerMatrix.set(getMatrix());
-        float[] centerM = new float[9];
-        centerMatrix.getValues(centerM);
-        centerM[2]=getX();
-        centerM[5]=getY();
-        centerMatrix.setValues(centerM);
-
-        //if child both w h is smaller than win than move to center
-        int dx = (winWidth- mTreeLayoutManager.getTreeLayoutBox().getWidth())/2;
-        int dy = (winHeight- mTreeLayoutManager.getTreeLayoutBox().getHeight())/2;
-        if(dx>0 || dy>0){
-            dx = Math.max(dx, 0);
-            dy = Math.max(dy, 0);
-            final int size = getChildCount();
-            for (int i = 0; i < size; i++) {
-                View child = getChildAt(i);
-                child.layout(child.getLeft()+dx,child.getTop()+dy,child.getRight()+dx,child.getBottom()+dy);
-            }
-        }
         setTouchDelegate();
     }
 
@@ -574,13 +550,14 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
             targetNode = targetNode.getParentNode();
         }
         if(targetNode!=null){
-            setTag(R.id.target_node,targetNode);
             TreeViewHolder<?> targetHolder = getTreeViewHolder(targetNode);
             if(targetHolder!=null){
                 View targetHolderView = targetHolder.getView();
                 ViewBox targetBox = ViewBox.getViewBox(targetHolderView);
                 //get target location on view port
                 ViewBox targetBoxOnViewport = targetBox.convert(getMatrix());
+
+                setTag(R.id.target_node,targetNode);
                 setTag(R.id.target_location_on_viewport,targetBoxOnViewport);
 
                 //The relative locations of other nodes
