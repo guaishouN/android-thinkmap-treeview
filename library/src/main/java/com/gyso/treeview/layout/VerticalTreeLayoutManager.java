@@ -1,11 +1,7 @@
 package com.gyso.treeview.layout;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.view.View;
-import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.gyso.treeview.R;
 import com.gyso.treeview.TreeViewContainer;
@@ -17,8 +13,6 @@ import com.gyso.treeview.model.TreeModel;
 import com.gyso.treeview.util.DensityUtils;
 import com.gyso.treeview.util.TreeViewLog;
 import com.gyso.treeview.util.ViewBox;
-
-import java.util.Map;
 
 /**
  * @Author: 怪兽N
@@ -150,95 +144,12 @@ public class VerticalTreeLayoutManager extends TreeLayoutManager {
 
                 @Override
                 public void finish() {
-                    //means that smooth move from preLocation to curLocation
-                    Object nodeTag = treeViewContainer.getTag(R.id.target_node);
-                    Object targetNodeLocationTag = treeViewContainer.getTag(R.id.target_node_final_location);
-                    Object relativeLocationMapTag = treeViewContainer.getTag(R.id.relative_locations);
-                    if (nodeTag instanceof NodeModel
-                            && targetNodeLocationTag instanceof ViewBox
-                            && relativeLocationMapTag instanceof Map) {
-                        ViewBox targetNodeLocation = (ViewBox) targetNodeLocationTag;
-                        Map<NodeModel<?>,ViewBox> relativeLocationMap = (Map<NodeModel<?>,ViewBox>)relativeLocationMapTag;
-
-                        AccelerateDecelerateInterpolator interpolator = new AccelerateDecelerateInterpolator();
-                        ValueAnimator valueAnimator = ValueAnimator.ofFloat(0f, 1f);
-                        valueAnimator.setDuration(TreeViewContainer.DEFAULT_FOCUS_DURATION);
-                        valueAnimator.setInterpolator(interpolator);
-                        valueAnimator.addUpdateListener(value -> {
-                            float ratio = (float) value.getAnimatedValue();
-                            TreeViewLog.e(TAG, "valueAnimator update ratio[" + ratio + "]");
-                            mTreeModel.doTraversalNodes(node -> {
-                                TreeViewHolder<?> treeViewHolder = treeViewContainer.getTreeViewHolder(node);
-                                if (treeViewHolder != null) {
-                                    View view = treeViewHolder.getView();
-                                    ViewBox preLocation = (ViewBox) view.getTag(R.id.node_pre_location);
-                                    ViewBox deltaLocation = (ViewBox) view.getTag(R.id.node_delta_location);
-
-                                    //calculate current location
-                                    ViewBox currentLocation = preLocation.add(deltaLocation.multiply(ratio));
-                                    view.layout(currentLocation.left,
-                                                currentLocation.top,
-                                              currentLocation.left+view.getMeasuredWidth(),
-                                             currentLocation.top+view.getMeasuredHeight());
-                                }
-                            });
-                        });
-
-                        valueAnimator.addListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationStart(Animator animation, boolean isReverse) {
-                                TreeViewLog.e(TAG, "onAnimationStart ");
-                                //calculate and layout on preLocation
-                                mTreeModel.doTraversalNodes(node -> {
-                                    TreeViewHolder<?> treeViewHolder = treeViewContainer.getTreeViewHolder(node);
-                                    if (treeViewHolder != null) {
-                                        View view = treeViewHolder.getView();
-                                        ViewBox relativeLocation = relativeLocationMap.get(treeViewHolder.getNode());
-
-                                        //calculate location info
-                                        ViewBox preLocation = targetNodeLocation.add(relativeLocation);
-                                        ViewBox finalLocation = (ViewBox) view.getTag(R.id.node_final_location);
-                                        ViewBox deltaLocation = finalLocation.subtract(preLocation);
-
-                                        //save as tag
-                                        view.setTag(R.id.node_pre_location, preLocation);
-                                        view.setTag(R.id.node_delta_location, deltaLocation);
-
-                                        //layout on preLocation
-                                        view.layout(preLocation.left, preLocation.top, preLocation.left+view.getMeasuredWidth(), preLocation.top+view.getMeasuredHeight());
-                                    }
-                                });
-
-                            }
-
-                            @Override
-                            public void onAnimationEnd(Animator animation, boolean isReverse) {
-                                //clear tag
-                                treeViewContainer.setTag(R.id.target_location_on_viewport, null);
-                                treeViewContainer.setTag(R.id.relative_locations, null);
-                                treeViewContainer.setTag(R.id.target_node, null);
-                                treeViewContainer.setTag(R.id.target_node_final_location, null);
-
-                                //layout on finalLocation
-                                mTreeModel.doTraversalNodes(node -> {
-                                    TreeViewHolder<?> treeViewHolder = treeViewContainer.getTreeViewHolder(node);
-                                    if (treeViewHolder != null) {
-                                        View view = treeViewHolder.getView();
-                                        ViewBox finalLocation = (ViewBox) view.getTag(R.id.node_final_location);
-                                        view.layout(finalLocation.left, finalLocation.top, finalLocation.right, finalLocation.bottom);
-                                        view.setTag(R.id.node_pre_location,null);
-                                        view.setTag(R.id.node_delta_location,null);
-                                        view.setTag(R.id.node_final_location, null);
-                                    }
-                                });
-                            }
-                        });
-                        valueAnimator.start();
-                    }
+                    layoutAnimate(treeViewContainer);
                 }
             });
         }
     }
+
 
     @Override
     public ViewBox getTreeLayoutBox() {
@@ -271,32 +182,8 @@ public class VerticalTreeLayoutManager extends TreeLayoutManager {
         int bottom = top+currentHeight;
         int right = left+currentWidth;
 
-        Object targetNodeTag = treeViewContainer.getTag(R.id.target_node);
-        if(targetNodeTag instanceof NodeModel){
-            ViewBox finalLocation = new ViewBox(top, left, bottom, right);
-            currentNodeView.setTag(R.id.node_final_location, finalLocation);
-            if(targetNodeTag.equals(currentNode)){
-                TreeViewLog.e(TAG,"Get target location!");
-                treeViewContainer.setTag(R.id.target_node_final_location, finalLocation);
-                Object targetLocationOnViewPortTag =treeViewContainer.getTag(R.id.target_location_on_viewport);
-                if(targetLocationOnViewPortTag instanceof ViewBox){
-                    ViewBox targetLocationOnViewPort=(ViewBox)targetLocationOnViewPortTag;
-                    //finalLocation*M=targetLocationOnViewPort
-                    //scale
-                    float scale = targetLocationOnViewPort.getWidth() * 1f / finalLocation.getWidth();
-                    treeViewContainer.setPivotX(0);
-                    treeViewContainer.setPivotY(0);
-                    treeViewContainer.setScaleX(scale);
-                    treeViewContainer.setScaleY(scale);
-                    //translate
-                    float dx = targetLocationOnViewPort.left-finalLocation.left*scale;
-                    float dy = targetLocationOnViewPort.top-finalLocation.top*scale;
-                    treeViewContainer.setTranslationX(dx);
-                    treeViewContainer.setTranslationY(dy);
-                }
-            }
-        }
-        else{
+        ViewBox finalLocation = new ViewBox(top, left, bottom, right);
+        if(!layoutAnimatePrepare(currentNode,currentNodeView,finalLocation,treeViewContainer)){
             currentNodeView.layout(left,top,right,bottom);
         }
     }

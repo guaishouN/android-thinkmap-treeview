@@ -1,6 +1,7 @@
 package com.gyso.treeview;
 
 import android.animation.LayoutTransition;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -53,9 +54,10 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     private static boolean isDebug = BuildConfig.isDebug;
     public static final Object IS_EDIT_DRAGGING = new Object();
     public static final double DRAG_HIT_SLOP = 60;
-    public static final float Z_NOR = 0f;
-    public static final float Z_SELECT = 10f;
-    public static final int DEFAULT_FOCUS_DURATION = 2000;
+    public static final float Z_NOR = 10f;
+    public static final float Z_SELECT = 20f;
+    public static final int DEFAULT_FOCUS_DURATION = 300;
+    public static final float DEFAULT_REMOVE_ANIMATOR_DES = 100;
 
     public TreeModel<?> mTreeModel;
     private DrawInfo drawInfo;
@@ -74,6 +76,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     private final ViewDragHelper dragHelper;
     private final SparseArray<HolderPool> holderPools = new SparseArray<>();
     private final ViewConfiguration viewConf;
+    private LayoutTransition mLayoutTransition;
 
     public TreeViewContainer(Context context) {
         this(context, null, 0);
@@ -105,6 +108,26 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         if(isDebug){
             setBackgroundColor(getResources().getColor(R.color.debug_container_color));
         }
+    }
+
+    @SuppressLint("ObjectAnimatorBinding")
+    @Override
+    public void onVisibilityAggregated(boolean isVisible) {
+        super.onVisibilityAggregated(isVisible);
+        TreeViewLog.e(TAG,"onVisibilityAggregated");
+        if(mLayoutTransition==null){
+            mLayoutTransition = new LayoutTransition();
+            //CHANGE_APPEARING CHANGE_DISAPPEARING CHANGING APPEARING
+            mLayoutTransition.setAnimator(LayoutTransition.CHANGE_APPEARING, null);
+            mLayoutTransition.setAnimator(LayoutTransition.CHANGE_DISAPPEARING, null);
+            mLayoutTransition.setAnimator(LayoutTransition.CHANGING, null);
+            mLayoutTransition.setAnimator(LayoutTransition.APPEARING, null);
+
+            mLayoutTransition.setDuration(LayoutTransition.DISAPPEARING,DEFAULT_FOCUS_DURATION);
+            ObjectAnimator disappearAnimator = ObjectAnimator.ofFloat(null, "alpha", 1f, 0f);
+            mLayoutTransition.setAnimator(LayoutTransition.DISAPPEARING, disappearAnimator);
+        }
+        //setLayoutTransition(mLayoutTransition);
     }
 
     @Override
@@ -520,16 +543,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
                 adapter.getTreeModel().removeNode(nodeToRemove.getParentNode(), nodeToRemove);
             }
             mTreeModel.calculateTreeNodesDeep();
-            for (NodeModel<?> nodeToRemove : nodeModels) {
-                nodeToRemove.selfTraverse(next -> {
-                    //remove view
-                    TreeViewHolder<?> holder = getTreeViewHolder(next);
-                    if(holder != null){
-                        removeView(holder.getView());
-                        recycleHolder(holder);
-                    }
-                });
-            }
+            requestLayout();
         }
     }
 
@@ -547,12 +561,18 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         NodeModel<?> targetNode = nodeModels[nodeModels.length-1];
         if(targetNode!=null && isRemove){
             //if remove, parent will be the target node
+            Map<NodeModel<?>,View> removeNodeMap = new HashMap<>();
+            targetNode.selfTraverse(node -> {
+                removeNodeMap.put(node,getTreeViewHolder(node).getView());
+            });
+            setTag(R.id.mark_remove_views,removeNodeMap);
             targetNode = targetNode.getParentNode();
         }
         if(targetNode!=null){
             TreeViewHolder<?> targetHolder = getTreeViewHolder(targetNode);
             if(targetHolder!=null){
                 View targetHolderView = targetHolder.getView();
+                targetHolderView.setElevation(Z_SELECT);
                 ViewBox targetBox = ViewBox.getViewBox(targetHolderView);
                 //get target location on view port
                 ViewBox targetBoxOnViewport = targetBox.convert(getMatrix());
@@ -591,7 +611,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         return adapter.onCreateViewHolder(this, (NodeModel)node);
     }
 
-    private void recycleHolder(TreeViewHolder<?> holder){
+    public void recycleHolder(TreeViewHolder<?> holder){
         int type = adapter.getHolderType(holder.getNode());
         HolderPool holderPool = holderPools.get(type);
         if(holderPool==null){

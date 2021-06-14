@@ -9,6 +9,8 @@
     <item type="id" name="node_delta_location"/>
     <item type="id" name="node_final_location"/>
     <item type="id" name="target_node"/>
+    <item type="id" name="mark_remove_views"/>
+    <item type="id" name="node_trans_animator"/>
     <item type="id" name="target_node_final_location"/>
     <color name="debug_container_color">#E1BEE7</color>
 </resources>

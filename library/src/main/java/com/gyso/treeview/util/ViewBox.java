@@ -141,11 +141,11 @@ public class ViewBox {
 
     @Override
     public String toString() {
-        return "ViewBox{" +
-                "top=" + top +
-                ", left=" + left +
-                ", right=" + right +
-                ", bottom=" + bottom +
+        return "{" +
+                "t:" + top +
+                " l:" + left +
+                " r:" + right +
+                " b:" + bottom +
                 '}';
     }
 }
