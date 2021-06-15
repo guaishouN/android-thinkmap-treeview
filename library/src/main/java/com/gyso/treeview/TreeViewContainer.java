@@ -250,8 +250,9 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
-        TreeViewLog.e(TAG, "onInterceptTouchEvent: "+MotionEvent.actionToString(event.getAction()));
-        return isDraggingNodeMode && dragHelper.shouldInterceptTouchEvent(event);
+        boolean intercept = dragHelper.shouldInterceptTouchEvent(event);
+        TreeViewLog.e(TAG, "onInterceptTouchEvent: "+MotionEvent.actionToString(event.getAction())+" intercept:"+intercept);
+        return isDraggingNodeMode && intercept;
     }
 
     @SuppressLint("ClickableViewAccessibility")
