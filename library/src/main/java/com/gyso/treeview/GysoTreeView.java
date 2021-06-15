@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import com.gyso.treeview.adapter.TreeViewAdapter;
 import com.gyso.treeview.cache_pool.PointPool;
 import com.gyso.treeview.layout.TreeLayoutManager;
+import com.gyso.treeview.listener.TreeViewControlListener;
 import com.gyso.treeview.touch.TouchEventHandler;
 import com.gyso.treeview.util.TreeViewLog;
 
@@ -26,6 +27,7 @@ public class GysoTreeView extends FrameLayout {
     private final TreeViewContainer treeViewContainer;
     private final TouchEventHandler treeViewGestureHandler;
     private boolean disallowIntercept = false;
+
     public GysoTreeView(@NonNull Context context) {
         this(context, null,0);
     }
@@ -41,6 +43,7 @@ public class GysoTreeView extends FrameLayout {
         treeViewContainer.setLayoutParams(layoutParams);
         addView(treeViewContainer);
         treeViewGestureHandler = new TouchEventHandler(getContext(), treeViewContainer);
+        treeViewGestureHandler.setKeepInViewport(false);
 
         //set animate default
         treeViewContainer.setAnimateAdd(true);
@@ -86,6 +89,11 @@ public class GysoTreeView extends FrameLayout {
 
     public TreeViewEditor getEditor(){
         return new TreeViewEditor(treeViewContainer);
+    }
+
+    public void setTreeViewControlListener(TreeViewControlListener listener){
+        treeViewGestureHandler.setControlListener(listener);
+        treeViewContainer.setControlListener(listener);
     }
 
     @Override

@@ -30,11 +30,13 @@ import com.gyso.treeview.cache_pool.HolderPool;
 import com.gyso.treeview.cache_pool.PointPool;
 import com.gyso.treeview.layout.TreeLayoutManager;
 import com.gyso.treeview.line.BaseLine;
+import com.gyso.treeview.listener.TreeViewControlListener;
 import com.gyso.treeview.listener.TreeViewNotifier;
 import com.gyso.treeview.model.ITraversal;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
 import com.gyso.treeview.touch.DragBlock;
+import com.gyso.treeview.util.DensityUtils;
 import com.gyso.treeview.util.Interpolators;
 import com.gyso.treeview.util.TreeViewLog;
 import com.gyso.treeview.util.ViewBox;
@@ -51,7 +53,7 @@ import java.util.Map;
 
 public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     private static final String TAG = TreeViewContainer.class.getSimpleName();
-    private static boolean isDebug = BuildConfig.isDebug;
+    private static final boolean isDebug = BuildConfig.isDebug;
     public static final Object IS_EDIT_DRAGGING = new Object();
     public static final double DRAG_HIT_SLOP = 60;
     public static final float Z_NOR = 10f;
@@ -80,6 +82,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     private boolean isAnimateRemove;
     private boolean isAnimateAdd;
     private boolean isAnimateMove;
+    private TreeViewControlListener controlListener = null;
 
     public TreeViewContainer(Context context) {
         this(context, null, 0);
@@ -188,6 +191,11 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
             centerMatrix = new Matrix();
         }
         centerMatrix.set(getMatrix());
+        float[] values = new float[9];
+        centerMatrix.getValues(values);
+        values[Matrix.MTRANS_X]=0f;
+        values[Matrix.MTRANS_Y]=0f;
+        centerMatrix.setValues(values);
         setTouchDelegate();
     }
 
@@ -437,6 +445,13 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
             TreeViewLog.d(TAG, "keep hitting: "+keepHitting);
             if(!keepHitting){
                 srcView.setTag(R.id.the_hit_target,null);
+                //un hit listener
+                if(controlListener!=null){
+                    Object srcViewHolderTag = srcView.getTag(R.id.item_holder);
+                    if(srcViewHolderTag instanceof TreeViewHolder){
+                        controlListener.onDragMoveNodesHit(((TreeViewHolder<?>) srcViewHolderTag).getNode(),null,srcView,null);
+                    }
+                }
             }
             PointPool.free(opa);
         }
@@ -452,6 +467,14 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
                     TreeViewLog.d(TAG, "hit target : "+ holder.getNode().getValue());
                     mTreeModel.setFinishTraversal(true);
                     srcView.setTag(R.id.the_hit_target, holder.getNode());
+
+                    //hit listener
+                    if(controlListener!=null){
+                        Object srcViewHolderTag = srcView.getTag(R.id.item_holder);
+                        if(srcViewHolderTag instanceof TreeViewHolder){
+                            controlListener.onDragMoveNodesHit(((TreeViewHolder<?>) srcViewHolderTag).getNode(),next,srcView,holder.getView());
+                        }
+                    }
                 }
                 PointPool.free(op);
             });
@@ -471,11 +494,11 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
             TreeViewHolder<?> holder = getTreeViewHolder((NodeModel)fTag);
             View targetView = holder.getView();
             double tarR = Math.hypot(targetView.getWidth(), targetView.getHeight());
-            double fR = Math.max(srcR, tarR) / 2;
+            float minGap = Math.min(mTreeLayoutManager.getSpacePeerToPeer(), mTreeLayoutManager.getSpaceParentToChild());
+            double fR = minGap/getScaleX() + Math.max(srcR, tarR) / 2;
 
             mPaint.reset();
             mPaint.setColor(Color.parseColor("#4FF1286C"));
-            mPaint.setStrokeWidth(20);
             mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
             PointF centerPoint = getCenterPoint(view);
             drawInfo.getCanvas().drawCircle(centerPoint.x,centerPoint.y,(float)fR,mPaint);
@@ -670,5 +693,9 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
 
     public boolean isAnimateMove(){
         return isAnimateMove;
+    }
+
+    public void setControlListener(TreeViewControlListener controlListener) {
+        this.controlListener = controlListener;
     }
 }

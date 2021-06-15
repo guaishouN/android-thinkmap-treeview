@@ -9,6 +9,7 @@ import android.view.ViewConfiguration;
 import androidx.dynamicanimation.animation.DynamicAnimation;
 import androidx.dynamicanimation.animation.FlingAnimation;
 import com.gyso.treeview.TreeViewContainer;
+import com.gyso.treeview.listener.TreeViewControlListener;
 import com.gyso.treeview.util.TreeViewLog;
 import com.gyso.treeview.util.ViewBox;
 
@@ -43,7 +44,9 @@ public class TouchEventHandler {
     private PointF preTranslate = new PointF();
     private float preScaleFactor = 1f;
     private final DynamicAnimation.OnAnimationUpdateListener flingAnimateListener;
-
+    private boolean isKeepInViewport;
+    private TreeViewControlListener controlListener = null;
+    private int scalePercentOnlyForControlListener = 0;
     public TouchEventHandler(Context context, View view) {
         this.mView = view;
         flingAnimateListener = (animation, value, velocity) -> keepWithinBoundaries();
@@ -147,10 +150,22 @@ public class TouchEventHandler {
                         break;
                     }
                     scaleFactor = (scaleNewR / scaleBaseR) * preScaleFactor * 0.15f + scaleFactor * 0.85f;
+                    int scaleState = TreeViewControlListener.FREE_SCALE;
+                    float finalMinScale = isKeepInViewport?minScale:minScale*0.8f;
                     if (scaleFactor >= MAX_SCALE) {
                         scaleFactor = MAX_SCALE;
-                    }else if (scaleFactor <= minScale) {
-                        scaleFactor = minScale;
+                        scaleState = TreeViewControlListener.MAX_SCALE;
+                    }else if (scaleFactor <= finalMinScale) {
+                        scaleFactor = finalMinScale;
+                        scaleState = TreeViewControlListener.MIN_SCALE;
+                    }
+                    if(controlListener!=null){
+                        int current = (int)(scaleFactor*100);
+                        //just make it no so frequently callback
+                        if(scalePercentOnlyForControlListener!=current){
+                            scalePercentOnlyForControlListener = current;
+                            controlListener.onScaling(scaleState,scalePercentOnlyForControlListener);
+                        }
                     }
                     mView.setPivotX(0);
                     mView.setPivotY(0);
@@ -204,6 +219,9 @@ public class TouchEventHandler {
      * keep within boundaries
      */
     private void keepWithinBoundaries() {
+        if(!isKeepInViewport){
+            return;
+        }
         calculateBound();
         int dBottom = layoutLocationInParent.bottom - viewportBox.bottom;
         int dTop = layoutLocationInParent.top - viewportBox.top;
@@ -252,8 +270,7 @@ public class TouchEventHandler {
     }
 
     /**
-     * 计算两个手指之间中心点的坐标。
-     *
+     * Calculate the distance between two fingers
      * @param event touch event
      */
     private void centerPointBetweenFingers(MotionEvent event, PointF point) {
@@ -262,5 +279,17 @@ public class TouchEventHandler {
         float xPoint1 = event.getX(1);
         float yPoint1 = event.getY(1);
         point.set((xPoint0 + xPoint1) / 2f,(yPoint0 + yPoint1) / 2f);
+    }
+
+    /**
+     * Identify that whether the control view is keep in viewport
+     * @param keepInViewport true for keep in view port
+     */
+    public void setKeepInViewport(boolean keepInViewport) {
+        isKeepInViewport = keepInViewport;
+    }
+
+    public void setControlListener(TreeViewControlListener controlListener) {
+        this.controlListener = controlListener;
     }
 }
