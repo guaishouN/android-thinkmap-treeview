@@ -19,10 +19,9 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.view.animation.Interpolator;
-import android.view.animation.PathInterpolator;
 import androidx.annotation.NonNull;
 import androidx.customview.widget.ViewDragHelper;
+
 import com.gyso.treeview.adapter.DrawInfo;
 import com.gyso.treeview.adapter.TreeViewAdapter;
 import com.gyso.treeview.adapter.TreeViewHolder;
@@ -36,8 +35,6 @@ import com.gyso.treeview.model.ITraversal;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
 import com.gyso.treeview.touch.DragBlock;
-import com.gyso.treeview.util.DensityUtils;
-import com.gyso.treeview.util.Interpolators;
 import com.gyso.treeview.util.TreeViewLog;
 import com.gyso.treeview.util.ViewBox;
 import java.util.ArrayDeque;
@@ -373,21 +370,29 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         @Override
         public int clampViewPositionHorizontal(@NonNull  View child, int left, int dx) {
             TreeViewLog.d(TAG, "clampViewPositionHorizontal: ");
-            final int oldLeft = child.getLeft();
-            dragBlock.drag(dx,0);
-            estimateToHitTarget(child);
-            invalidate();
-            return oldLeft;
+            if(dragHelper.getViewDragState()==ViewDragHelper.STATE_DRAGGING){
+                final int oldLeft = child.getLeft();
+                dragBlock.drag(dx,0);
+                estimateToHitTarget(child);
+                invalidate();
+                return oldLeft;
+            }else{
+                return left;
+            }
         }
 
         @Override
         public int clampViewPositionVertical(@NonNull  View child, int top, int dy) {
             TreeViewLog.d(TAG, "clampViewPositionVertical: ");
-            final int oldTop = child.getTop();
-            dragBlock.drag(0,dy);
-            estimateToHitTarget(child);
-            invalidate();
-            return oldTop;
+            if(dragHelper.getViewDragState()== ViewDragHelper.STATE_DRAGGING){
+                final int oldTop = child.getTop();
+                dragBlock.drag(0,dy);
+                estimateToHitTarget(child);
+                invalidate();
+                return oldTop;
+            }else{
+                return top;
+            }
         }
 
         @Override
