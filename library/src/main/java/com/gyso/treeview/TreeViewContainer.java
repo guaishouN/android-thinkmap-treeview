@@ -231,11 +231,11 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         TreeViewLog.e(TAG, "focusMidLocation: \n"
                 + Arrays.toString(centerM)+"\n"
                 + Arrays.toString(now));
-        if(now[0]>0&&now[4]>0){
-            animate().scaleX(centerM[0])
-                    .translationX(centerM[2])
-                    .scaleY(centerM[4])
-                    .translationY(centerM[5])
+        if(now[Matrix.MSCALE_X]>0&&now[Matrix.MSCALE_Y]>0){
+            animate().scaleX(centerM[Matrix.MSCALE_X])
+                    .translationX(centerM[Matrix.MTRANS_X])
+                    .scaleY(centerM[Matrix.MSCALE_Y])
+                    .translationY(centerM[Matrix.MTRANS_Y])
                     .setDuration(DEFAULT_FOCUS_DURATION)
                     .start();
         }
