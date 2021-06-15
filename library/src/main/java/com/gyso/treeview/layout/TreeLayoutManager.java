@@ -161,7 +161,10 @@ public abstract class TreeLayoutManager {
                 treeViewContainer.setTag(R.id.target_node_final_location, finalLocation);
 
                 //remove views
-                animateRemoveNodes(treeViewContainer, finalLocation);
+                if(!animateRemoveNodes(treeViewContainer, finalLocation)){
+                    //TODO remove nodes directly
+                    TreeViewLog.e(TAG,"Has remove nodes directly!");
+                }
 
                 Object targetLocationOnViewPortTag =treeViewContainer.getTag(R.id.target_location_on_viewport);
                 if(targetLocationOnViewPortTag instanceof ViewBox){
@@ -297,7 +300,7 @@ public abstract class TreeLayoutManager {
      * @param treeViewContainer container
      * @param targetLocation target location
      */
-    private void animateRemoveNodes(TreeViewContainer treeViewContainer, ViewBox targetLocation) {
+    private boolean animateRemoveNodes(TreeViewContainer treeViewContainer, ViewBox targetLocation) {
         Object removedViewMapTag = treeViewContainer.getTag(R.id.mark_remove_views);
         Object relativeLocationMapTag = treeViewContainer.getTag(R.id.relative_locations);
         if (removedViewMapTag instanceof Map && relativeLocationMapTag instanceof Map) {
@@ -369,6 +372,8 @@ public abstract class TreeLayoutManager {
                 }
             });
             removeAnimator.start();
+            return true;
         }
+        return false;
     }
 }

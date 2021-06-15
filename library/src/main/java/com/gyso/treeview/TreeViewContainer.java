@@ -77,6 +77,9 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     private final SparseArray<HolderPool> holderPools = new SparseArray<>();
     private final ViewConfiguration viewConf;
     private LayoutTransition mLayoutTransition;
+    private boolean isAnimateRemove;
+    private boolean isAnimateAdd;
+    private boolean isAnimateMove;
 
     public TreeViewContainer(Context context) {
         this(context, null, 0);
@@ -394,7 +397,9 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
                 }
                 mTreeModel.addNode(targetHolderNode,releasedChildHolderNode);
                 mTreeModel.calculateTreeNodesDeep();
-                recordAnchorLocationOnViewPort(false,targetHolderNode);
+                if(isAnimateMove()){
+                    recordAnchorLocationOnViewPort(false,targetHolderNode);
+                }
                 requestLayout();
             }else{
                 //recover
@@ -526,7 +531,9 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     @Override
     public void onAddNodes(NodeModel<?> parent, NodeModel<?>... childNodes) {
         if(adapter!=null){
-            recordAnchorLocationOnViewPort(false, parent);
+            if(isAnimateAdd()){
+                recordAnchorLocationOnViewPort(false, parent);
+            }
             mTreeModel.addNode(parent,childNodes);
             mTreeModel.calculateTreeNodesDeep();
             for (NodeModel<?> node:childNodes) {
@@ -538,12 +545,27 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     @Override
     public void onRemoveNodes(NodeModel<?>... nodeModels) {
         if(adapter!=null){
-            recordAnchorLocationOnViewPort(true, nodeModels);
+            if(isAnimateRemove()){
+                recordAnchorLocationOnViewPort(true, nodeModels);
+            }
             for (NodeModel<?> nodeToRemove : nodeModels) {
                 adapter.getTreeModel().removeNode(nodeToRemove.getParentNode(), nodeToRemove);
             }
             mTreeModel.calculateTreeNodesDeep();
-            requestLayout();
+            if(isAnimateRemove()){
+                requestLayout();
+            }else{
+                for (NodeModel<?> nodeToRemove : nodeModels) {
+                    nodeToRemove.selfTraverse(next -> {
+                        //remove view
+                        TreeViewHolder<?> holder = getTreeViewHolder(next);
+                        if(holder != null){
+                            removeView(holder.getView());
+                            recycleHolder(holder);
+                        }
+                    });
+                }
+            }
         }
     }
 
@@ -624,5 +646,29 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     @Override
     public void onItemViewChange(NodeModel<?> nodeModel){
 
+    }
+
+    public void setAnimateRemove(boolean animateRemove) {
+        isAnimateRemove = animateRemove;
+    }
+
+    public void setAnimateAdd(boolean animateAdd) {
+        isAnimateAdd = animateAdd;
+    }
+
+    public void setAnimateMove(boolean animateMove) {
+        isAnimateMove = animateMove;
+    }
+
+    public boolean isAnimateRemove() {
+        return isAnimateRemove;
+    }
+
+    public boolean isAnimateAdd(){
+        return isAnimateAdd;
+    }
+
+    public boolean isAnimateMove(){
+        return isAnimateMove;
     }
 }

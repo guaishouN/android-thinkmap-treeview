@@ -41,6 +41,11 @@ public class GysoTreeView extends FrameLayout {
         treeViewContainer.setLayoutParams(layoutParams);
         addView(treeViewContainer);
         treeViewGestureHandler = new TouchEventHandler(getContext(), treeViewContainer);
+
+        //set animate default
+        treeViewContainer.setAnimateAdd(true);
+        treeViewContainer.setAnimateRemove(true);
+        treeViewContainer.setAnimateMove(true);
     }
 
     @Override
