@@ -55,10 +55,9 @@ public class TreeViewEditor {
      * @param childNodes new nodes that will be add to tree model
      */
     public void addChildNodes(NodeModel<?> parent, NodeModel<?>... childNodes) {
-        TreeViewAdapter<?> adapter = getAdapter();
-        if(adapter!=null){
-            adapter.getTreeModel().addNode(parent,childNodes);
-            adapter.notifyDataSetChange();
+        TreeViewContainer container = getContainer();
+        if(container!=null){
+            container.onAddNodes(parent,childNodes);
         }
     }
 
@@ -67,10 +66,9 @@ public class TreeViewEditor {
      * @param nodeToRemove node to remove
      */
     public void removeNode(NodeModel<?> nodeToRemove){
-        TreeViewAdapter<?> adapter = getAdapter();
-        if(adapter!=null){
-            adapter.getTreeModel().removeNode(nodeToRemove.getParentNode(),nodeToRemove);
-            adapter.notifyDataSetChange();
+        TreeViewContainer container = getContainer();
+        if(container!=null){
+            container.onRemoveNodes(nodeToRemove);
         }
     }
 }

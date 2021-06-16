@@ -2,7 +2,6 @@ package com.gyso.treeview.layout;
 
 import android.content.Context;
 import android.view.View;
-
 import com.gyso.treeview.TreeViewContainer;
 import com.gyso.treeview.adapter.TreeViewHolder;
 import com.gyso.treeview.line.BaseLine;
@@ -134,9 +133,20 @@ public class VerticalTreeLayoutManager extends TreeLayoutManager {
     public void performLayout(final TreeViewContainer treeViewContainer) {
         final TreeModel<?> mTreeModel = treeViewContainer.getTreeModel();
         if (mTreeModel != null) {
-            mTreeModel.doTraversalNodes((ITraversal<NodeModel<?>>) next -> layoutNodes(next, treeViewContainer));
+            mTreeModel.doTraversalNodes(new ITraversal<NodeModel<?>>() {
+                @Override
+                public void next(NodeModel<?> next) {
+                    layoutNodes(next, treeViewContainer);
+                }
+
+                @Override
+                public void finish() {
+                    layoutAnimate(treeViewContainer);
+                }
+            });
         }
     }
+
 
     @Override
     public ViewBox getTreeLayoutBox() {
@@ -168,6 +178,10 @@ public class VerticalTreeLayoutManager extends TreeLayoutManager {
         int left  = deepStart.get(deep)+verticalCenterFix+deltaWidth;
         int bottom = top+currentHeight;
         int right = left+currentWidth;
-        currentNodeView.layout(left,top,right,bottom);
+
+        ViewBox finalLocation = new ViewBox(top, left, bottom, right);
+        if(!layoutAnimatePrepare(currentNode,currentNodeView,finalLocation,treeViewContainer)){
+            currentNodeView.layout(left,top,right,bottom);
+        }
     }
 }

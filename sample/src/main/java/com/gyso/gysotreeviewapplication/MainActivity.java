@@ -1,7 +1,10 @@
 package com.gyso.gysotreeviewapplication;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.SystemClock;
+import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +17,7 @@ import com.gyso.treeview.layout.TreeLayoutManager;
 import com.gyso.treeview.layout.VerticalTreeLayoutManager;
 import com.gyso.treeview.line.AngledLine;
 import com.gyso.treeview.line.BaseLine;
+import com.gyso.treeview.listener.TreeViewControlListener;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
 
@@ -23,10 +27,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MainActivity extends AppCompatActivity {
+    public static final String TAG = MainActivity.class.getSimpleName();
     private ActivityMainBinding binding;
     private final Stack<NodeModel<Animal>> removeCache = new Stack();
     private NodeModel<Animal> targetNode;
     private AtomicInteger atomicInteger = new AtomicInteger();
+    private Handler handler = new Handler();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,10 +94,10 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this,"Ohs, your targetNode is null", Toast.LENGTH_SHORT).show();
                 return;
             }
-            NodeModel<Animal> a = new NodeModel<>(new Animal(R.drawable.ic_13,"add-" + atomicInteger.getAndIncrement()));
-            NodeModel<Animal> b = new NodeModel<>(new Animal(R.drawable.ic_10,"add-" + atomicInteger.getAndIncrement()));
-            NodeModel<Animal> c = new NodeModel<>(new Animal(R.drawable.ic_11,"add-" + atomicInteger.getAndIncrement()));
-            editor.addChildNodes(targetNode,a,b,c);
+            NodeModel<Animal> a = new NodeModel<>(new Animal(R.drawable.ic_10,"add-" + atomicInteger.getAndIncrement()));
+            NodeModel<Animal> b = new NodeModel<>(new Animal(R.drawable.ic_11,"add-" + atomicInteger.getAndIncrement()));
+            NodeModel<Animal> c = new NodeModel<>(new Animal(R.drawable.ic_14,"add-" + atomicInteger.getAndIncrement()));
+            editor.addChildNodes(targetNode,b,a,c);
 
 
             //add to remove demo cache
@@ -114,6 +120,37 @@ public class MainActivity extends AppCompatActivity {
             Animal animal = node.getValue();
             Toast.makeText(this,"you click the head of "+animal,Toast.LENGTH_SHORT).show();
         });
+
+
+        //treeView control listener
+        final Object token = new Object();
+        Runnable dismissRun = ()->{
+            binding.scalePercent.setVisibility(View.GONE);
+        };
+
+        binding.baseTreeView.setTreeViewControlListener(new TreeViewControlListener() {
+            @Override
+            public void onScaling(int state, int percent) {
+                Log.e(TAG, "onScaling: "+state+"  "+percent);
+                binding.scalePercent.setVisibility(View.VISIBLE);
+                if(state == TreeViewControlListener.MAX_SCALE){
+                    binding.scalePercent.setText("MAX");
+                }else if(state == TreeViewControlListener.MIN_SCALE){
+                    binding.scalePercent.setText("MIN");
+                }else{
+                    binding.scalePercent.setText(percent+"%");
+                }
+                handler.removeCallbacksAndMessages(token);
+                handler.postAtTime(dismissRun,token,SystemClock.uptimeMillis()+2000);
+            }
+
+            @Override
+            public void onDragMoveNodesHit(NodeModel<?> draggingNode, NodeModel<?> hittingNode, View draggingView, View hittingView) {
+                Log.e(TAG, "onDragMoveNodesHit: draging["+draggingNode+"]hittingNode["+hittingNode+"]");
+
+            }
+        });
+
     }
 
     private TreeLayoutManager getTreeLayoutManager() {
@@ -166,12 +203,12 @@ public class MainActivity extends AppCompatActivity {
         treeModel.addNode(sub1,sub2);
         treeModel.addNode(sub0,sub4,sub5);
         treeModel.addNode(sub4,sub6);
-        treeModel.addNode(sub5,sub7,sub8);
-        treeModel.addNode(sub6,sub9,sub10,sub11);
-        treeModel.addNode(sub3,sub12,sub13);
-        treeModel.addNode(sub11,sub14,sub15);
-        treeModel.addNode(sub10,sub16);
-        treeModel.addNode(sub8,sub17,sub18,sub19,sub20);
+//        treeModel.addNode(sub5,sub7,sub8);
+//        treeModel.addNode(sub6,sub9,sub10,sub11);
+//        treeModel.addNode(sub3,sub12,sub13);
+//        treeModel.addNode(sub11,sub14,sub15);
+//        treeModel.addNode(sub10,sub16);
+//        treeModel.addNode(sub8,sub17,sub18,sub19,sub20);
         //set data
         adapter.setTreeModel(treeModel);
     }

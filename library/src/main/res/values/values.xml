@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="id" name="edit_and_dragging"/>
+    <item type="id" name="item_holder"/>
+    <item type="id" name="the_hit_target"/>
+    <item type="id" name="target_location_on_viewport"/>
+    <item type="id" name="relative_locations"/>
+    <item type="id" name="node_pre_location"/>
+    <item type="id" name="node_delta_location"/>
+    <item type="id" name="node_final_location"/>
+    <item type="id" name="target_node"/>
+    <item type="id" name="mark_remove_views"/>
+    <item type="id" name="node_trans_animator"/>
+    <item type="id" name="target_node_final_location"/>
+    <color name="debug_container_color">#E1BEE7</color>
+</resources>

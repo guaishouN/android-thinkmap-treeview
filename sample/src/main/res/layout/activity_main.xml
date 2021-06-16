@@ -10,54 +10,93 @@
         android:id="@+id/base_tree_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorBackground"/>
+        android:background="@color/colorBackground">
+    </com.gyso.treeview.GysoTreeView>
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/view_center_bt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:padding="6dp"
+                android:checked="false"
+                android:text="FIT WINDOW"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:background="@drawable/drag_mode_bg"
+                android:foreground="?attr/selectableItemBackground"
+                app:layout_constraintLeft_toRightOf="@+id/drag_edit_mode_rd"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/add_nodes_bt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:padding="6dp"
+                android:checked="false"
+                android:text="ADD"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:background="@drawable/drag_mode_bg"
+                android:foreground="?attr/selectableItemBackground"
+                app:layout_constraintLeft_toRightOf="@+id/view_center_bt"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/remove_node_bt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:padding="6dp"
+                android:checked="false"
+                android:text="REMOVE"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:background="@drawable/drag_mode_bg"
+                android:foreground="?attr/selectableItemBackground"
+                app:layout_constraintLeft_toRightOf="@+id/add_nodes_bt"
+                app:layout_constraintTop_toTopOf="parent" />
+        </LinearLayout>
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/drag_edit_mode_rd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
             android:checked="false"
             android:textAppearance="@style/ToggleStyle"
+            android:textColor="@android:color/white"
             android:text="DRAG EDIT MODE"
-            android:background="@color/LineColor1"
+            android:layout_marginStart="10dp"
+            android:padding="5dp"
+            android:textStyle="bold"
+            android:background="@drawable/drag_mode_bg"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/view_center_bt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:checked="false"
-            android:text="VIEW CENTER"
-            app:layout_constraintLeft_toRightOf="@+id/drag_edit_mode_rd"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/add_nodes_bt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:checked="false"
-            android:text="ADD NODES"
-            app:layout_constraintLeft_toRightOf="@+id/view_center_bt"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/remove_node_bt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:checked="false"
-            android:text="REMOVE NODE"
-            app:layout_constraintLeft_toRightOf="@+id/add_nodes_bt"
-            app:layout_constraintTop_toTopOf="parent" />
     </LinearLayout>
-
+    <TextView
+        android:id="@+id/scale_percent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="80dp"
+        android:background="@drawable/percent_bg"
+        android:layout_gravity="bottom|center_horizontal"
+        android:padding="10dp"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:typeface="serif"
+        android:visibility="gone"
+        tools:text="100%">
+    </TextView>
 
 </FrameLayout>
