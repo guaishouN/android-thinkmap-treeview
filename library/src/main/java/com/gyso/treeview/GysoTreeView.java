@@ -39,6 +39,8 @@ public class GysoTreeView extends FrameLayout {
     public GysoTreeView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);
+        setClipChildren(false);
+        setClipToPadding(false);
         treeViewContainer = new TreeViewContainer(getContext());
         treeViewContainer.setLayoutParams(layoutParams);
         addView(treeViewContainer);
