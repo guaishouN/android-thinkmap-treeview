@@ -22,16 +22,46 @@ Tree View; Mind map; Think map; tree map; 树状图；思维导图；
 
 - 支持拖动调整节点关系
 
+- 增删、移动结构添加动画效果
+
   
 
 [github控件连接](https://github.com/guaishouN/android-tree-view.git)
 
-<img src=".\images\Screenshot_2021-05-10-20-55-35-885_com.gyso.gysotreeviewapplication.jpg" width="33%" />
+> **基础--连接线, 布局, 自定义节点View**
 
-<img src=".\images\Screenshot_2021-05-10-21-09-12-787_com.gyso.gysotreeviewapplication.jpg" width="33%" />
+<img src=".\images\fs.png" width="70%" align = left/>
+
+> **添加**
+
+<img src=".\images\add.gif" width="20%"  align = "left"/>
+
+> **删除**
+
+<img src=".\images\remove.gif" width="20%" align = "left"/>
+
+> **拖动节点编辑书树状图结构**
+
+<img src=".\images\dragEdit.gif" width="20%"  align = "left"/>
+
+> **放缩拖动不影响点击**
+
+<img src=".\images\click.gif" width="20%"  align = "left"/>
+
+> **放缩及适应窗口**
+
+<img src=".\images\fit.gif" width="20%"  align = "left"/>
 
 #### 使用步骤：
 
+```xml
+<com.gyso.treeview.GysoTreeView
+    android:id="@+id/base_tree_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground">
+</com.gyso.treeview.GysoTreeView>
+```
 下面说明中Animal类是仅仅用于举例的bean
 
 ```java

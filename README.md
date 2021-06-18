@@ -18,11 +18,41 @@ A custom tree view for Android,  designed for easy drawing some tree nodes (e.g.
 
 [Releases & downloads](https://github.com/guaishouN/android-tree-view.git)
 
-<img src=".\images\Screenshot_2021-05-10-20-55-35-885_com.gyso.gysotreeviewapplication.jpg" width="33%" />
+> **Base--Line, LayoutManger, Custom node view**
 
-<img src=".\images\Screenshot_2021-05-10-21-09-12-787_com.gyso.gysotreeviewapplication.jpg"  width="33%" />
+<img src=".\images\fs.png" width="70%" align = "left"/>
+
+> **Add**
+
+<img src=".\images\add.gif" width="20%"  align = "left"/>
+
+> **Remove**
+
+<img src=".\images\remove.gif" width="20%" align = "left"/>
+
+> **Drag Edit Mode**
+
+<img src=".\images\dragEdit.gif" width="20%"  align = "left"/>
+
+> **Click**
+
+<img src=".\images\click.gif" width="20%"  align = "left"/>
+
+> **Zoom and Fit Window**
+
+<img src=".\images\fit.gif" width="20%"  align = "left"/>
 
 #### Steps for use
+
+
+```xml
+    <com.gyso.treeview.GysoTreeView
+        android:id="@+id/base_tree_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorBackground">
+    </com.gyso.treeview.GysoTreeView>
+```
 
 Before presentation, Animal class means you own bean class, like this:
 
@@ -32,6 +62,7 @@ public class Animal {
     public String name;
 }
 ```
+
 
 To use a tree view, you should do **5 steps** as follows:
 
