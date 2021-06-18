@@ -30,27 +30,27 @@ Tree View; Mind map; Think map; tree map; 树状图；思维导图；
 
 > **基础--连接线, 布局, 自定义节点View**
 
-<img src=".\images\fs.png" width="70%" align = left/>
+<img src=".\images\fs.png" width="70%"/>
 
 > **添加**
 
-<img src=".\images\add.gif" width="20%"  align = "left"/>
+<img src=".\images\add.gif" width="20%" />
 
 > **删除**
 
-<img src=".\images\remove.gif" width="20%" align = "left"/>
+<img src=".\images\remove.gif" width="20%"/>
 
 > **拖动节点编辑书树状图结构**
 
-<img src=".\images\dragEdit.gif" width="20%"  align = "left"/>
+<img src=".\images\dragEdit.gif" width="20%" />
 
 > **放缩拖动不影响点击**
 
-<img src=".\images\click.gif" width="20%"  align = "left"/>
+<img src=".\images\click.gif" width="20%"/>
 
 > **放缩及适应窗口**
 
-<img src=".\images\fit.gif" width="20%"  align = "left"/>
+<img src=".\images\fit.gif" width="20%" />
 
 #### 使用步骤：
 

@@ -20,27 +20,27 @@ A custom tree view for Android,  designed for easy drawing some tree nodes (e.g.
 
 > **Base--Line, LayoutManger, Custom node view**
 
-<img src=".\images\fs.png" width="70%" align = "left"/>
+<img src=".\images\fs.png" width="70%"/>
 
 > **Add**
 
-<img src=".\images\add.gif" width="20%"  align = "left"/>
+<img src=".\images\add.gif" width="20%"/>
 
 > **Remove**
 
-<img src=".\images\remove.gif" width="20%" align = "left"/>
+<img src=".\images\remove.gif" width="20%"/>
 
 > **Drag Edit Mode**
 
-<img src=".\images\dragEdit.gif" width="20%"  align = "left"/>
+<img src=".\images\dragEdit.gif" width="20%"/>
 
 > **Click**
 
-<img src=".\images\click.gif" width="20%"  align = "left"/>
+<img src=".\images\click.gif" width="20%"/>
 
 > **Zoom and Fit Window**
 
-<img src=".\images\fit.gif" width="20%"  align = "left"/>
+<img src=".\images\fit.gif" width="20%" />
 
 #### Steps for use
 
