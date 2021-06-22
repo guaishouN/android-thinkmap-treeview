@@ -55,6 +55,8 @@ public class DashLine extends BaseLine {
         Paint mPaint = drawInfo.getPaint();
         Path mPath = drawInfo.getPath();
         int layoutType = drawInfo.getLayoutType();
+        int spacePeerToPeer = drawInfo.getSpacePeerToPeer();
+        int spaceParentToChild = drawInfo.getSpaceParentToChild();
 
         //get view and node
         View fromView = fromHolder.getView();
@@ -74,6 +76,9 @@ public class DashLine extends BaseLine {
         //setPath
         mPath.reset();
         if(layoutType== TreeLayoutManager.LAYOUT_TYPE_HORIZON_RIGHT){
+            if(toView.getLeft()-fromView.getRight()<spaceParentToChild){
+                return;
+            }
             PointF startPoint = PointPool.obtain(fromView.getRight(),(fromView.getTop()+fromView.getBottom())/2f);
             PointF point1 = PointPool.obtain(startPoint.x+DensityUtils.dp2px(context,15),startPoint.y);
             PointF endPoint =  PointPool.obtain(toView.getLeft(),(toView.getTop()+toView.getBottom())/2f);
@@ -90,6 +95,9 @@ public class DashLine extends BaseLine {
             PointPool.free(point2);
             PointPool.free(endPoint);
         }else if(layoutType== TreeLayoutManager.LAYOUT_TYPE_VERTICAL_DOWN){
+            if(toView.getTop()-fromView.getBottom()<spaceParentToChild){
+                return;
+            }
             PointF startPoint = PointPool.obtain((fromView.getLeft()+fromView.getRight())/2f,fromView.getBottom());
             PointF point1 = PointPool.obtain(startPoint.x,startPoint.y+DensityUtils.dp2px(context,15));
             PointF endPoint =  PointPool.obtain((toView.getLeft()+toView.getRight())/2f,toView.getTop());

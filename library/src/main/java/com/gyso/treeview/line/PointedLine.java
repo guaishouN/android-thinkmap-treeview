@@ -56,6 +56,9 @@ public class PointedLine extends BaseLine {
         int spacePc = drawInfo.getSpaceParentToChild();
         int layoutType = drawInfo.getLayoutType();
 
+        int spacePeerToPeer = drawInfo.getSpacePeerToPeer();
+        int spaceParentToChild = drawInfo.getSpaceParentToChild();
+
         //get view and node
         View fromView = fromHolder.getView();
         NodeModel<?> fromNode = fromHolder.getNode();
@@ -73,7 +76,9 @@ public class PointedLine extends BaseLine {
         //setPath
         mPath.reset();
         if (layoutType == TreeLayoutManager.LAYOUT_TYPE_HORIZON_RIGHT) {
-
+            if(toView.getLeft()-fromView.getRight()<spaceParentToChild){
+                return;
+            }
             int deltaY = fromView.getTop()-toView.getTop();
             int distance = (int)Math.sqrt(deltaY*deltaY+spacePeer*spacePeer);
             int baseWidth = (distance/spacePeer)*lineWidth;
@@ -105,6 +110,9 @@ public class PointedLine extends BaseLine {
             PointPool.free(midPoint4);
             PointPool.free(endPoint);
         }else if (layoutType == TreeLayoutManager.LAYOUT_TYPE_VERTICAL_DOWN) {
+            if(toView.getTop()-fromView.getBottom()<spaceParentToChild){
+                return;
+            }
             int deltaX = fromView.getLeft()-toView.getLeft();
             int distance = (int)Math.sqrt(deltaX*deltaX+spacePc*spacePc);
             int baseWidth = (distance/spacePc)*lineWidth;

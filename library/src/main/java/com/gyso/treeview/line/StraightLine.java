@@ -53,7 +53,8 @@ public class StraightLine extends BaseLine {
         Paint mPaint = drawInfo.getPaint();
         Path mPath = drawInfo.getPath();
         int layoutType = drawInfo.getLayoutType();
-
+        int spacePeerToPeer = drawInfo.getSpacePeerToPeer();
+        int spaceParentToChild = drawInfo.getSpaceParentToChild();
         //get view and node
         View fromView = fromHolder.getView();
         NodeModel<?> fromNode = fromHolder.getNode();
@@ -71,6 +72,9 @@ public class StraightLine extends BaseLine {
         //setPath
         mPath.reset();
         if(layoutType == TreeLayoutManager.LAYOUT_TYPE_HORIZON_RIGHT){
+            if(toView.getLeft()-fromView.getRight()<spaceParentToChild){
+                return;
+            }
             PointF startPoint =  PointPool.obtain(fromView.getRight(),(fromView.getTop()+fromView.getBottom())/2f);
             PointF endPoint =  PointPool.obtain(toView.getLeft(),(toView.getTop()+toView.getBottom())/2f);
             mPath.moveTo(startPoint.x,startPoint.y);
@@ -79,6 +83,9 @@ public class StraightLine extends BaseLine {
             PointPool.free(startPoint);
             PointPool.free(endPoint);
         }else if (layoutType == TreeLayoutManager.LAYOUT_TYPE_VERTICAL_DOWN){
+            if(toView.getTop()-fromView.getBottom()<spaceParentToChild){
+                return;
+            }
             PointF startPoint =  PointPool.obtain((fromView.getLeft()+fromView.getRight())/2f,fromView.getBottom());
             PointF endPoint =  PointPool.obtain((toView.getLeft()+toView.getRight())/2f,toView.getTop());
             mPath.moveTo(startPoint.x,startPoint.y);
