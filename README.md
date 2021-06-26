@@ -3,7 +3,7 @@
 【[中文](./README_CN.md)】【[English](./README.md)】
 **⭐If ok, give me a star⭐**
 
-Tree View; Mind map; Think map; tree map; 树状图；思维导图；组织机构图；层次图；树型图
+⭐⭐⭐⭐⭐Tree View; Mind map; Think map; tree map; 树状图；思维导图；组织机构图；层次图；树型图
 
 A custom tree view for Android,  designed for easy drawing some tree nodes (e.g. thind mind and tree nodes). Includes smoothly zoom, move, limit and center fix animation support, and allows easy extension so you can add your own child node's customs view and touch event detection.
 
