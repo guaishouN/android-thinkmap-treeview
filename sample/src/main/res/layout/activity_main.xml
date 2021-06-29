@@ -67,6 +67,20 @@
                 android:foreground="?attr/selectableItemBackground"
                 app:layout_constraintLeft_toRightOf="@+id/add_nodes_bt"
                 app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/remove_children_bt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:padding="6dp"
+                android:checked="false"
+                android:text="REMOVE C"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:background="@drawable/drag_mode_bg"
+                android:foreground="?attr/selectableItemBackground"
+                app:layout_constraintLeft_toRightOf="@+id/add_nodes_bt"
+                app:layout_constraintTop_toTopOf="parent" />
         </LinearLayout>
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/drag_edit_mode_rd"

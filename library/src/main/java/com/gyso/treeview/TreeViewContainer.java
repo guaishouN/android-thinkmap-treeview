@@ -412,7 +412,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
                 mTreeModel.addNode(targetHolderNode,releasedChildHolderNode);
                 mTreeModel.calculateTreeNodesDeep();
                 if(isAnimateMove()){
-                    recordAnchorLocationOnViewPort(false,targetHolderNode);
+                    recordAnchorLocationOnViewPort(false,false,targetHolderNode);
                 }
                 requestLayout();
             }else{
@@ -561,7 +561,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     public void onAddNodes(NodeModel<?> parent, NodeModel<?>... childNodes) {
         if(adapter!=null){
             if(isAnimateAdd()){
-                recordAnchorLocationOnViewPort(false, parent);
+                recordAnchorLocationOnViewPort(false, false,parent);
             }
             mTreeModel.addNode(parent,childNodes);
             mTreeModel.calculateTreeNodesDeep();
@@ -572,52 +572,74 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     }
 
     @Override
-    public void onRemoveNodes(NodeModel<?>... nodeModels) {
+    public void onRemoveNode(NodeModel<?> nodeModel) {
+        innerRemoveNode(nodeModel, false);
+    }
+
+    @Override
+    public void onRemoveChildNodes(NodeModel<?> parentNode) {
+        innerRemoveNode(parentNode,true);
+    }
+
+    private void innerRemoveNode(NodeModel<?> nodeModel, boolean isRemoveChildNodesOnly){
         if(adapter!=null){
             if(isAnimateRemove()){
-                recordAnchorLocationOnViewPort(true, nodeModels);
+                recordAnchorLocationOnViewPort(true,isRemoveChildNodesOnly ,nodeModel);
             }
-            for (NodeModel<?> nodeToRemove : nodeModels) {
-                adapter.getTreeModel().removeNode(nodeToRemove.getParentNode(), nodeToRemove);
+            if(isRemoveChildNodesOnly){
+                nodeModel.traverseChildren(next->adapter.getTreeModel().removeNode(nodeModel, next));
+            }else{
+                adapter.getTreeModel().removeNode(nodeModel.getParentNode(), nodeModel);
             }
+
             mTreeModel.calculateTreeNodesDeep();
             if(isAnimateRemove()){
                 requestLayout();
             }else{
-                for (NodeModel<?> nodeToRemove : nodeModels) {
-                    nodeToRemove.selfTraverse(next -> {
-                        //remove view
-                        TreeViewHolder<?> holder = getTreeViewHolder(next);
-                        if(holder != null){
-                            removeView(holder.getView());
-                            recycleHolder(holder);
-                        }
-                    });
+                if(isRemoveChildNodesOnly){
+                    nodeModel.traverseChildren(this::removeViewByNode);
+                }else{
+                    nodeModel.selfTraverse(this::removeViewByNode);
                 }
             }
         }
     }
 
     /**
-     * Prepare moving, adding or removing nodes, record the last one node as an anchor node on view port, so that make it looks smooth change
-     * Note:
-     *     The last one will been choose as target node.
-     *
-     *  @param nodeModels nodes[nodes.length-1] as the target one
+     * Remove View By Node
+     * @param nodeModel node to remove the view
      */
-    private void recordAnchorLocationOnViewPort(boolean isRemove, NodeModel<?>... nodeModels) {
-        if(nodeModels==null || nodeModels.length==0){
+    private void removeViewByNode(NodeModel<?> nodeModel){
+        //remove view
+        TreeViewHolder<?> holder = getTreeViewHolder(nodeModel);
+        if(holder != null){
+            removeView(holder.getView());
+            recycleHolder(holder);
+        }
+    }
+
+    /**
+     * Prepare moving, adding or removing nodes, record the last one node as an anchor node on view port, so that make it looks smooth change
+     *  @param targetNode  the target one
+     */
+    private void recordAnchorLocationOnViewPort(boolean isRemove, boolean isRemoveChildrenOnly, NodeModel<?> targetNode) {
+        if(targetNode==null){
             return;
         }
-        NodeModel<?> targetNode = nodeModels[nodeModels.length-1];
-        if(targetNode!=null && isRemove){
+        if(isRemove){
             //if remove, parent will be the target node
             Map<NodeModel<?>,View> removeNodeMap = new HashMap<>();
-            targetNode.selfTraverse(node -> {
-                removeNodeMap.put(node,getTreeViewHolder(node).getView());
-            });
+            if(isRemoveChildrenOnly){
+                targetNode.traverseChildren(node -> {
+                    removeNodeMap.put(node,getTreeViewHolder(node).getView());
+                });
+            }else{
+                targetNode.selfTraverse(node -> {
+                    removeNodeMap.put(node,getTreeViewHolder(node).getView());
+                });
+                targetNode = targetNode.getParentNode();
+            }
             setTag(R.id.mark_remove_views,removeNodeMap);
-            targetNode = targetNode.getParentNode();
         }
         if(targetNode!=null){
             TreeViewHolder<?> targetHolder = getTreeViewHolder(targetNode);
