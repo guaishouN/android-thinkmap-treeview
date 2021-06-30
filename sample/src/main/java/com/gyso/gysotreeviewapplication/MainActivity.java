@@ -117,11 +117,6 @@ public class MainActivity extends AppCompatActivity {
             editor.removeNode(toRemoveNode);
         });
 
-        //remove node
-        binding.removeChildrenBt.setOnClickListener(v->{
-            editor.removeNodeChildren(parentToRemoveChildren);
-        });
-
         adapter.setOnItemListener((item, node)-> {
             Animal animal = node.getValue();
             Toast.makeText(this,"you click the head of "+animal,Toast.LENGTH_SHORT).show();
