@@ -68,7 +68,18 @@ public class TreeViewEditor {
     public void removeNode(NodeModel<?> nodeToRemove){
         TreeViewContainer container = getContainer();
         if(container!=null){
-            container.onRemoveNodes(nodeToRemove);
+            container.onRemoveNode(nodeToRemove);
+        }
+    }
+
+    /**
+     * remove children nodes by parent node
+     * @param parentNode parent node to remove children
+     */
+    public void removeNodeChildren(NodeModel<?> parentNode){
+        TreeViewContainer container = getContainer();
+        if(container!=null){
+            container.onRemoveChildNodes(parentNode);
         }
     }
 }

@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private NodeModel<Animal> targetNode;
     private AtomicInteger atomicInteger = new AtomicInteger();
     private Handler handler = new Handler();
+    private NodeModel<Animal> parentToRemoveChildren = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,6 +115,11 @@ public class MainActivity extends AppCompatActivity {
             NodeModel<Animal> toRemoveNode = removeCache.pop();
             targetNode = toRemoveNode.getParentNode();
             editor.removeNode(toRemoveNode);
+        });
+
+        //remove node
+        binding.removeChildrenBt.setOnClickListener(v->{
+            editor.removeNodeChildren(parentToRemoveChildren);
         });
 
         adapter.setOnItemListener((item, node)-> {
@@ -203,6 +209,7 @@ public class MainActivity extends AppCompatActivity {
         treeModel.addNode(sub1,sub2);
         treeModel.addNode(sub0,sub4,sub5);
         treeModel.addNode(sub4,sub6);
+        parentToRemoveChildren = sub0;
 //        treeModel.addNode(sub5,sub7,sub8);
 //        treeModel.addNode(sub6,sub9,sub10,sub11);
 //        treeModel.addNode(sub3,sub12,sub13);

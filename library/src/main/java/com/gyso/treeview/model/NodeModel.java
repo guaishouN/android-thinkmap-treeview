@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -128,7 +129,11 @@ public class NodeModel<T> implements Serializable {
      * traverse
      * @param node to deal node
      */
-    public void traverse(NodeModel<T> node, INext<T> next){
+    private void traverse(NodeModel<T> node, INext<T> next){
+        traverse(node,next,true);
+    }
+
+    private void traverse(NodeModel<T> node, INext<T> next, boolean isIncludeSelf){
         if(node==null || next==null){
             return;
         }
@@ -136,21 +141,48 @@ public class NodeModel<T> implements Serializable {
         stack.add(node);
         while (!stack.isEmpty()) {
             NodeModel<T> tmp = stack.pop();
-            next.next(tmp);
+            if(isIncludeSelf){
+                next.next(tmp);
+            }else if(tmp!=this){
+                next.next(tmp);
+            }
             LinkedList<NodeModel<T>> childNodes = tmp.getChildNodes();
             stack.addAll(childNodes);
         }
     }
-
     /**
-     * traverse bys self
+     * traverse all sub node include self
      * @param next callback
      */
-    public void selfTraverse(INext<T> next){
+    public void traverseIncludeSelf(INext<T> next){
         if(next==null){
             return;
         }
-        traverse(this,next);
+        traverse(this,next,true);
+    }
+
+    /**
+     * traverse all sub node exclude self
+     * @param next callback
+     */
+    public void traverseExcludeSelf(INext<T> next){
+        if(next==null){
+            return;
+        }
+        traverse(this,next,false);
+    }
+
+    /**
+     * traverse only direct children
+     * @param next callback
+     */
+    public void traverseDirectChildren(INext<T> next){
+        if(next==null){
+            return;
+        }
+        for (NodeModel<T> childNode : new LinkedList<>(childNodes)) {
+            next.next(childNode);
+        }
     }
 
     public void removeChildNode(NodeModel<T> aChild){
