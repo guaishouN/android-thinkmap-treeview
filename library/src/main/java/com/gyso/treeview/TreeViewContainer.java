@@ -585,23 +585,22 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         if(adapter!=null){
             if(isAnimateRemove()){
                 recordAnchorLocationOnViewPort(true,isRemoveChildNodesOnly ,nodeModel);
-            }
-            if(isRemoveChildNodesOnly){
-                nodeModel.traverseChildren(next->adapter.getTreeModel().removeNode(nodeModel, next));
-            }else{
-                adapter.getTreeModel().removeNode(nodeModel.getParentNode(), nodeModel);
-            }
-
-            mTreeModel.calculateTreeNodesDeep();
-            if(isAnimateRemove()){
-                requestLayout();
+                if(isRemoveChildNodesOnly){
+                    nodeModel.traverseDirectChildren(next->adapter.getTreeModel().removeNode(nodeModel, next));
+                }else{
+                    adapter.getTreeModel().removeNode(nodeModel.getParentNode(), nodeModel);
+                }
             }else{
                 if(isRemoveChildNodesOnly){
-                    nodeModel.traverseChildren(this::removeViewByNode);
+                    nodeModel.traverseExcludeSelf(this::removeViewByNode);
+                    nodeModel.traverseDirectChildren(next->adapter.getTreeModel().removeNode(nodeModel, next));
                 }else{
-                    nodeModel.selfTraverse(this::removeViewByNode);
+                    nodeModel.traverseIncludeSelf(this::removeViewByNode);
+                    adapter.getTreeModel().removeNode(nodeModel.getParentNode(), nodeModel);
                 }
             }
+            mTreeModel.calculateTreeNodesDeep();
+            requestLayout();
         }
     }
 
@@ -630,11 +629,11 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
             //if remove, parent will be the target node
             Map<NodeModel<?>,View> removeNodeMap = new HashMap<>();
             if(isRemoveChildrenOnly){
-                targetNode.traverseChildren(node -> {
+                targetNode.traverseExcludeSelf(node -> {
                     removeNodeMap.put(node,getTreeViewHolder(node).getView());
                 });
             }else{
-                targetNode.selfTraverse(node -> {
+                targetNode.traverseIncludeSelf(node -> {
                     removeNodeMap.put(node,getTreeViewHolder(node).getView());
                 });
                 targetNode = targetNode.getParentNode();
