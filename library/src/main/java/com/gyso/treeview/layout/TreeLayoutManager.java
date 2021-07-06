@@ -138,7 +138,9 @@ public abstract class TreeLayoutManager {
      * path->path from parent, same as paint
      */
     public void performDrawLine(DrawInfo drawInfo){
-        baseline.draw(drawInfo);
+        if(baseline!=null){
+            baseline.draw(drawInfo);
+        }
     }
 
     /**
