@@ -48,6 +48,7 @@ A custom tree view for Android,  designed for easy drawing some tree nodes (e.g.
  Add dependence like this
  ```groovy
 	 dependencies {
+	 	implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
 		implementation 'io.github.guaishoun:gyso-treeview:1.0.1'
 	}
  ```
