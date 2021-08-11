@@ -45,6 +45,12 @@ A custom tree view for Android,  designed for easy drawing some tree nodes (e.g.
 
 #### Steps for use
 
+ Add dependence like this
+ ```groovy
+	 dependencies {
+		implementation 'io.github.guaishoun:gyso-treeview:1.0.1'
+	}
+ ```
 
 ```xml
     <com.gyso.treeview.GysoTreeView

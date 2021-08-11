@@ -54,6 +54,13 @@ Tree View; Mind map; Think map; tree map; 树状图；思维导图；
 
 #### 使用步骤：
 
+ 添加依赖
+ ```groovy
+	 dependencies {
+		implementation 'io.github.guaishoun:gyso-treeview:1.0.1'
+	}
+ ```
+
 ```xml
 <com.gyso.treeview.GysoTreeView
     android:id="@+id/base_tree_view"
