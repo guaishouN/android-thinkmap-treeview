@@ -179,4 +179,4 @@ Secondly, customing lines by extends BaseLine may be a little complicate for And
 
 Finally, this custom view will be continuely improved,  if you has some innovative ideas, please tell me. Thanks for you patience.
 
-I will tell you how it works on [my CSDN blogs](https://blog.csdn.net/guaisou/article/details/116611140).
+I will tell you how it works on [my CSDN blogs](https://blog.csdn.net/guaisou/article/details/116611140).Thx.
