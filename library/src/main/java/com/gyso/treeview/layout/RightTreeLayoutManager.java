@@ -168,7 +168,7 @@ public class RightTreeLayoutManager extends TreeLayoutManager {
         int deltaHeight = 0;
         if(leafCount>1){
             deltaHeight = (deepStart.get(deep + leafCount) - deepStart.get(deep)-currentHeight)/2-horizonCenterFix;
-            //deltaHeight -= spacePeerToPeer/2;
+            deltaHeight -= spacePeerToPeer/2;
         }
 
         int top  = deepStart.get(deep)+horizonCenterFix+deltaHeight;
