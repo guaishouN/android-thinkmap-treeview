@@ -138,7 +138,7 @@ public class RightTreeLayoutManager extends TreeLayoutManager {
 
                 @Override
                 public void finish() {
-
+                    layoutAnimate(treeViewContainer);
                 }
             });
         }
@@ -176,6 +176,9 @@ public class RightTreeLayoutManager extends TreeLayoutManager {
         int bottom = top+currentHeight;
         int right = left+currentWidth;
 
-        currentNodeView.layout(left,top,right,bottom);
+        ViewBox finalLocation = new ViewBox(top, left, bottom, right);
+        if(!layoutAnimatePrepare(currentNode,currentNodeView,finalLocation,treeViewContainer)){
+            currentNodeView.layout(left,top,right,bottom);
+        }
     }
 }
