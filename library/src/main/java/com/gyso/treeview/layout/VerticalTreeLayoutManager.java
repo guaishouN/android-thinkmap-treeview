@@ -172,6 +172,7 @@ public class VerticalTreeLayoutManager extends TreeLayoutManager {
         int deltaWidth = 0;
         if(leafCount>1){
             deltaWidth = (deepStart.get(deep + leafCount) - deepStart.get(deep)-currentWidth)/2-verticalCenterFix;
+            deltaWidth -= spacePeerToPeer/2;
         }
 
         int top = floorStart.get(floor);

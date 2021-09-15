@@ -56,9 +56,10 @@ Tree View; Mind map; Think map; tree map; 树状图；思维导图；
 
  添加依赖
  ```groovy
-	 dependencies {
-		implementation 'io.github.guaishoun:gyso-treeview:1.0.1'
-	}
+ dependencies {
+	implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
+	implementation 'io.github.guaishoun:gyso-treeview:1.0.1'
+}
  ```
 
 ```xml

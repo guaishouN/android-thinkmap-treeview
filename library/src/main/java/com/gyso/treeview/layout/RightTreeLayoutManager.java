@@ -138,7 +138,7 @@ public class RightTreeLayoutManager extends TreeLayoutManager {
 
                 @Override
                 public void finish() {
-
+                    layoutAnimate(treeViewContainer);
                 }
             });
         }
@@ -168,6 +168,7 @@ public class RightTreeLayoutManager extends TreeLayoutManager {
         int deltaHeight = 0;
         if(leafCount>1){
             deltaHeight = (deepStart.get(deep + leafCount) - deepStart.get(deep)-currentHeight)/2-horizonCenterFix;
+            deltaHeight -= spacePeerToPeer/2;
         }
 
         int top  = deepStart.get(deep)+horizonCenterFix+deltaHeight;
@@ -175,6 +176,9 @@ public class RightTreeLayoutManager extends TreeLayoutManager {
         int bottom = top+currentHeight;
         int right = left+currentWidth;
 
-        currentNodeView.layout(left,top,right,bottom);
+        ViewBox finalLocation = new ViewBox(top, left, bottom, right);
+        if(!layoutAnimatePrepare(currentNode,currentNodeView,finalLocation,treeViewContainer)){
+            currentNodeView.layout(left,top,right,bottom);
+        }
     }
 }
