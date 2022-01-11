@@ -683,6 +683,14 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         return adapter.onCreateViewHolder(this, (NodeModel)node);
     }
 
+    /**
+     *  focus map on center of viewport by one node
+     * @param nodeToFocus node to focus
+     */
+   public void getViewByNode(NodeModel<?> nodeToFocus){
+
+    }
+
     public void recycleHolder(TreeViewHolder<?> holder){
         int type = adapter.getHolderType(holder.getNode());
         HolderPool holderPool = holderPools.get(type);
