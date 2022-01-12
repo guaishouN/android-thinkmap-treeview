@@ -55,4 +55,12 @@ class ForceDirectKotlin constructor(
             }
         }
     }
+
+    fun updateRepulsion(){
+
+    }
+
+    fun updateGravitation(){
+
+    }
 }
