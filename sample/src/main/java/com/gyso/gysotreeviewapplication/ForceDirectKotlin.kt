@@ -9,7 +9,6 @@ import android.graphics.PointF
 import android.util.AttributeSet
 import android.view.View
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 data class Conf(val kq: Float, val ks: Float)
