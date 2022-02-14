@@ -12,11 +12,14 @@ import com.gyso.gysotreeviewapplication.base.Animal;
 import com.gyso.gysotreeviewapplication.base.AnimalTreeViewAdapter;
 import com.gyso.gysotreeviewapplication.databinding.ActivityMainBinding;
 import com.gyso.treeview.TreeViewEditor;
+import com.gyso.treeview.layout.ForceDirectedTreeLayoutManager;
 import com.gyso.treeview.layout.RightTreeLayoutManager;
 import com.gyso.treeview.layout.TreeLayoutManager;
 import com.gyso.treeview.layout.VerticalTreeLayoutManager;
 import com.gyso.treeview.line.AngledLine;
 import com.gyso.treeview.line.BaseLine;
+import com.gyso.treeview.line.SmoothLine;
+import com.gyso.treeview.line.StraightLine;
 import com.gyso.treeview.listener.TreeViewControlListener;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
@@ -155,19 +158,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private TreeLayoutManager getTreeLayoutManager() {
-        int space_50dp = 50;
+        int space_50dp = 150;
         int space_20dp = 20;
         BaseLine line = getLine();
         //return new RightTreeLayoutManager(this,space_50dp,space_20dp,line);
-        return new VerticalTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new VerticalTreeLayoutManager(this,space_50dp,space_20dp,line);
+        return new ForceDirectedTreeLayoutManager(this,space_50dp,space_20dp,line);
     }
 
     private BaseLine getLine() {
-        //return new SmoothLine();
-        //return new StraightLine();
+        return new SmoothLine();
+        // return new StraightLine();
         //return new PointedLine();
         //return new DashLine(Color.parseColor("#4DB6AC"),8);
-        return new AngledLine();
+        //return new AngledLine();
     }
 
     private void setData(AnimalTreeViewAdapter adapter){
@@ -205,12 +209,12 @@ public class MainActivity extends AppCompatActivity {
         treeModel.addNode(sub0,sub4,sub5);
         treeModel.addNode(sub4,sub6);
         parentToRemoveChildren = sub0;
-//        treeModel.addNode(sub5,sub7,sub8);
-//        treeModel.addNode(sub6,sub9,sub10,sub11);
-//        treeModel.addNode(sub3,sub12,sub13);
-//        treeModel.addNode(sub11,sub14,sub15);
-//        treeModel.addNode(sub10,sub16);
-//        treeModel.addNode(sub8,sub17,sub18,sub19,sub20);
+        treeModel.addNode(sub5,sub7,sub8);
+        treeModel.addNode(sub6,sub9,sub10,sub11);
+        treeModel.addNode(sub3,sub12,sub13);
+        treeModel.addNode(sub11,sub14,sub15);
+        treeModel.addNode(sub10,sub16);
+        treeModel.addNode(sub8,sub17,sub18,sub19,sub20);
         //set data
         adapter.setTreeModel(treeModel);
     }

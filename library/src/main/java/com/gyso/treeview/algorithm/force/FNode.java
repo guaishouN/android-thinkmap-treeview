@@ -25,7 +25,7 @@ public class FNode {
     private Object obj;    // 用来携带其他数据，如：该节点对应的数据实体 Bean，或数据库中的 _id
     private int    level;  // 级别
 
-    float x, y;    // 当前坐标
+    public float x, y;    // 当前坐标
     float px, py;  // 前一个状态的坐标
     int weight;    // 根据子节点自动计算，weight 越大，该节点越不容易被拖动
 
