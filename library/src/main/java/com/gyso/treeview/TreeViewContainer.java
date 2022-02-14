@@ -65,7 +65,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     private int viewHeight;
     private int winWidth;
     private int winHeight;
-    private float minScale = 1f;
+    private float minScale = 0.2f;
     private Map<NodeModel<?>, TreeViewHolder<?>> nodeViewMap =null;
     private Paint mPaint;
     private Matrix centerMatrix;
@@ -275,11 +275,11 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
-        super.dispatchDraw(canvas);
         if (mTreeModel != null) {
             drawInfo.setCanvas(canvas);
             drawTreeLine(mTreeModel.getRootNode());
         }
+        super.dispatchDraw(canvas);
     }
 
     /**

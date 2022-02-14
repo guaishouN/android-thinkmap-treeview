@@ -5,6 +5,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+
 import com.gyso.treeview.TreeViewContainer;
 import com.gyso.treeview.adapter.TreeViewHolder;
 import com.gyso.treeview.algorithm.force.FLink;
@@ -30,8 +32,8 @@ public class ForceDirectedTreeLayoutManager extends TreeLayoutManager implements
     private final Handler handler;
     private TreeViewContainer treeViewContainer;
     final Map<NodeModel<?>,FNode > fNodeCache = new HashMap<>();
-    public ForceDirectedTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
-        super(context, spaceParentToChild, spacePeerToPeer, baseline);
+    public ForceDirectedTreeLayoutManager(Context context, BaseLine baseline) {
+        super(context, 150, 150, baseline);
         handler = new Handler(Looper.getMainLooper());
         force = new Force(this);
         init();
@@ -41,7 +43,7 @@ public class ForceDirectedTreeLayoutManager extends TreeLayoutManager implements
         handler.post(() ->
                 force.setStrength(0.7f)
                     .setFriction(0.8f)
-                    .setDistance(150)
+                    .setDistance(50)
                     .setCharge(-320f)
                     .setGravity(0.1f)
                     .setTheta(0.8f)
@@ -70,10 +72,11 @@ public class ForceDirectedTreeLayoutManager extends TreeLayoutManager implements
             mTreeModel.doTraversalNodes(new ITraversal<NodeModel<?>>() {
                 @Override
                 public void next(NodeModel<?> next) {
+                    float radius = getViewRadius(next);
                     FNode parentFNode = fNodeCache.get(next);
                     if(parentFNode == null){
                         //deal node
-                        parentFNode = new FNode(next.toString());
+                        parentFNode = new FNode(next.toString(),radius,next.floor);
                         fNodeCache.put(next,parentFNode);
                         nodes.add(parentFNode);
                     }
@@ -84,7 +87,8 @@ public class ForceDirectedTreeLayoutManager extends TreeLayoutManager implements
                             if(child!=null){
                                 FNode childFNode = fNodeCache.get(child);
                                 if(childFNode==null){
-                                    childFNode = new FNode(child.toString());
+                                    float r = getViewRadius(child);
+                                    childFNode = new FNode(child.toString(),radius,child.floor);
                                     fNodeCache.put(child,childFNode);
                                     nodes.add(childFNode);
                                 }
@@ -103,6 +107,17 @@ public class ForceDirectedTreeLayoutManager extends TreeLayoutManager implements
             });
         }
     }
+
+    private float getViewRadius(@NonNull NodeModel<?> nodeMode){
+        TreeViewHolder<?> viewHolder = treeViewContainer.getTreeViewHolder(nodeMode);
+        View theView =  viewHolder==null?null:viewHolder.getView();
+        assert theView != null;
+        float w = theView.getMeasuredWidth()/2f;
+        float h = theView.getMeasuredHeight()/2f;
+        float radius = (float)Math.sqrt(w * w + h * h);
+        return radius;
+    }
+
     @Override
     public void performMeasure(TreeViewContainer treeViewContainer) {
         this.treeViewContainer = treeViewContainer;
@@ -114,8 +129,8 @@ public class ForceDirectedTreeLayoutManager extends TreeLayoutManager implements
                 fixedViewBox.clear();
                 force.setSize(winWidth,winHeight);
                 setUpData();
-                fixedViewBox.setValues(0,0,winWidth,winHeight);
-                mContentViewBox.setValues(0,0,winWidth,winHeight);
+                fixedViewBox.setValues(0,0,winWidth*3,winHeight*3);
+                mContentViewBox.setValues(0,0,winWidth*3,winHeight*3);
             }
         }
     }

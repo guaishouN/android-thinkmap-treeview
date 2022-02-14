@@ -219,20 +219,19 @@ public class Force {
     }
 
     private void tick() {
-        if ((alpha *= 0.99) < 0.005) {
-            //endTickTask();
-            pauseTask();
-            return;
-        }
-
-        if (nodes == null || links == null) {
+        if (nodes == null || links == null || nodes.isEmpty() || links.isEmpty()) {
 //            endTickTask();
             pauseTask();
             return;
         }
-
         ArrayList<FNode> nodes = this.nodes;
         ArrayList<FLink> links = this.links;
+
+        if ((alpha *= 0.99) < 0.0001/nodes.size()) {
+            //endTickTask();
+            pauseTask();
+            return;
+        }
 
         final int nodeCount = nodes.size();
         int linkCount = links.size();
@@ -261,16 +260,16 @@ public class Force {
             }
         }
 
-        float k = alpha * gravity;
-        if (k != 0) {
-            int w = width / 2;
-            int h = height / 2;
-            for (int i = 0; i < nodeCount; i++) {
-                FNode node = nodes.get(i);
-                node.x += (w - node.x) * k;
-                node.y += (h - node.y) * k;
-            }
-        }
+//        float k = alpha * gravity;
+//        if (k != 0) {
+//            int w = width / 2;
+//            int h = height / 2;
+//            for (int i = 0; i < nodeCount; i++) {
+//                FNode node = nodes.get(i);
+//                node.x += (w - node.x) * k;
+//                node.y += (h - node.y) * k;
+//            }
+//        }
 
         if (charge != 0) {
             final QuadTree quadTree = getQuadTree(nodes);
