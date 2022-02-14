@@ -31,6 +31,9 @@ public abstract class TreeLayoutManager {
     public static final String TAG = TreeLayoutManager.class.getSimpleName();
     public static final int LAYOUT_TYPE_HORIZON_RIGHT = 0;
     public static final int LAYOUT_TYPE_VERTICAL_DOWN = 1;
+    public static final int LAYOUT_TYPE_FORCE_DIRECTED = 2;
+    public static final int LAYOUT_TYPE_HORIZON_LEFT = 3;
+    public static final int LAYOUT_TYPE_VERTICAL_UP = 4;
     /**
      * the content padding, unit is dp;
      */

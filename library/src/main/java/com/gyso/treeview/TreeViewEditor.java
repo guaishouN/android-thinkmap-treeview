@@ -55,6 +55,7 @@ public class TreeViewEditor {
      *  change layout algorithm
      */
     public void changeLayoutAlgorithm(){
+
     }
 
     /**
@@ -71,11 +72,11 @@ public class TreeViewEditor {
      * @param jsonStringFilePath jsonStringFilePath
      */
     public boolean save(String jsonStringFilePath, TraverseRelationshipCallback traverse){
-            return  false;
+            return false;
     }
 
     public boolean save(File jsonStringFile, TraverseRelationshipCallback traverse){
-        return  false;
+        return false;
     }
 
     /**
@@ -127,7 +128,7 @@ public class TreeViewEditor {
     }
 
     /**
-     *  for  support scroll view
+     *  for support scroll view
      */
     public void  lockDragDirection(){
 
@@ -155,7 +156,8 @@ public class TreeViewEditor {
     }
 
     /**
-     *  restructure by dragging;  multi select mode;  single click to focus; totally free drag; add node by node view list
+     *  default: auto restructure by dragging;
+     *  totally free drag;
      * @param status status
      */
     public void setEditStatus(int status){
