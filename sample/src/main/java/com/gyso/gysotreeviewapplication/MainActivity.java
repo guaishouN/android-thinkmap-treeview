@@ -154,7 +154,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
     private TreeLayoutManager getTreeLayoutManager() {
@@ -162,13 +161,13 @@ public class MainActivity extends AppCompatActivity {
         int space_20dp = 20;
         BaseLine line = getLine();
         //return new RightTreeLayoutManager(this,space_50dp,space_20dp,line);
-        //return new VerticalTreeLayoutManager(this,space_50dp,space_20dp,line);
-        return new ForceDirectedTreeLayoutManager(this,space_50dp,space_20dp,line);
+        return new VerticalTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new ForceDirectedTreeLayoutManager(this,line);
     }
 
     private BaseLine getLine() {
-        return new SmoothLine();
-        // return new StraightLine();
+        //return new SmoothLine();
+         return new StraightLine();
         //return new PointedLine();
         //return new DashLine(Color.parseColor("#4DB6AC"),8);
         //return new AngledLine();

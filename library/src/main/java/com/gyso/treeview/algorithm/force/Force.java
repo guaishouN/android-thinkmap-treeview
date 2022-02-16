@@ -173,8 +173,10 @@ public class Force {
         }
         for (int i = 0; i < nodeCount; i++) {
             FNode node = nodes.get(i);
-            node.px = node.x = getRandomPosition(width);
-            node.py = node.y = getRandomPosition(height);
+            node.x = node.x==-1f?getRandomPosition(width):node.x;
+            node.y = node.y ==-1f? getRandomPosition(height):node.y;
+            node.px = node.x;
+            node.py = node.y;
         }
 
         return resume();
@@ -260,16 +262,16 @@ public class Force {
             }
         }
 
-//        float k = alpha * gravity;
-//        if (k != 0) {
-//            int w = width / 2;
-//            int h = height / 2;
-//            for (int i = 0; i < nodeCount; i++) {
-//                FNode node = nodes.get(i);
-//                node.x += (w - node.x) * k;
-//                node.y += (h - node.y) * k;
-//            }
-//        }
+        float k = alpha * gravity;
+        if (k != 0) {
+            int w = width / 2;
+            int h = height / 2;
+            for (int i = 0; i < nodeCount; i++) {
+                FNode node = nodes.get(i);
+                node.x += (w - node.x) * k;
+                node.y += (h - node.y) * k;
+            }
+        }
 
         if (charge != 0) {
             final QuadTree quadTree = getQuadTree(nodes);

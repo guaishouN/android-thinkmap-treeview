@@ -71,7 +71,7 @@ public class TreeModel<T> implements Serializable {
 
     }
 
-    /**
+      /**
      * calculate the deep of all tree nodes
      */
     public void calculateTreeNodesDeep(){
@@ -158,5 +158,13 @@ public class TreeModel<T> implements Serializable {
         this.iTraversal = ITraversal;
         this.finishTraversal = false;
         ergodicTreeByQueue();
+    }
+
+    /**
+     *
+     * @param isBottomToTop true for leaves to root; false for root to leaves
+     */
+    private void ergodicTreeByFloor( boolean isBottomToTop){
+
     }
 }

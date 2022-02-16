@@ -31,8 +31,7 @@ public class VerticalTreeLayoutManager extends TreeLayoutManager {
         return LAYOUT_TYPE_VERTICAL_DOWN;
     }
 
-    @Override
-    public void performMeasure(TreeViewContainer treeViewContainer) {
+    public void performMeasureAndListen(TreeViewContainer treeViewContainer, TreeLayoutManager.MeasureListener measureListener) {
         final TreeModel<?> mTreeModel = treeViewContainer.getTreeModel();
         if (mTreeModel != null) {
             mContentViewBox.clear();
@@ -42,6 +41,9 @@ public class VerticalTreeLayoutManager extends TreeLayoutManager {
                 @Override
                 public void next(NodeModel<?> next) {
                     measure(next, treeViewContainer);
+                    if(measureListener!=null){
+                        measureListener.onMeasureChild(next);
+                    }
                 }
 
                 @Override
@@ -83,10 +85,19 @@ public class VerticalTreeLayoutManager extends TreeLayoutManager {
                         int startPos = (dn==0?(mFixedDx + paddingBox.left):spacePeerToPeer) + preStart + preMax;
                         deepStart.put(dn,startPos);
                     }
+
+                    if(measureListener!=null){
+                        measureListener.onMeasureFinished();
+                    }
                 }
             };
             mTreeModel.doTraversalNodes(traversal);
         }
+    }
+
+    @Override
+    public void performMeasure(TreeViewContainer treeViewContainer) {
+        performMeasureAndListen(treeViewContainer,null);
     }
 
     /**

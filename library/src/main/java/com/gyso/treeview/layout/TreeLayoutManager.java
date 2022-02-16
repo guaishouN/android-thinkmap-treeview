@@ -381,4 +381,14 @@ public abstract class TreeLayoutManager {
         }
         return false;
     }
+
+    public interface  LayoutListener{
+        default void onLayoutChild(NodeModel<?> next){};
+        void onLayoutFinished();
+    }
+
+    public interface  MeasureListener{
+        default void onMeasureChild(NodeModel<?> next){};
+        void onMeasureFinished();
+    }
 }

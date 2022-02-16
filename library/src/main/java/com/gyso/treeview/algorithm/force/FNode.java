@@ -40,6 +40,8 @@ public class FNode {
         this.text = text;
         this.radius = radius;
         this.level = level;
+        x=y=-1f;
+        weight=1;
     }
 
     public void setObj(Object obj) {
