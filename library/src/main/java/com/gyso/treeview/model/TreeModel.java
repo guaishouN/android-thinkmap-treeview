@@ -1,13 +1,11 @@
 package com.gyso.treeview.model;
 
-import android.util.Log;
 import android.util.SparseArray;
 
 import com.gyso.treeview.util.TreeViewLog;
 
 import java.io.Serializable;
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -90,7 +88,7 @@ public class TreeModel<T> implements Serializable {
                 if(indexOfCur>0){
                     NodeModel<T> prePeer = parentNode.childNodes.get(indexOfCur - 1);
                     cur.deep += prePeer.deep;
-                    cur.deep += (prePeer.leafCount==0?1:prePeer.leafCount);
+                    cur.deep += (prePeer.leafCount ==0?1:prePeer.leafCount);
                 }else{
                     cur.deep = parentNode.deep;
                 }

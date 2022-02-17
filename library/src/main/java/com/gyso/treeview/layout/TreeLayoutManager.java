@@ -38,7 +38,7 @@ public abstract class TreeLayoutManager {
     /**
      * the content padding, unit is dp;
      */
-    protected static final int DEFAULT_CONTENT_PADDING_DP = 100;
+    protected static final int DEFAULT_CONTENT_PADDING_DP = 50;
     public static final int DEFAULT_SPACE_PARENT_CHILD_DP = 50;
     public static final int DEFAULT_SPACE_PEER_PEER_DP = 20;
     public static final BaseLine DEFAULT_LINE = new SmoothLine();

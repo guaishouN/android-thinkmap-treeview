@@ -21,7 +21,7 @@ public class RingTreeLayoutManager extends TreeLayoutManager{
 
         @Override
         public int getTreeLayoutType() {
-            return LAYOUT_TYPE_VERTICAL_DOWN;
+            return LAYOUT_TYPE_RING;
         }
 
         public void performMeasureAndListen(TreeViewContainer treeViewContainer, TreeLayoutManager.MeasureListener measureListener) {
@@ -41,6 +41,14 @@ public class RingTreeLayoutManager extends TreeLayoutManager{
 
                     @Override
                     public void finish() {
+                        //base content box
+                        for (int i=0;i<floorMax.size();i++){
+                            int r = floorMax.get(i);
+                            mContentViewBox.right += r*2;
+                            mContentViewBox.bottom += r*2;
+                        }
+
+                        //add padding
                         getPadding(treeViewContainer);
                         mContentViewBox.bottom += (paddingBox.bottom+paddingBox.top);
                         mContentViewBox.right  += (paddingBox.left+paddingBox.right);
@@ -61,23 +69,12 @@ public class RingTreeLayoutManager extends TreeLayoutManager{
                         mFixedDx = (fixedViewBox.getWidth()-mContentViewBox.getWidth())/2;
                         mFixedDy = (fixedViewBox.getHeight()-mContentViewBox.getHeight())/2;
 
-                        //compute floor start position
-                        for (int i = 0; i <= floorMax.size(); i++) {
-                            int fn = (i == floorMax.size())?floorMax.size():floorMax.keyAt(i);
-                            int preStart = floorStart.get(fn - 1, 0);
-                            int preMax = floorMax.get(fn - 1, 0);
-                            int startPos = (fn==0?(mFixedDy + paddingBox.top):spaceParentToChild) + preStart + preMax;
-                            floorStart.put(fn,startPos);
-                        }
+                        int rootCenterX = mFixedDx+fixedViewBox.getWidth()/2;
+                        int rootCenterY = mFixedDx+fixedViewBox.getHeight()/2;
+                        NodeModel<?> rootNode = mTreeModel.getRootNode();
+                        int leavesCount = rootNode.leafCount;
+                        int anglePerLeaf  = 360 / leavesCount;
 
-                        //compute deep start position
-                        for (int i = 0; i <= deepMax.size(); i++) {
-                            int dn = (i == deepMax.size())?deepMax.size():deepMax.keyAt(i);
-                            int preStart = deepStart.get(dn - 1, 0);
-                            int preMax = deepMax.get(dn - 1, 0);
-                            int startPos = (dn==0?(mFixedDx + paddingBox.left):spacePeerToPeer) + preStart + preMax;
-                            deepStart.put(dn,startPos);
-                        }
 
                         if(measureListener!=null){
                             measureListener.onMeasureFinished();
@@ -116,20 +113,12 @@ public class RingTreeLayoutManager extends TreeLayoutManager{
             if(currentNodeView==null){
                 throw new NullPointerException(" currentNodeView can not be null");
             }
-            int preMaxH = floorMax.get(node.floor);
             int curH = currentNodeView.getMeasuredHeight();
-            if(preMaxH < curH){
-                floorMax.put(node.floor,curH);
-                int delta = spaceParentToChild +curH-preMaxH;
-                mContentViewBox.bottom += delta;
-            }
-
-            int preMaxW = deepMax.get(node.deep);
             int curW = currentNodeView.getMeasuredWidth();
-            if(preMaxW < curW){
-                deepMax.put(node.deep,curW);
-                int delta = spacePeerToPeer +curW-preMaxW;
-                mContentViewBox.right += delta;
+            int maxR = (int)Math.hypot(curH,curW);
+            int preMaxR= floorMax.get(node.floor);
+            if(preMaxR < maxR){
+                floorMax.put(node.floor,maxR);
             }
         }
 
