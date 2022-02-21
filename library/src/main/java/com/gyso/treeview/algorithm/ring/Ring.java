@@ -66,6 +66,7 @@ public class Ring {
             if(next.equals(rootNode)){
                 return;
             }
+            TreeViewLog.e(TAG,next+" -gyso");
             PointF pointF = nodeModelPointFMap.get(next);
             if (pointF == null) {
                 pointF = new PointF();
@@ -75,8 +76,8 @@ public class Ring {
                 LinkedList<? extends NodeModel<?>> childNodes = next.getChildNodes();
                 if(!childNodes.isEmpty()){
                     int count = next.leafCount;
-                    if(count>2){
-                        double d = count%2 == 0?(deltaAngle*(count-1)/2f):(deltaAngle*(count-deep)/2f);
+                    if(count>=2){
+                        double d = count%2 == 0?(deltaAngle*(count-1)/2f):(deltaAngle*(count-1)/2f);
                         angle += d;
                     }
                 }

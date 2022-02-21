@@ -99,9 +99,9 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this,"Ohs, your targetNode is null", Toast.LENGTH_SHORT).show();
                 return;
             }
-            NodeModel<Animal> a = new NodeModel<>(new Animal(R.drawable.ic_10,"add-" + atomicInteger.getAndIncrement()));
-            NodeModel<Animal> b = new NodeModel<>(new Animal(R.drawable.ic_11,"add-" + atomicInteger.getAndIncrement()));
-            NodeModel<Animal> c = new NodeModel<>(new Animal(R.drawable.ic_14,"add-" + atomicInteger.getAndIncrement()));
+            NodeModel<Animal> a = new NodeModel<>(new Animal(R.drawable.ic_10,"add1"));
+            NodeModel<Animal> b = new NodeModel<>(new Animal(R.drawable.ic_11,"add2"));
+            NodeModel<Animal> c = new NodeModel<>(new Animal(R.drawable.ic_14,"add3"));
             editor.addChildNodes(targetNode,a,b,c);
 
 
@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private TreeLayoutManager getTreeLayoutManager() {
-        int space_50dp = 150;
+        int space_50dp = 30;
         int space_20dp = 20;
         BaseLine line = getLine();
         //return new RightTreeLayoutManager(this,space_50dp,space_20dp,line);
@@ -207,9 +207,9 @@ public class MainActivity extends AppCompatActivity {
         //build relationship
         treeModel.addNode(root,sub0,sub1,sub3);
         treeModel.addNode(sub3,sub7,sub18,sub19,sub20);
-//        treeModel.addNode(sub1,sub2);
-//        treeModel.addNode(sub0,sub4,sub5);
-//        treeModel.addNode(sub4,sub6);
+        treeModel.addNode(sub1,sub2);
+        treeModel.addNode(sub0,sub4,sub5);
+        treeModel.addNode(sub4,sub6);
         parentToRemoveChildren = sub0;
 //        treeModel.addNode(sub5,sub7,sub8);
 //        treeModel.addNode(sub6,sub9,sub10,sub11);
