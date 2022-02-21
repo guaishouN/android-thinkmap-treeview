@@ -2,7 +2,6 @@ package com.gyso.treeview.layout;
 
 import android.content.Context;
 import android.graphics.PointF;
-import android.util.Log;
 import android.view.View;
 import com.gyso.treeview.R;
 import com.gyso.treeview.TreeViewContainer;
@@ -146,7 +145,7 @@ public class RingTreeLayoutManager extends TreeLayoutManager {
             mTreeModel.doTraversalNodes(new ITraversal<NodeModel<?>>() {
                 @Override
                 public void next(NodeModel<?> next) {
-                    Log.e(TAG, "performLayout next: "+next);
+                    TreeViewLog.e(TAG, "performLayout next: "+next);
                     layoutNodes(next, treeViewContainer);
                 }
 

@@ -17,10 +17,12 @@ import java.util.Stack;
  */
 public class NodeModel<T> implements Serializable {
 
+    public TreeModel<?>  treeModel = null;
+
     /**
      * the parent node,if root node parent node=null;
      */
-    public NodeModel<T> parentNode;
+    public NodeModel parentNode;
 
     /**
      * the data value
@@ -30,7 +32,7 @@ public class NodeModel<T> implements Serializable {
     /**
      * have the child nodes
      */
-    public LinkedList<NodeModel<T>> childNodes;
+    public final LinkedList<NodeModel<T>> childNodes;
 
     /**
      * focus tag for the tree add nodes
@@ -195,13 +197,13 @@ public class NodeModel<T> implements Serializable {
         }
     }
 
-    public void removeChildNode(NodeModel<T> aChild){
+    public void removeChildNode(NodeModel<?> aChild){
         childNodes.remove(aChild);
 
         int removeCount = Math.max(1,aChild.leafCount);
         leafCount -= removeCount;
 
-        NodeModel<T> parentNode = getParentNode();
+        NodeModel<?> parentNode = getParentNode();
 
         while (parentNode!=null){
             parentNode.leafCount -=removeCount;
@@ -212,6 +214,7 @@ public class NodeModel<T> implements Serializable {
             parentNode = parentNode.getParentNode();
         }
         aChild.setParentNode(null);
+
     }
 
     public boolean isFocus() {

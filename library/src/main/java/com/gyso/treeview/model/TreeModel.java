@@ -21,12 +21,16 @@ public class TreeModel<T> implements Serializable {
      * the root for the tree
      */
     private NodeModel<T> rootNode;
+    private NodeModel<?> maxChildNode;
     private SparseArray<LinkedList<NodeModel<T>>> arrayByFloor = new SparseArray<>(10);
     private transient ITraversal<NodeModel<?>> iTraversal;
     public TreeModel(NodeModel<T> rootNode) {
         this.rootNode = rootNode;
+        this.maxChildNode = rootNode;
     }
+
     private boolean finishTraversal = false;
+
     /**
      * add the node in some father node
      * @param parent
@@ -35,13 +39,37 @@ public class TreeModel<T> implements Serializable {
     @SafeVarargs
     public final void addNode(NodeModel<?> parent, NodeModel<?>... childNodes) {
         if(parent!=null&&childNodes!=null && childNodes.length>0){
+            parent.treeModel = this;
             List<NodeModel<T>> nodeModels = new LinkedList<>();
             for (int i = 0; i < childNodes.length; i++) {
                 nodeModels.add((NodeModel<T>)childNodes[i]);
+                ((NodeModel<T>)childNodes[i]).treeModel = this;
             }
             ((NodeModel<T>)parent).addChildNodes(nodeModels);
             List<NodeModel<T>> floorList = getFloorList(nodeModels.get(0).floor);
             floorList.addAll(nodeModels);
+        }
+        recordMaxChildrenNode(parent);
+    }
+
+    public void recordMaxChildrenNode(NodeModel<?> aChildNode){
+        if(aChildNode==null){
+            return;
+        }
+        LinkedList<?> cLs = aChildNode.getChildNodes();
+        if(!cLs.isEmpty()){
+            LinkedList<?> mLs = maxChildNode.getChildNodes();
+           float k = (cLs.size()+aChildNode.leafCount)/2f;
+           float l = (mLs.size()+maxChildNode.leafCount)/2f;
+            if(rootNode.equals(maxChildNode)){
+                if( cLs.size()>mLs.size()){
+                    maxChildNode = aChildNode;
+                }
+            } else  if(k>l ){
+                maxChildNode = aChildNode;
+            }else if(k==l && cLs.size()>mLs.size()){
+                maxChildNode = aChildNode;
+            }
         }
     }
 
@@ -52,7 +80,7 @@ public class TreeModel<T> implements Serializable {
      */
     public void removeNode(NodeModel<?> parent, NodeModel<?> childNode) {
         if(parent!=null&&childNode!=null){
-            ((NodeModel<T>)parent).removeChildNode((NodeModel<T>)childNode);
+            parent.removeChildNode(childNode);
             List<NodeModel<T>> floorList = getFloorList(childNode.floor);
             floorList.remove(childNode);
         }
@@ -60,13 +88,6 @@ public class TreeModel<T> implements Serializable {
 
     public NodeModel<T> getRootNode() {
         return rootNode;
-    }
-
-    /**
-     * calculate the num of all tree nodes' leaf
-     */
-    public void calculateTreeNodesLeaves(){
-
     }
 
       /**
