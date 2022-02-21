@@ -14,6 +14,7 @@ import com.gyso.gysotreeviewapplication.databinding.ActivityMainBinding;
 import com.gyso.treeview.TreeViewEditor;
 import com.gyso.treeview.layout.ForceDirectedTreeLayoutManager;
 import com.gyso.treeview.layout.RightTreeLayoutManager;
+import com.gyso.treeview.layout.RingTreeLayoutManager;
 import com.gyso.treeview.layout.TreeLayoutManager;
 import com.gyso.treeview.layout.VerticalTreeLayoutManager;
 import com.gyso.treeview.line.AngledLine;
@@ -101,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
             NodeModel<Animal> a = new NodeModel<>(new Animal(R.drawable.ic_10,"add-" + atomicInteger.getAndIncrement()));
             NodeModel<Animal> b = new NodeModel<>(new Animal(R.drawable.ic_11,"add-" + atomicInteger.getAndIncrement()));
             NodeModel<Animal> c = new NodeModel<>(new Animal(R.drawable.ic_14,"add-" + atomicInteger.getAndIncrement()));
-            editor.addChildNodes(targetNode,b,a,c);
+            editor.addChildNodes(targetNode,a,b,c);
 
 
             //add to remove demo cache
@@ -161,7 +162,8 @@ public class MainActivity extends AppCompatActivity {
         int space_20dp = 20;
         BaseLine line = getLine();
         //return new RightTreeLayoutManager(this,space_50dp,space_20dp,line);
-        return new VerticalTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new VerticalTreeLayoutManager(this,space_50dp,space_20dp,line);
+        return new RingTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new ForceDirectedTreeLayoutManager(this,line);
     }
 
@@ -204,16 +206,17 @@ public class MainActivity extends AppCompatActivity {
 
         //build relationship
         treeModel.addNode(root,sub0,sub1,sub3);
-        treeModel.addNode(sub1,sub2);
-        treeModel.addNode(sub0,sub4,sub5);
-        treeModel.addNode(sub4,sub6);
+        treeModel.addNode(sub3,sub7,sub18,sub19,sub20);
+//        treeModel.addNode(sub1,sub2);
+//        treeModel.addNode(sub0,sub4,sub5);
+//        treeModel.addNode(sub4,sub6);
         parentToRemoveChildren = sub0;
-        treeModel.addNode(sub5,sub7,sub8);
-        treeModel.addNode(sub6,sub9,sub10,sub11);
-        treeModel.addNode(sub3,sub12,sub13);
-        treeModel.addNode(sub11,sub14,sub15);
-        treeModel.addNode(sub10,sub16);
-        treeModel.addNode(sub8,sub17,sub18,sub19,sub20);
+//        treeModel.addNode(sub5,sub7,sub8);
+//        treeModel.addNode(sub6,sub9,sub10,sub11);
+//        treeModel.addNode(sub3,sub12,sub13);
+//        treeModel.addNode(sub11,sub14,sub15);
+//        treeModel.addNode(sub10,sub16);
+//        treeModel.addNode(sub8,sub17,sub18,sub19,sub20);
         //set data
         adapter.setTreeModel(treeModel);
     }
