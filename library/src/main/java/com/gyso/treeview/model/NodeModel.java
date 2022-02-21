@@ -214,7 +214,6 @@ public class NodeModel<T> implements Serializable {
             parentNode = parentNode.getParentNode();
         }
         aChild.setParentNode(null);
-
     }
 
     public boolean isFocus() {

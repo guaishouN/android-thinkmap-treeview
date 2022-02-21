@@ -140,7 +140,7 @@ public class Ring {
                     if(l1 <= p2r){
                         //no good layout request layout
                         isGenPositionOK.set(false);
-                        int d = leafCount/3;
+                        int d = leafCount/6;
                         multi.addAndGet(d==0?1:d);
                         TreeViewLog.e(TAG,"Calculate ring position false!!!");
                     }

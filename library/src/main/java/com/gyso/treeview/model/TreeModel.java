@@ -90,10 +90,30 @@ public class TreeModel<T> implements Serializable {
         return rootNode;
     }
 
-      /**
+    public NodeModel<?> getMaxChildrenNodeAsRootNode() {
+        if(rootNode.equals(maxChildNode)){
+            return rootNode;
+        }
+        NodeModel parent = maxChildNode.getParentNode();
+        while (parent!=null){
+            //exchange parent
+            NodeModel graP = parent.parentNode;
+            graP.removeChildNode(parent);
+            maxChildNode.parentNode = graP;
+            parent.removeChildNode(maxChildNode);
+            addNode(maxChildNode,parent);
+            parent = graP;
+        }
+        return maxChildNode;
+    }
+
+    public void calculateTreeNodesDeep(){
+        calculateTreeNodesDeep(false);
+    }
+    /**
      * calculate the deep of all tree nodes
      */
-    public void calculateTreeNodesDeep(){
+    public void calculateTreeNodesDeep(boolean isMaxChildrenAsRoot){
         TreeViewLog.e(TAG,"calculateTreeNodesDeep start");
         Stack<NodeModel<T>> stack = new Stack<>();
         NodeModel<T> rootNode = getRootNode();
