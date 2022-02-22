@@ -1,6 +1,7 @@
 package com.gyso.treeview.model;
 
 import android.util.SparseArray;
+import android.util.SparseIntArray;
 
 import com.gyso.treeview.util.TreeViewLog;
 
@@ -24,6 +25,7 @@ public class TreeModel<T> implements Serializable {
     private NodeModel<?> maxChildNode;
     private SparseArray<LinkedList<NodeModel<T>>> arrayByFloor = new SparseArray<>(10);
     private transient ITraversal<NodeModel<?>> iTraversal;
+    private int compactMaxDeep=0;
     public TreeModel(NodeModel<T> rootNode) {
         this.rootNode = rootNode;
         this.maxChildNode = rootNode;
@@ -108,12 +110,14 @@ public class TreeModel<T> implements Serializable {
     }
 
     public void calculateTreeNodesDeep(){
-        calculateTreeNodesDeep(false);
+        //calculateTreeNodesDeepLoose();
+        calculateTreeNodesDeepCompact();
     }
     /**
-     * calculate the deep of all tree nodes
+     * calculate the deep of all tree nodes  by loose
+     * deep has sort 0--->n
      */
-    public void calculateTreeNodesDeep(boolean isMaxChildrenAsRoot){
+    public void calculateTreeNodesDeepLoose(){
         TreeViewLog.e(TAG,"calculateTreeNodesDeep start");
         Stack<NodeModel<T>> stack = new Stack<>();
         NodeModel<T> rootNode = getRootNode();
@@ -144,14 +148,154 @@ public class TreeModel<T> implements Serializable {
     }
 
     /**
-     *child nodes will ergodic in the last
+     * calculate the deep of all tree nodes  by compact way
+     * deep has sort 0--->n
      */
-    private void ergodicTreeByQueue() {
-        Deque<NodeModel<T>> queue = new ArrayDeque<>();
+    public void calculateTreeNodesDeepCompact(){
+        TreeViewLog.e(TAG,"calculateTreeNodesDeep start");
+        Deque<NodeModel<T>> deque = new ArrayDeque<>();
         NodeModel<T> rootNode = getRootNode();
-        queue.add(rootNode);
-        while (!queue.isEmpty()) {
-            rootNode = queue.poll();
+        deque.add(rootNode);
+        SparseIntArray deepSum = new SparseIntArray();
+        //calculate base deep
+        while (!deque.isEmpty()) {
+            NodeModel<T> cur = deque.poll();
+            cur.deep = deepSum.get(cur.floor,0);
+            compactMaxDeep = Math.max(cur.deep,compactMaxDeep);
+            deepSum.put(cur.floor,cur.deep+1);
+            LinkedList<NodeModel<T>> childNodes = cur.getChildNodes();
+            if (childNodes.size() > 0) {
+                deque.addAll(childNodes);
+            }
+        }
+
+        //calculate final deep
+        LinkedList<NodeModel<T>> hasDealNode  = new LinkedList<>();
+        deque.add(rootNode);
+        while (!deque.isEmpty()) {
+            NodeModel<T> cur = deque.poll();
+            if(hasDealNode.contains(cur)){
+                continue;
+            }else{
+                hasDealNode.add(cur);
+            }
+            int peerMidDeep;
+            int parentDeep;
+
+           //deal parent and me
+            NodeModel<T> parentNode = cur.getParentNode();
+            if(parentNode!=null){
+                LinkedList<NodeModel<T>> peers = parentNode.getChildNodes();
+                if(peers !=null && !peers.isEmpty()){
+                    int sum=0;
+                    for(NodeModel<T> peer: peers){
+                        sum +=peer.deep;
+                    }
+                    peerMidDeep=sum/peers.size();
+                    parentDeep = parentNode.deep;
+                    if(parentDeep!=peerMidDeep){
+                        if (parentDeep<peerMidDeep){
+                                //parent all left move to peers' mid
+                               final int d = peerMidDeep-parentDeep;
+                                fromRootToMyUpRight(cur, next -> next.deep +=d);
+                        }else{
+                            final int d = parentDeep - peerMidDeep;
+                             //peers' mid move to parent
+                            LinkedList<NodeModel<T>> nodeModels = arrayByFloor.get(cur.floor);
+                            boolean foundMe;
+                            for (NodeModel<T> afterMe:nodeModels) {
+                                foundMe = cur.equals(afterMe);
+                                if(foundMe){
+                                    afterMe.deep += d;
+                                }
+                            }
+                            fromMeToMyDownRight(cur, next -> {
+                                if (!peers.contains(next)){
+                                    next.deep +=d;
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+
+            LinkedList<NodeModel<T>> childNodes = cur.getChildNodes();
+            compactMaxDeep = Math.max(cur.deep,compactMaxDeep);
+            deepSum.put(cur.floor,cur.deep+1);
+            if (childNodes.size() > 0) {
+                deque.addAll(childNodes);
+            }
+        }
+        TreeViewLog.e(TAG,"calculateTreeNodesDeepCompact end");
+    }
+
+    private void fromMeToMyDownRight(NodeModel<T> node, NodeModel.INext<T> next) {
+        NodeModel<T> parentNode = node.getParentNode();
+        parentNode.traverseExcludeSelf(next);
+    }
+
+    private void fromRootToMyUpRight(final NodeModel<T> node, ITraversal<NodeModel<?>> traversal){
+        //mark line
+        NodeModel<?> markNode = node;
+        SparseArray<NodeModel<?>> modelSparseArray = new SparseArray<>();
+        while (markNode!=null){
+            modelSparseArray.put(markNode.floor,markNode);
+            markNode = markNode.parentNode;
+        }
+        Deque<NodeModel<T>> deque = new ArrayDeque<>();
+        NodeModel<T> tmpNode = getRootNode();
+        deque.add(tmpNode);
+        while (!deque.isEmpty()) {
+            tmpNode = deque.poll();
+            NodeModel<?> mn= modelSparseArray.get(tmpNode.floor);
+            if(mn.deep>tmpNode.deep){
+                continue;
+            }
+            if(tmpNode.floor>=node.floor){
+                break;
+            }
+            if (traversal != null) {
+                traversal.next(tmpNode);
+            }
+            if(tmpNode==null){
+                continue;
+            }
+            LinkedList<NodeModel<T>> childNodes = tmpNode.getChildNodes();
+            if (childNodes.size() > 0) {
+                deque.addAll(childNodes);
+            }
+        }
+        if (traversal != null) {
+            traversal.finish();
+        }
+    }
+
+    private void moveDeepForRightAndUp(){
+
+    }
+
+    private void moveDeepForRightAndDown(){
+
+    }
+
+
+    public int getCompactMaxDeep(){
+        return  compactMaxDeep;
+    }
+
+    /**
+     *child nodes will ergodic in the last
+     * 广度遍历
+     * breadth search
+     * For every floor , child nodes  has been  sort 0--->n;
+     * And node will been display one by one floor.
+     */
+    private void ergodicTreeByFloor() {
+        Deque<NodeModel<T>> deque = new ArrayDeque<>();
+        NodeModel<T> rootNode = getRootNode();
+        deque.add(rootNode);
+        while (!deque.isEmpty()) {
+            rootNode = deque.poll();
             if (iTraversal != null) {
                 iTraversal.next(rootNode);
             }
@@ -163,7 +307,7 @@ public class TreeModel<T> implements Serializable {
             }
             LinkedList<NodeModel<T>> childNodes = rootNode.getChildNodes();
             if (childNodes.size() > 0) {
-                queue.addAll(childNodes);
+                deque.addAll(childNodes);
             }
         }
         if (iTraversal != null) {
@@ -196,14 +340,39 @@ public class TreeModel<T> implements Serializable {
     public void doTraversalNodes(ITraversal<NodeModel<?>> ITraversal) {
         this.iTraversal = ITraversal;
         this.finishTraversal = false;
-        ergodicTreeByQueue();
+        ergodicTreeByFloor();
     }
 
     /**
-     *
-     * @param isBottomToTop true for leaves to root; false for root to leaves
+     *child nodes will ergodic by deep
+     * 深度遍历
+     * depth search
+     * For every  child node list  has been  sort 0--->n;
+     * And node will been display one then the children by deep until end.
      */
-    private void ergodicTreeByFloor( boolean isBottomToTop){
-
+    private void ergodicTreeByDeep(){
+        Stack<NodeModel<T>> stack = new Stack<>();
+        NodeModel<T> rootNode = getRootNode();
+        stack.add(rootNode);
+        while (!stack.isEmpty()) {
+            rootNode = stack.pop();
+            if (iTraversal != null) {
+                iTraversal.next(rootNode);
+            }
+            if(this.finishTraversal){
+                break;
+            }
+            if(rootNode==null){
+                continue;
+            }
+            LinkedList<NodeModel<T>> childNodes = rootNode.getChildNodes();
+            if (childNodes.size() > 0) {
+                stack.addAll(childNodes);
+            }
+        }
+        if (iTraversal != null) {
+            iTraversal.finish();
+            this.finishTraversal = false;
+        }
     }
 }

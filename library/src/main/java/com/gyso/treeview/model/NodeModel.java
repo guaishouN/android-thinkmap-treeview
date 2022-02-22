@@ -20,6 +20,19 @@ public class NodeModel<T> implements Serializable {
     public TreeModel<?>  treeModel = null;
 
     /**
+     * for mark this node
+     */
+    public boolean mark = false;
+    public void mark(){
+        mark = true;
+    }
+    public boolean isMarkThenReset(){
+        boolean b = mark;
+        mark = false;
+        return b;
+    }
+
+    /**
      * the parent node,if root node parent node=null;
      */
     public NodeModel parentNode;

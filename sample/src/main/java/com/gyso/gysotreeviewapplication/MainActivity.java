@@ -12,6 +12,7 @@ import com.gyso.gysotreeviewapplication.base.Animal;
 import com.gyso.gysotreeviewapplication.base.AnimalTreeViewAdapter;
 import com.gyso.gysotreeviewapplication.databinding.ActivityMainBinding;
 import com.gyso.treeview.TreeViewEditor;
+import com.gyso.treeview.layout.CompactVerticalTreeLayoutManager;
 import com.gyso.treeview.layout.ForceDirectedTreeLayoutManager;
 import com.gyso.treeview.layout.RightTreeLayoutManager;
 import com.gyso.treeview.layout.RingTreeLayoutManager;
@@ -163,7 +164,8 @@ public class MainActivity extends AppCompatActivity {
         BaseLine line = getLine();
         //return new RightTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new VerticalTreeLayoutManager(this,space_50dp,space_20dp,line);
-        return new RingTreeLayoutManager(this,space_50dp,space_20dp,line);
+        return new CompactVerticalTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new RingTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new ForceDirectedTreeLayoutManager(this,line);
     }
 
