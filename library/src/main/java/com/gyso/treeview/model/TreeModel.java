@@ -220,8 +220,9 @@ public class TreeModel<T> implements Serializable {
                             final int d = parentDeep - peerMidDeep;
                             //peers' mid move to parent
                             LinkedList<NodeModel<T>> nodeModels = arrayByFloor.get(cur.floor);
+                            int md = cur.deep;
                             for (NodeModel<T> afterMe:nodeModels) {
-                                if(afterMe.deep >= cur.deep){
+                                if(afterMe.deep >= md){
                                     afterMe.deep += d;
                                 }
                             }
