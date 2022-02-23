@@ -168,10 +168,16 @@ public class TreeModel<T> implements Serializable {
                 deque.addAll(childNodes);
             }
         }
+        compactTable();
+        TreeViewLog.e(TAG,"calculateTreeNodesDeepCompact end");
+    }
 
+    private void compactTable(){
         //calculate final deep
+        Deque<NodeModel<T>> deque = new ArrayDeque<>();
         LinkedList<NodeModel<T>> hasDealNode  = new LinkedList<>();
         deque.add(rootNode);
+        SparseIntArray deepSum = new SparseIntArray();
         while (!deque.isEmpty()) {
             NodeModel<T> cur = deque.poll();
             if(hasDealNode.contains(cur)){
@@ -182,7 +188,7 @@ public class TreeModel<T> implements Serializable {
             int peerMidDeep;
             int parentDeep;
 
-           //deal parent and me
+            //deal parent and me
             NodeModel<T> parentNode = cur.getParentNode();
             if(parentNode!=null){
                 LinkedList<NodeModel<T>> peers = parentNode.getChildNodes();
@@ -195,30 +201,34 @@ public class TreeModel<T> implements Serializable {
                     parentDeep = parentNode.deep;
                     if(parentDeep!=peerMidDeep){
                         if (parentDeep<peerMidDeep){
-                                //parent all left move to peers' mid
-                               final int d = peerMidDeep-parentDeep;
-                                fromRootToMyUpRight(cur, next -> next.deep +=d);
+                            //parent all left move to peers' mid
+                            final int d = peerMidDeep-parentDeep;
+                            fromRootToMyUpRight(cur, next -> {
+                                next.deep +=d;
+                                //next's parent fit center
+                                NodeModel<?> np = next.getParentNode();
+                                int nSum=0;
+                                if(np!=null){
+                                    LinkedList<? extends NodeModel<?>> npChildNodes = np.getChildNodes();
+                                    for(NodeModel<?> nPeer:npChildNodes ){
+                                        nSum +=nPeer.deep;
+                                    }
+                                    np.deep = nSum/npChildNodes.size();
+                                }
+                            });
                         }else{
                             final int d = parentDeep - peerMidDeep;
-                             //peers' mid move to parent
+                            //peers' mid move to parent
                             LinkedList<NodeModel<T>> nodeModels = arrayByFloor.get(cur.floor);
-                            boolean foundMe;
                             for (NodeModel<T> afterMe:nodeModels) {
-                                foundMe = cur.equals(afterMe);
-                                if(foundMe){
+                                if(afterMe.deep >= cur.deep){
                                     afterMe.deep += d;
                                 }
                             }
-                            fromMeToMyDownRight(cur, next -> {
-                                if (!peers.contains(next)){
-                                    next.deep +=d;
-                                }
-                            });
                         }
                     }
                 }
             }
-
             LinkedList<NodeModel<T>> childNodes = cur.getChildNodes();
             compactMaxDeep = Math.max(cur.deep,compactMaxDeep);
             deepSum.put(cur.floor,cur.deep+1);
@@ -226,20 +236,14 @@ public class TreeModel<T> implements Serializable {
                 deque.addAll(childNodes);
             }
         }
-        TreeViewLog.e(TAG,"calculateTreeNodesDeepCompact end");
-    }
-
-    private void fromMeToMyDownRight(NodeModel<T> node, NodeModel.INext<T> next) {
-        NodeModel<T> parentNode = node.getParentNode();
-        parentNode.traverseExcludeSelf(next);
     }
 
     private void fromRootToMyUpRight(final NodeModel<T> node, ITraversal<NodeModel<?>> traversal){
         //mark line
         NodeModel<?> markNode = node;
-        SparseArray<NodeModel<?>> modelSparseArray = new SparseArray<>();
+        SparseIntArray modelSparseArray = new SparseIntArray();
         while (markNode!=null){
-            modelSparseArray.put(markNode.floor,markNode);
+            modelSparseArray.put(markNode.floor,markNode.deep);
             markNode = markNode.parentNode;
         }
         Deque<NodeModel<T>> deque = new ArrayDeque<>();
@@ -247,8 +251,8 @@ public class TreeModel<T> implements Serializable {
         deque.add(tmpNode);
         while (!deque.isEmpty()) {
             tmpNode = deque.poll();
-            NodeModel<?> mn= modelSparseArray.get(tmpNode.floor);
-            if(mn.deep>tmpNode.deep){
+            int markDeep= modelSparseArray.get(tmpNode.floor);
+            if(markDeep>tmpNode.deep){
                 continue;
             }
             if(tmpNode.floor>=node.floor){

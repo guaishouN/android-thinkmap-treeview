@@ -100,9 +100,9 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this,"Ohs, your targetNode is null", Toast.LENGTH_SHORT).show();
                 return;
             }
-            NodeModel<Animal> a = new NodeModel<>(new Animal(R.drawable.ic_10,"add1"));
-            NodeModel<Animal> b = new NodeModel<>(new Animal(R.drawable.ic_11,"add2"));
-            NodeModel<Animal> c = new NodeModel<>(new Animal(R.drawable.ic_14,"add3"));
+            NodeModel<Animal> a = new NodeModel<>(new Animal(R.drawable.ic_10,"add-"+atomicInteger.getAndIncrement()));
+            NodeModel<Animal> b = new NodeModel<>(new Animal(R.drawable.ic_11,"add-"+atomicInteger.getAndIncrement()));
+            NodeModel<Animal> c = new NodeModel<>(new Animal(R.drawable.ic_14,"add-"+atomicInteger.getAndIncrement()));
             editor.addChildNodes(targetNode,a,b,c);
 
 
@@ -179,46 +179,78 @@ public class MainActivity extends AppCompatActivity {
 
     private void setData(AnimalTreeViewAdapter adapter){
         //root
-        NodeModel<Animal> root = new NodeModel<>(new Animal(R.drawable.ic_01,"root"));
+        NodeModel<Animal> root = new NodeModel<>(new Animal(R.drawable.ic_01,"-root-"));
         TreeModel<Animal> treeModel = new TreeModel<>(root);
 
         //child nodes
-        NodeModel<Animal> sub0 = new NodeModel<>(new Animal(R.drawable.ic_02,"sub0"));
-        NodeModel<Animal> sub1 = new NodeModel<>(new Animal(R.drawable.ic_03,"sub1"));
-        targetNode = sub1;
-        NodeModel<Animal> sub2 = new NodeModel<>(new Animal(R.drawable.ic_04,"sub2"));
-        NodeModel<Animal> sub3 = new NodeModel<>(new Animal(R.drawable.ic_05,"sub3"));
-        NodeModel<Animal> sub4 = new NodeModel<>(new Animal(R.drawable.ic_06,"sub4"));
-        NodeModel<Animal> sub5 = new NodeModel<>(new Animal(R.drawable.ic_07,"sub5"));
-        NodeModel<Animal> sub6 = new NodeModel<>(new Animal(R.drawable.ic_08,"sub6"));
-        NodeModel<Animal> sub7 = new NodeModel<>(new Animal(R.drawable.ic_09,"sub7"));
-        NodeModel<Animal> sub8 = new NodeModel<>(new Animal(R.drawable.ic_10,"sub8"));
-        NodeModel<Animal> sub9 = new NodeModel<>(new Animal(R.drawable.ic_11,"sub9"));
-        NodeModel<Animal> sub10 = new NodeModel<>(new Animal(R.drawable.ic_12,"sub10\nWhat is this."));
+        NodeModel<Animal> sub0 = new NodeModel<>(new Animal(R.drawable.ic_02,"sub00"));
+        NodeModel<Animal> sub1 = new NodeModel<>(new Animal(R.drawable.ic_03,"sub01"));
+        NodeModel<Animal> sub2 = new NodeModel<>(new Animal(R.drawable.ic_04,"sub02"));
+        NodeModel<Animal> sub3 = new NodeModel<>(new Animal(R.drawable.ic_05,"sub03"));
+        NodeModel<Animal> sub4 = new NodeModel<>(new Animal(R.drawable.ic_06,"sub04"));
+        NodeModel<Animal> sub5 = new NodeModel<>(new Animal(R.drawable.ic_07,"sub05"));
+        NodeModel<Animal> sub6 = new NodeModel<>(new Animal(R.drawable.ic_08,"sub06"));
+        NodeModel<Animal> sub7 = new NodeModel<>(new Animal(R.drawable.ic_09,"sub07"));
+        NodeModel<Animal> sub8 = new NodeModel<>(new Animal(R.drawable.ic_10,"sub08"));
+        NodeModel<Animal> sub9 = new NodeModel<>(new Animal(R.drawable.ic_11,"sub09"));
+        NodeModel<Animal> sub10 = new NodeModel<>(new Animal(R.drawable.ic_12,"sub10"));
         NodeModel<Animal> sub11 = new NodeModel<>(new Animal(R.drawable.ic_13,"sub11"));
-        NodeModel<Animal> sub12 = new NodeModel<>(new Animal(R.drawable.ic_14,"sub12\nThink Map\n"));
+        NodeModel<Animal> sub12 = new NodeModel<>(new Animal(R.drawable.ic_14,"sub12"));
         NodeModel<Animal> sub13 = new NodeModel<>(new Animal(R.drawable.ic_15,"sub13"));
         NodeModel<Animal> sub14 = new NodeModel<>(new Animal(R.drawable.ic_13,"sub14"));
-        NodeModel<Animal> sub15 = new NodeModel<>(new Animal(R.drawable.ic_14,"sub15\nTree View"));
+        NodeModel<Animal> sub15 = new NodeModel<>(new Animal(R.drawable.ic_14,"sub15"));
         NodeModel<Animal> sub16 = new NodeModel<>(new Animal(R.drawable.ic_15,"sub16"));
-        NodeModel<Animal> sub17 = new NodeModel<>(new Animal(R.drawable.ic_08,"sub17\nHello World!"));
+        NodeModel<Animal> sub17 = new NodeModel<>(new Animal(R.drawable.ic_08,"sub17"));
         NodeModel<Animal> sub18 = new NodeModel<>(new Animal(R.drawable.ic_09,"sub18"));
         NodeModel<Animal> sub19 = new NodeModel<>(new Animal(R.drawable.ic_10,"sub19"));
-        NodeModel<Animal> sub20 = new NodeModel<>(new Animal(R.drawable.ic_11,"sub20"));
+        NodeModel<Animal> sub20 = new NodeModel<>(new Animal(R.drawable.ic_02,"sub20"));
+        NodeModel<Animal> sub21 = new NodeModel<>(new Animal(R.drawable.ic_03,"sub21"));
+        NodeModel<Animal> sub22 = new NodeModel<>(new Animal(R.drawable.ic_04,"sub22"));
+        NodeModel<Animal> sub23 = new NodeModel<>(new Animal(R.drawable.ic_05,"sub23"));
+        NodeModel<Animal> sub24 = new NodeModel<>(new Animal(R.drawable.ic_06,"sub24"));
+        NodeModel<Animal> sub25 = new NodeModel<>(new Animal(R.drawable.ic_07,"sub25"));
+        NodeModel<Animal> sub26 = new NodeModel<>(new Animal(R.drawable.ic_08,"sub26"));
+        NodeModel<Animal> sub27 = new NodeModel<>(new Animal(R.drawable.ic_09,"sub27"));
+        NodeModel<Animal> sub28 = new NodeModel<>(new Animal(R.drawable.ic_10,"sub28"));
+        NodeModel<Animal> sub29 = new NodeModel<>(new Animal(R.drawable.ic_11,"sub29"));
+        NodeModel<Animal> sub30 = new NodeModel<>(new Animal(R.drawable.ic_02,"sub30"));
+        NodeModel<Animal> sub31 = new NodeModel<>(new Animal(R.drawable.ic_03,"sub31"));
+        NodeModel<Animal> sub32 = new NodeModel<>(new Animal(R.drawable.ic_04,"sub32"));
+        NodeModel<Animal> sub33 = new NodeModel<>(new Animal(R.drawable.ic_05,"sub33"));
+        NodeModel<Animal> sub34 = new NodeModel<>(new Animal(R.drawable.ic_06,"sub34"));
+        NodeModel<Animal> sub35 = new NodeModel<>(new Animal(R.drawable.ic_07,"sub35"));
+        NodeModel<Animal> sub36 = new NodeModel<>(new Animal(R.drawable.ic_08,"sub36"));
+        NodeModel<Animal> sub37 = new NodeModel<>(new Animal(R.drawable.ic_09,"sub37"));
+        NodeModel<Animal> sub38 = new NodeModel<>(new Animal(R.drawable.ic_10,"sub38"));
+        NodeModel<Animal> sub39 = new NodeModel<>(new Animal(R.drawable.ic_11,"sub39"));
+        NodeModel<Animal> sub40 = new NodeModel<>(new Animal(R.drawable.ic_02,"sub40"));
+        NodeModel<Animal> sub41 = new NodeModel<>(new Animal(R.drawable.ic_03,"sub41"));
+        NodeModel<Animal> sub42 = new NodeModel<>(new Animal(R.drawable.ic_04,"sub42"));
+        NodeModel<Animal> sub43 = new NodeModel<>(new Animal(R.drawable.ic_05,"sub43"));
+        NodeModel<Animal> sub44 = new NodeModel<>(new Animal(R.drawable.ic_06,"sub44"));
+        NodeModel<Animal> sub45 = new NodeModel<>(new Animal(R.drawable.ic_07,"sub45"));
+        NodeModel<Animal> sub46 = new NodeModel<>(new Animal(R.drawable.ic_08,"sub46"));
+        NodeModel<Animal> sub47 = new NodeModel<>(new Animal(R.drawable.ic_09,"sub47"));
+        NodeModel<Animal> sub48 = new NodeModel<>(new Animal(R.drawable.ic_10,"sub48"));
+        NodeModel<Animal> sub49 = new NodeModel<>(new Animal(R.drawable.ic_11,"sub49"));
 
         //build relationship
         treeModel.addNode(root,sub0,sub1,sub3);
-        treeModel.addNode(sub3,sub7,sub18,sub19,sub20);
+        treeModel.addNode(sub3,sub12,sub13);
         treeModel.addNode(sub1,sub2);
         treeModel.addNode(sub0,sub4,sub5);
         treeModel.addNode(sub4,sub6);
+        treeModel.addNode(sub5,sub7,sub8);
+        treeModel.addNode(sub6,sub9,sub10,sub11);
+        treeModel.addNode(sub11,sub14,sub15);
+        treeModel.addNode(sub10,sub16);
+        treeModel.addNode(sub8,sub17,sub18,sub19,sub20,sub21,sub22,sub23);
+        treeModel.addNode(sub23,sub24,sub25,sub26,sub27,sub28,sub29,sub30);
+
+        //mark
         parentToRemoveChildren = sub0;
-//        treeModel.addNode(sub5,sub7,sub8);
-//        treeModel.addNode(sub6,sub9,sub10,sub11);
-//        treeModel.addNode(sub3,sub12,sub13);
-//        treeModel.addNode(sub11,sub14,sub15);
-//        treeModel.addNode(sub10,sub16);
-//        treeModel.addNode(sub8,sub17,sub18,sub19,sub20);
+        targetNode = sub1;
+
         //set data
         adapter.setTreeModel(treeModel);
     }
