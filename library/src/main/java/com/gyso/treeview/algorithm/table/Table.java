@@ -13,7 +13,9 @@ import java.lang.annotation.Retention;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Table {
     public static final String TAG = Table.class.getSimpleName();
@@ -24,11 +26,13 @@ public class Table {
     public static final int COMPACT_TABLE = 1;
     private int maxDeep =0;
     private int minDeep =0;
+    private final Map<TableKey,NodeModel<?>> tableRecordMap = new ConcurrentHashMap<>();
 
     @Retention(SOURCE)
     @IntDef({LOOSE_TABLE,COMPACT_TABLE})
     public @interface TableLayoutAlgorithmType {}
     public<T> void reconstruction(TreeModel<T> treeModel, @TableLayoutAlgorithmType int tableLayoutAlgorithm){
+        tableRecordMap.clear();
         if(tableLayoutAlgorithm==COMPACT_TABLE){
             calculateTreeNodesDeepCompact(treeModel);
         }else{
@@ -104,8 +108,12 @@ public class Table {
         //calculate base deep
         while (!deque.isEmpty()) {
             NodeModel<T> cur = deque.poll();
+            if(cur==null){
+                return;
+            }
+            removeFromRecord(cur);
             cur.deep = deepSum.get(cur.floor,0);
-            recordDeep(cur);
+            record(cur);
             deepSum.put(cur.floor,cur.deep+1);
             LinkedList<NodeModel<T>> childNodes = cur.getChildNodes();
             if (childNodes.size() > 0) {
@@ -119,7 +127,6 @@ public class Table {
     private<T> void compactTable(TreeModel<T> treeModel){
         //calculate final deep
         Deque<NodeModel<T>> deque = new ArrayDeque<>();
-        LinkedList<NodeModel<T>> hasDealNode  = new LinkedList<>();
         NodeModel<T> rootNode = treeModel.getRootNode();
         SparseArray<LinkedList<NodeModel<T>>> arrayByFloor = treeModel.getArrayByFloor();
         deque.add(rootNode);
@@ -148,8 +155,9 @@ public class Table {
                             //parent all left move to peers' mid
                             final int d = peerMidDeep-parentDeep;
                             fromRootToMyUpRight(treeModel,cur, next -> {
+                                removeFromRecord(next);
                                 next.deep +=d;
-                                recordDeep(next);
+                                record(next);
                                 //next's parent fit center
                                 NodeModel<?> np = next.getParentNode();
                                 int nSum=0;
@@ -158,8 +166,9 @@ public class Table {
                                     for(NodeModel<?> nPeer:npChildNodes ){
                                         nSum +=nPeer.deep;
                                     }
+                                    removeFromRecord(np);
                                     np.deep = nSum/npChildNodes.size();
-                                    recordDeep(np);
+                                    record(np);
                                 }
                             });
                         }else{
@@ -169,8 +178,9 @@ public class Table {
                             int md = cur.deep;
                             for (NodeModel<T> afterMe:nodeModels) {
                                 if(afterMe.deep >= md){
+                                    removeFromRecord(afterMe);
                                     afterMe.deep += d;
-                                    recordDeep(afterMe);
+                                    record(afterMe);
                                 }
                             }
                         }
@@ -178,7 +188,7 @@ public class Table {
                 }
             }
             LinkedList<NodeModel<T>> childNodes = cur.getChildNodes();
-            recordDeep(cur);
+            record(cur);
             deepSum.put(cur.floor,cur.deep+1);
             if (childNodes.size() > 0) {
                 deque.addAll(childNodes);
@@ -187,6 +197,9 @@ public class Table {
     }
 
     private<T> void fromRootToMyUpRight(TreeModel<T> treeModel,final NodeModel<T> node, ITraversal<NodeModel<T>> traversal){
+        if(node==null){
+            return;
+        }
         //mark line
         NodeModel<?> markNode = node;
         SparseIntArray modelSparseArray = new SparseIntArray();
@@ -199,6 +212,9 @@ public class Table {
         deque.add(tmpNode);
         while (!deque.isEmpty()) {
             tmpNode = deque.poll();
+            if(tmpNode==null){
+                continue;
+            }
             int markDeep= modelSparseArray.get(tmpNode.floor);
             if(markDeep>tmpNode.deep){
                 continue;
@@ -208,9 +224,6 @@ public class Table {
             }
             if (traversal != null) {
                 traversal.next(tmpNode);
-            }
-            if(tmpNode==null){
-                continue;
             }
             LinkedList<NodeModel<T>> childNodes = tmpNode.getChildNodes();
             if (childNodes.size() > 0) {
@@ -222,19 +235,21 @@ public class Table {
         }
     }
 
-    public<T> void recordDeep(NodeModel<T> node) {
+    private <T> void removeFromRecord(NodeModel<T> node){
+        tableRecordMap.put(new TableKey(node.floor, node.deep),null);
+    }
+
+    private <T> void record(NodeModel<T> node) {
         if(node==null){
             return;
         }
         maxDeep = Math.max(node.deep, maxDeep);
         minDeep = Math.min(node.deep, minDeep);
+        tableRecordMap.put(new TableKey(node.floor,node.deep),node);
     }
 
-    public int getMinDeep(){
-        return minDeep;
-    }
-
-    public int getMaxDeep(){
-        return maxDeep;
+    private boolean isImpact(NodeModel<?> node){
+        NodeModel<?> nodeModel = tableRecordMap.get(new TableKey(node.floor, node.deep));
+        return nodeModel!=null;
     }
 }
