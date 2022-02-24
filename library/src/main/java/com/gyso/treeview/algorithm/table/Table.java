@@ -1,20 +1,9 @@
 package com.gyso.treeview.algorithm.table;
 
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.LOCAL_VARIABLE;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.RetentionPolicy.CLASS;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
-
 import android.util.SparseArray;
 import android.util.SparseIntArray;
-
-import androidx.annotation.ColorInt;
 import androidx.annotation.IntDef;
-import androidx.annotation.UiThread;
-
 import com.gyso.treeview.model.ITraversal;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
