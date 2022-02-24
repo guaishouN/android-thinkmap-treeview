@@ -40,6 +40,8 @@ public class Table {
     /**
      * calculate the deep of all tree nodes  by loose
      * deep has sort 0--->n
+     * Fastest
+     * 所有节点位置不大于同辈所需位置
      */
     private<T> void calculateTreeNodesDeepLoose(TreeModel<T> treeModel){
         TreeViewLog.e(TAG,"calculateTreeNodesDeepLoose start");
@@ -62,7 +64,6 @@ public class Table {
                     cur.deep = parentNode.deep;
                 }
             }
-            TreeViewLog.e(TAG,"calculateTreeNodesDeepLoose--->"+cur.toString());
             LinkedList<NodeModel<T>> childNodes = cur.getChildNodes();
             for (int i = childNodes.size()-1; i >=0; i--) {
                 stack.add(childNodes.get(i));
@@ -76,6 +77,23 @@ public class Table {
     /**
      * calculate the deep of all tree nodes  by compact way
      * deep has sort 0--->n
+     * **********移动节点步骤
+     * 1 按floor自上而下紧密排列
+     * 2 按deep自左向右紧密排列
+     * 3 按floor，deep遍历
+     * 4 如果是父节点位置小于所有子节点中心位置，中心点到到根节点的分支都右移
+     * 5 如果是所有子节点中心位置小于父节点位置，则所有子节点中心点移动到父节点位置，并把子节点的右侧所有节点都移动同样距离
+     *
+     * *******删除空白格子的步骤
+     * 1 记录Table(floor,deep) 并且 Map
+     * 2 整棵树的最右侧叶子分支不处理
+     * 3 每个最右侧叶子的同辈叶子不处理
+     * 4 同辈的叶子仅仅处理最右侧的叶子分支
+     * 5 判断是不是左右侧叶子的同辈都是叶子，是则选为目标叶子
+     * 6 目标叶子的右侧必需有空格
+     * 7 每次移动节点都要计算父节点的位置
+     * 8 分支的所有节点向右移动
+     * 9 遇到分支移动父节点时冲突则停止移动
      */
     private <T> void calculateTreeNodesDeepCompact(TreeModel<T> treeModel){
         TreeViewLog.e(TAG,"calculateTreeNodesDeepCompact start");

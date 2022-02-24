@@ -1,5 +1,6 @@
 package com.gyso.gysotreeviewapplication;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -21,6 +22,7 @@ import com.gyso.treeview.layout.TreeLayoutManager;
 import com.gyso.treeview.layout.VerticalTreeLayoutManager;
 import com.gyso.treeview.line.AngledLine;
 import com.gyso.treeview.line.BaseLine;
+import com.gyso.treeview.line.DashLine;
 import com.gyso.treeview.line.SmoothLine;
 import com.gyso.treeview.line.StraightLine;
 import com.gyso.treeview.listener.TreeViewControlListener;
@@ -164,18 +166,19 @@ public class MainActivity extends AppCompatActivity {
         int space_20dp = 20;
         BaseLine line = getLine();
         //return new RightTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new CompactRightTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new VerticalTreeLayoutManager(this,space_50dp,space_20dp,line);
-        //return new CompactVerticalTreeLayoutManager(this,space_50dp,space_20dp,line);
+        return new CompactVerticalTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new RingTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new ForceDirectedTreeLayoutManager(this,line);
-        return new CompactRightTreeLayoutManager(this,space_50dp,space_20dp,line);
+
     }
 
     private BaseLine getLine() {
         //return new SmoothLine();
-         return new StraightLine();
+        return new StraightLine(Color.parseColor("#055287"),2);
         //return new PointedLine();
-        //return new DashLine(Color.parseColor("#4DB6AC"),8);
+        //return new DashLine(Color.parseColor("#F1286C"),3);
         //return new AngledLine();
     }
 
