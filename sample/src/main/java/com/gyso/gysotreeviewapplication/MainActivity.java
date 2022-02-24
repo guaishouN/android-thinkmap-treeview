@@ -245,8 +245,10 @@ public class MainActivity extends AppCompatActivity {
         treeModel.addNode(sub11,sub14,sub15);
         treeModel.addNode(sub10,sub16);
         treeModel.addNode(sub8,sub17,sub18,sub19,sub20,sub21,sub22,sub23);
-        treeModel.addNode(sub23,sub24,sub25,sub26,sub27,sub28,sub29,sub30);
-        treeModel.addNode(sub15,sub31,sub32,sub33,sub34,sub35,sub36,sub37);
+        treeModel.addNode(sub9,sub47,sub48);
+        treeModel.addNode(sub16,sub24,sub25,sub26,sub27,sub28,sub29,sub30);
+        //treeModel.addNode(sub15,sub31,sub32,sub33,sub34,sub35,sub36,sub37);
+        //treeModel.addNode(sub2,sub40,sub41,sub42,sub43,sub44,sub45,sub46);
         //mark
         parentToRemoveChildren = sub0;
         targetNode = sub1;

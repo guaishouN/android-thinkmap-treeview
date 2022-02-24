@@ -25,7 +25,8 @@ public class TreeModel<T> implements Serializable {
     private NodeModel<?> maxChildNode;
     private SparseArray<LinkedList<NodeModel<T>>> arrayByFloor = new SparseArray<>(10);
     private transient ITraversal<NodeModel<?>> iTraversal;
-    private int compactMaxDeep=0;
+    private int maxDeep =0;
+    private int minDeep =0;
     public TreeModel(NodeModel<T> rootNode) {
         this.rootNode = rootNode;
         this.maxChildNode = rootNode;
@@ -161,7 +162,7 @@ public class TreeModel<T> implements Serializable {
         while (!deque.isEmpty()) {
             NodeModel<T> cur = deque.poll();
             cur.deep = deepSum.get(cur.floor,0);
-            compactMaxDeep = Math.max(cur.deep,compactMaxDeep);
+            recordDeep(cur);
             deepSum.put(cur.floor,cur.deep+1);
             LinkedList<NodeModel<T>> childNodes = cur.getChildNodes();
             if (childNodes.size() > 0) {
@@ -171,6 +172,23 @@ public class TreeModel<T> implements Serializable {
         compactTable();
         TreeViewLog.e(TAG,"calculateTreeNodesDeepCompact end");
     }
+
+    private void recordDeep(NodeModel<?> node) {
+        if(node==null){
+            return;
+        }
+        maxDeep = Math.max(node.deep, maxDeep);
+        minDeep = Math.min(node.deep, minDeep);
+    }
+
+    public int getMinDeep(){
+        return minDeep;
+    }
+
+    public int getMaxDeep(){
+        return maxDeep;
+    }
+
 
     private void compactTable(){
         //calculate final deep
@@ -205,6 +223,7 @@ public class TreeModel<T> implements Serializable {
                             final int d = peerMidDeep-parentDeep;
                             fromRootToMyUpRight(cur, next -> {
                                 next.deep +=d;
+                                recordDeep(next);
                                 //next's parent fit center
                                 NodeModel<?> np = next.getParentNode();
                                 int nSum=0;
@@ -214,6 +233,7 @@ public class TreeModel<T> implements Serializable {
                                         nSum +=nPeer.deep;
                                     }
                                     np.deep = nSum/npChildNodes.size();
+                                    recordDeep(np);
                                 }
                             });
                         }else{
@@ -224,6 +244,7 @@ public class TreeModel<T> implements Serializable {
                             for (NodeModel<T> afterMe:nodeModels) {
                                 if(afterMe.deep >= md){
                                     afterMe.deep += d;
+                                    recordDeep(afterMe);
                                 }
                             }
                         }
@@ -231,7 +252,7 @@ public class TreeModel<T> implements Serializable {
                 }
             }
             LinkedList<NodeModel<T>> childNodes = cur.getChildNodes();
-            compactMaxDeep = Math.max(cur.deep,compactMaxDeep);
+            maxDeep = Math.max(cur.deep, maxDeep);
             deepSum.put(cur.floor,cur.deep+1);
             if (childNodes.size() > 0) {
                 deque.addAll(childNodes);
@@ -283,10 +304,6 @@ public class TreeModel<T> implements Serializable {
 
     }
 
-
-    public int getCompactMaxDeep(){
-        return  compactMaxDeep;
-    }
 
     /**
      *child nodes will ergodic in the last
