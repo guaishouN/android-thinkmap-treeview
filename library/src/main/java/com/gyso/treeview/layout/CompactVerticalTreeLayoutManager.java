@@ -5,6 +5,7 @@ import android.view.View;
 
 import com.gyso.treeview.TreeViewContainer;
 import com.gyso.treeview.adapter.TreeViewHolder;
+import com.gyso.treeview.algorithm.table.Table;
 import com.gyso.treeview.line.BaseLine;
 import com.gyso.treeview.model.ITraversal;
 import com.gyso.treeview.model.NodeModel;
@@ -18,6 +19,11 @@ public class CompactVerticalTreeLayoutManager extends TreeLayoutManager {
 
     public CompactVerticalTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
         super(context, spaceParentToChild, spacePeerToPeer, baseline);
+    }
+
+    @Override
+    public void calculateByLayoutAlgorithm(TreeModel<?> mTreeModel) {
+        new Table().reconstruction(mTreeModel,Table.COMPACT_TABLE);
     }
 
     @Override

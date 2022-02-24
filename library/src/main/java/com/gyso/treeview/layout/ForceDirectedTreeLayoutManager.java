@@ -14,6 +14,7 @@ import com.gyso.treeview.algorithm.force.FLink;
 import com.gyso.treeview.algorithm.force.FNode;
 import com.gyso.treeview.algorithm.force.Force;
 import com.gyso.treeview.algorithm.force.ForceListener;
+import com.gyso.treeview.algorithm.table.Table;
 import com.gyso.treeview.line.BaseLine;
 import com.gyso.treeview.model.ITraversal;
 import com.gyso.treeview.model.NodeModel;
@@ -37,6 +38,11 @@ public class ForceDirectedTreeLayoutManager extends VerticalTreeLayoutManager im
         handler = new Handler(Looper.getMainLooper());
         force = new Force(this);
         init();
+    }
+
+    @Override
+    public void calculateByLayoutAlgorithm(TreeModel<?> mTreeModel) {
+        new Table().reconstruction(mTreeModel,Table.COMPACT_TABLE);
     }
 
     private void init() {

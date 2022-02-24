@@ -7,6 +7,7 @@ import com.gyso.treeview.R;
 import com.gyso.treeview.TreeViewContainer;
 import com.gyso.treeview.adapter.TreeViewHolder;
 import com.gyso.treeview.algorithm.ring.Ring;
+import com.gyso.treeview.algorithm.table.Table;
 import com.gyso.treeview.line.BaseLine;
 import com.gyso.treeview.model.ITraversal;
 import com.gyso.treeview.model.NodeModel;
@@ -27,6 +28,11 @@ public class RingTreeLayoutManager extends TreeLayoutManager {
     @Override
     public int getTreeLayoutType() {
         return LAYOUT_TYPE_RING;
+    }
+
+    @Override
+    public void calculateByLayoutAlgorithm(TreeModel<?> mTreeModel) {
+        new Table().reconstruction(mTreeModel,Table.COMPACT_TABLE);
     }
 
     public void performMeasureAndListen(TreeViewContainer treeViewContainer, TreeLayoutManager.MeasureListener measureListener) {

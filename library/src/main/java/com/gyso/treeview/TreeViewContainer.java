@@ -410,7 +410,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
                     mTreeModel.removeNode(releasedChildHolderNode.getParentNode(),releasedChildHolderNode);
                 }
                 mTreeModel.addNode(targetHolderNode,releasedChildHolderNode);
-                mTreeModel.calculateTreeNodesDeep();
+                mTreeLayoutManager.calculateByLayoutAlgorithm(mTreeModel);
                 if(isAnimateMove()){
                     recordAnchorLocationOnViewPort(false,false,targetHolderNode);
                 }
@@ -553,7 +553,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
             nodeViewMap = nodeViewMap==null? new HashMap<>():nodeViewMap;
             nodeViewMap.clear();
             addNoteViews();
-            mTreeModel.calculateTreeNodesDeep();
+            mTreeLayoutManager.calculateByLayoutAlgorithm(mTreeModel);
         }
     }
 
@@ -564,7 +564,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
                 recordAnchorLocationOnViewPort(false, false,parent);
             }
             mTreeModel.addNode(parent,childNodes);
-            mTreeModel.calculateTreeNodesDeep();
+            mTreeLayoutManager.calculateByLayoutAlgorithm(mTreeModel);
             for (NodeModel<?> node:childNodes) {
                 addNodeViewToGroup(node);
             }
@@ -599,7 +599,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
                     adapter.getTreeModel().removeNode(nodeModel.getParentNode(), nodeModel);
                 }
             }
-            mTreeModel.calculateTreeNodesDeep();
+            mTreeLayoutManager.calculateByLayoutAlgorithm(mTreeModel);
             requestLayout();
         }
     }

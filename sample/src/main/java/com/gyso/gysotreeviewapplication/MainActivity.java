@@ -164,9 +164,9 @@ public class MainActivity extends AppCompatActivity {
         BaseLine line = getLine();
         //return new RightTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new VerticalTreeLayoutManager(this,space_50dp,space_20dp,line);
-        return new CompactVerticalTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new CompactVerticalTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new RingTreeLayoutManager(this,space_50dp,space_20dp,line);
-        //return new ForceDirectedTreeLayoutManager(this,line);
+        return new ForceDirectedTreeLayoutManager(this,line);
     }
 
     private BaseLine getLine() {
@@ -243,10 +243,12 @@ public class MainActivity extends AppCompatActivity {
         treeModel.addNode(sub5,sub7,sub8);
         treeModel.addNode(sub6,sub9,sub10,sub11);
         treeModel.addNode(sub11,sub14,sub15);
-        treeModel.addNode(sub10,sub16);
+        treeModel.addNode(sub10,sub40);
+        treeModel.addNode(sub40,sub16);
         treeModel.addNode(sub8,sub17,sub18,sub19,sub20,sub21,sub22,sub23);
         treeModel.addNode(sub9,sub47,sub48);
-        treeModel.addNode(sub16,sub24,sub25,sub26,sub27,sub28,sub29,sub30);
+        treeModel.addNode(sub16,sub24,sub25,sub26,sub27,sub28,sub29,sub30,sub46,sub45);
+        treeModel.addNode(sub47,sub49);
         //treeModel.addNode(sub15,sub31,sub32,sub33,sub34,sub35,sub36,sub37);
         //treeModel.addNode(sub2,sub40,sub41,sub42,sub43,sub44,sub45,sub46);
         //mark

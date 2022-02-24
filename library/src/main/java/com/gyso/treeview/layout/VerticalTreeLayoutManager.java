@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.View;
 import com.gyso.treeview.TreeViewContainer;
 import com.gyso.treeview.adapter.TreeViewHolder;
+import com.gyso.treeview.algorithm.table.Table;
 import com.gyso.treeview.line.BaseLine;
 import com.gyso.treeview.model.ITraversal;
 import com.gyso.treeview.model.NodeModel;
@@ -31,6 +32,10 @@ public class VerticalTreeLayoutManager extends TreeLayoutManager {
         return LAYOUT_TYPE_VERTICAL_DOWN;
     }
 
+    @Override
+    public void calculateByLayoutAlgorithm(TreeModel<?> mTreeModel) {
+        new Table().reconstruction(mTreeModel,Table.LOOSE_TABLE);
+    }
     public void performMeasureAndListen(TreeViewContainer treeViewContainer, TreeLayoutManager.MeasureListener measureListener) {
         final TreeModel<?> mTreeModel = treeViewContainer.getTreeModel();
         if (mTreeModel != null) {

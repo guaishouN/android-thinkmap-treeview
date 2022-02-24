@@ -4,11 +4,9 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.graphics.Color;
 import android.util.SparseIntArray;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.LinearInterpolator;
 
 import com.gyso.treeview.R;
 import com.gyso.treeview.TreeViewContainer;
@@ -124,6 +122,8 @@ public abstract class TreeLayoutManager {
         this.winHeight =winHeight;
         this.winWidth = winWidth;
     }
+
+    public abstract void  calculateByLayoutAlgorithm(TreeModel<?> mTreeModel);
 
     public abstract void performMeasure(TreeViewContainer treeViewContainer);
 
