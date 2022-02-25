@@ -17,6 +17,10 @@ public class CompactUpTreeLayoutManager extends CompactDownTreeLayoutManager {
     public CompactUpTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
         super(context, spaceParentToChild, spacePeerToPeer, baseline);
     }
+    @Override
+    public int getTreeLayoutType() {
+        return LAYOUT_TYPE_VERTICAL_UP;
+    }
 
     @Override
     public void performLayout(final TreeViewContainer treeViewContainer) {

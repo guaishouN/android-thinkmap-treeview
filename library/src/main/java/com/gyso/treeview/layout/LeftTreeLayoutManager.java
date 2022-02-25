@@ -18,6 +18,11 @@ public class LeftTreeLayoutManager extends RightTreeLayoutManager {
     }
 
     @Override
+    public int getTreeLayoutType() {
+        return LAYOUT_TYPE_HORIZON_LEFT;
+    }
+
+    @Override
     public void performLayout(final TreeViewContainer treeViewContainer) {
         isJustCalculate = true;
         super.performLayout(treeViewContainer);

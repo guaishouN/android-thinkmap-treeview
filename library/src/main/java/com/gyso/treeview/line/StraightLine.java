@@ -93,7 +93,7 @@ public class StraightLine extends BaseLine {
             //release
             PointPool.free(startPoint);
             PointPool.free(endPoint);
-        }else if (layoutType == TreeLayoutManager.LAYOUT_TYPE_FORCE_DIRECTED || layoutType == TreeLayoutManager.LAYOUT_TYPE_RING){
+        }else{
             PointF startPoint =  PointPool.obtain(fromView.getLeft()+fromView.getWidth()/2f,fromView.getTop()+fromView.getHeight()/2f);
             PointF endPoint =  PointPool.obtain(toView.getLeft()+toView.getWidth()/2f,toView.getTop()+toView.getHeight()/2f);
             mPath.moveTo(startPoint.x,startPoint.y);

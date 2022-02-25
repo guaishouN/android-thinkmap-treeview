@@ -33,6 +33,9 @@ public abstract class TreeLayoutManager {
     public static final int LAYOUT_TYPE_HORIZON_LEFT = 3;
     public static final int LAYOUT_TYPE_VERTICAL_UP = 4;
     public static final int LAYOUT_TYPE_RING = 5;
+    public static final int LAYOUT_TYPE_HORIZON_LEFT_AND_RIGHT = 6;
+    public static final int LAYOUT_TYPE_VERTICAL_DOWN_AND_UP = 7;
+
     /**
      * the content padding, unit is dp;
      */

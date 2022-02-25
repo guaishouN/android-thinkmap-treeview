@@ -198,6 +198,42 @@ public class NodeModel<T> implements Serializable {
     }
 
     /**
+     * traverse all nodes on branch  from me to root exclude self
+     * @param next callback
+     */
+    public void traverseBranchParent(INext<T> next){
+        if(next==null){
+            return;
+        }
+        NodeModel<?> parent = parentNode;
+        while (parent!=null){
+            next.next((NodeModel<T>) parent);
+            if(next.fetch((NodeModel<T>) parent)){
+                break;
+            }
+            parent = parent.parentNode;
+        }
+    }
+
+    /**
+     * traverse all nodes on branch  from me to root include self
+     * @param next callback
+     */
+    public void traverseBranch(INext<T> next){
+        if(next==null){
+            return;
+        }
+        NodeModel<?> parent = this;
+        while (parent!=null){
+            next.next((NodeModel<T>) parent);
+            if(next.fetch((NodeModel<T>) parent)){
+                break;
+            }
+            parent = parent.parentNode;
+        }
+    }
+
+    /**
      * traverse only direct children
      * @param next callback
      */
@@ -255,6 +291,7 @@ public class NodeModel<T> implements Serializable {
 
     public interface INext<E>{
         void next(NodeModel<E> node);
+        default boolean fetch(NodeModel<E> node){ return false;}
     }
 
     @Override

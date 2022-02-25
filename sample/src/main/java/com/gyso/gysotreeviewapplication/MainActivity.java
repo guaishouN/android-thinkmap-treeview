@@ -13,7 +13,11 @@ import com.gyso.gysotreeviewapplication.base.Animal;
 import com.gyso.gysotreeviewapplication.base.AnimalTreeViewAdapter;
 import com.gyso.gysotreeviewapplication.databinding.ActivityMainBinding;
 import com.gyso.treeview.TreeViewEditor;
+import com.gyso.treeview.layout.CompactDownTreeLayoutManager;
+import com.gyso.treeview.layout.CompactHorizonLeftAndRightLayoutManager;
+import com.gyso.treeview.layout.CompactRightTreeLayoutManager;
 import com.gyso.treeview.layout.CompactUpTreeLayoutManager;
+import com.gyso.treeview.layout.HorizonLeftAndRightLayoutManager;
 import com.gyso.treeview.layout.TreeLayoutManager;
 import com.gyso.treeview.layout.UpTreeLayoutManager;
 import com.gyso.treeview.line.BaseLine;
@@ -159,11 +163,12 @@ public class MainActivity extends AppCompatActivity {
         //return new LeftTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new CompactRightTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new CompactLeftTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new HorizonLeftAndRightLayoutManager(this,space_50dp,space_20dp,line);
+        //return new CompactHorizonLeftAndRightLayoutManager(this,space_50dp,space_20dp,line);
         //return new DownTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new UpTreeLayoutManager(this,space_50dp,space_20dp,line);
-        //return new CompactDownTreeLayoutManager(this,space_50dp,space_20dp,line);
-        return new CompactUpTreeLayoutManager(this,space_50dp,space_20dp,line);
-
+        return new CompactDownTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new CompactUpTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new RingTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new ForceDirectedTreeLayoutManager(this,line);
     }
@@ -234,10 +239,10 @@ public class MainActivity extends AppCompatActivity {
         NodeModel<Animal> sub49 = new NodeModel<>(new Animal(R.drawable.ic_11,"sub49"));
 
         //build relationship
-        treeModel.addNode(root,sub0,sub1,sub3);
+        treeModel.addNode(root,sub0,sub1,sub3,sub4);
         treeModel.addNode(sub3,sub12,sub13);
         treeModel.addNode(sub1,sub2);
-        treeModel.addNode(sub0,sub4,sub5,sub38,sub39);
+        treeModel.addNode(sub0,sub5,sub38,sub39);
         treeModel.addNode(sub4,sub6);
         treeModel.addNode(sub5,sub7,sub8);
         treeModel.addNode(sub6,sub9,sub10,sub11);

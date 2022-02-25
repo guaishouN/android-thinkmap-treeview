@@ -12,10 +12,12 @@ import com.gyso.treeview.util.TreeViewLog;
 import java.lang.annotation.Retention;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Table {
     public static final String TAG = Table.class.getSimpleName();
@@ -27,7 +29,7 @@ public class Table {
     private int maxDeep =0;
     private int minDeep =0;
     private final Map<TableKey,NodeModel<?>> tableRecordMap = new ConcurrentHashMap<>();
-
+    private final LinkedList<NodeModel<?>>  shouldCheckNodes = new LinkedList<>();
     @Retention(SOURCE)
     @IntDef({LOOSE_TABLE,COMPACT_TABLE})
     public @interface TableLayoutAlgorithmType {}
@@ -121,7 +123,68 @@ public class Table {
             }
         }
         compactTable(treeModel);
+        //remove space
+        //moveMoreCompact(treeModel);
         TreeViewLog.e(TAG,"calculateTreeNodesDeepCompact end");
+    }
+
+    private <T> void moveMoreCompact(TreeModel<T> treeModel) {
+        LinkedList<NodeModel<?>>  tmpNodes = new LinkedList<>(shouldCheckNodes);
+        for (NodeModel<?> checkNode : tmpNodes) {
+            NodeModel<T> shouldCheckNode = (NodeModel<T>)checkNode;
+            if(shouldCheckNode.equals(treeModel.getRootNode())){
+                break;
+            }
+            if(isDeepImpact(shouldCheckNode) || isDeepImpact(shouldCheckNode.parentNode)){
+                continue;
+            }
+            Map<NodeModel<T>,TableKey>  oldPosition = new HashMap<>();
+            //branch old position
+            shouldCheckNode.traverseBranch(node -> {
+                oldPosition.put(node,new TableKey(node.floor,node.deep));
+            });
+            final AtomicBoolean isMoveOk = new AtomicBoolean(true);
+            int count =0;
+            while (!isDeepImpact(shouldCheckNode)&&count<2){
+                count++;
+                removeFromRecord(shouldCheckNode);
+                shouldCheckNode.deep=shouldCheckNode.deep+1;
+                record(shouldCheckNode);
+                shouldCheckNode.traverseBranchParent(new NodeModel.INext<T>() {
+                    @Override
+                    public void next(NodeModel<T> node) {
+
+                    }
+
+                    @Override
+                    public boolean fetch(NodeModel<T> node) {
+                        int nSum = 0;
+                        LinkedList<? extends NodeModel<?>> nnChildNodes = node.getChildNodes();
+                        for(NodeModel<?> nPeer:nnChildNodes ){
+                            nSum = nSum +nPeer.deep;
+                        }
+                        removeFromRecord(node);
+                        node.deep = nSum /nnChildNodes.size();
+                        record(node);
+                        if(isDeepImpact(node)){
+                            isMoveOk.set(false);
+                             return true;
+                        }
+                        return false;
+                    }
+                });
+            }
+            //move failed then reset old position
+            if(!isMoveOk.get()){
+                for (NodeModel<T> tNodeModel : oldPosition.keySet()) {
+                    TableKey tableKey = oldPosition.get(tNodeModel);
+                    removeFromRecord(tNodeModel);
+                    tNodeModel.floor=tableKey.floor;
+                    tNodeModel.deep=tableKey.deep;
+                    record(tNodeModel);
+                }
+            }
+        }
     }
 
     private<T> void compactTable(TreeModel<T> treeModel){
@@ -159,16 +222,18 @@ public class Table {
                                 next.deep +=d;
                                 record(next);
                                 //next's parent fit center
-                                NodeModel<?> np = next.getParentNode();
-                                int nSum=0;
+                                NodeModel<T> np = next.getParentNode();
                                 if(np!=null){
-                                    LinkedList<? extends NodeModel<?>> npChildNodes = np.getChildNodes();
-                                    for(NodeModel<?> nPeer:npChildNodes ){
-                                        nSum +=nPeer.deep;
-                                    }
-                                    removeFromRecord(np);
-                                    np.deep = nSum/npChildNodes.size();
-                                    record(np);
+                                    np.traverseBranch(nn -> {
+                                        int nSum = 0;
+                                        LinkedList<? extends NodeModel<?>> nnChildNodes = nn.getChildNodes();
+                                        for(NodeModel<?> nPeer:nnChildNodes ){
+                                            nSum = nSum +nPeer.deep;
+                                        }
+                                        removeFromRecord(nn);
+                                        nn.deep = nSum /nnChildNodes.size();
+                                        record(nn);
+                                    });
                                 }
                             });
                         }else{
@@ -246,10 +311,29 @@ public class Table {
         maxDeep = Math.max(node.deep, maxDeep);
         minDeep = Math.min(node.deep, minDeep);
         tableRecordMap.put(new TableKey(node.floor,node.deep),node);
+        if(node.getChildNodes().isEmpty()){
+             shouldCheckNodes.add(node);
+            TreeModel<T> treeModel = (TreeModel<T>)node.treeModel;
+            if(treeModel!=null){
+                SparseArray<LinkedList<NodeModel<T>>> arrayByFloor =  treeModel.getArrayByFloor();
+                LinkedList<NodeModel<T>> nodeModels = arrayByFloor.get(node.floor);
+                if(node.equals(nodeModels.getLast())){
+                    shouldCheckNodes.remove(node);
+                }
+            }
+        }
     }
 
-    private boolean isImpact(NodeModel<?> node){
-        NodeModel<?> nodeModel = tableRecordMap.get(new TableKey(node.floor, node.deep));
+    private boolean isDeepImpact(NodeModel<?> node){
+        NodeModel<?> nodeModel = tableRecordMap.get(new TableKey(node.floor, node.deep+1));
+        if(node.equals(nodeModel)){
+            return false;
+        }
+        return nodeModel!=null;
+    }
+
+    private boolean isFloorImpact(NodeModel<?> node){
+        NodeModel<?> nodeModel = tableRecordMap.get(new TableKey(node.floor+1, node.deep));
         if(node.equals(nodeModel)){
             return false;
         }
