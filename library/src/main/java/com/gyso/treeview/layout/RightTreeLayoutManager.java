@@ -3,6 +3,7 @@ package com.gyso.treeview.layout;
 import android.content.Context;
 import android.view.View;
 
+import com.gyso.treeview.R;
 import com.gyso.treeview.TreeViewContainer;
 import com.gyso.treeview.adapter.TreeViewHolder;
 import com.gyso.treeview.algorithm.table.Table;
@@ -144,7 +145,7 @@ public class RightTreeLayoutManager extends TreeLayoutManager {
 
                 @Override
                 public void finish() {
-                    layoutAnimate(treeViewContainer);
+                    onManagerFinishLayoutAllNodes(treeViewContainer);
                 }
             });
         }
@@ -183,8 +184,20 @@ public class RightTreeLayoutManager extends TreeLayoutManager {
         int right = left+currentWidth;
 
         ViewBox finalLocation = new ViewBox(top, left, bottom, right);
-        if(!layoutAnimatePrepare(currentNode,currentNodeView,finalLocation,treeViewContainer)){
-            currentNodeView.layout(left,top,right,bottom);
+        onManagerLayoutNode(currentNode, currentNodeView, finalLocation, treeViewContainer);
+    }
+
+    public void onManagerLayoutNode(NodeModel<?> currentNode,
+                                    View currentNodeView,
+                                    ViewBox finalLocation,
+                                    TreeViewContainer treeViewContainer){
+        treeViewContainer.setTag(R.id.target_node,null);
+        if (!layoutAnimatePrepare(currentNode, currentNodeView, finalLocation, treeViewContainer)) {
+            currentNodeView.layout(finalLocation.left, finalLocation.top, finalLocation.right, finalLocation.bottom);
         }
+    }
+
+    public void onManagerFinishLayoutAllNodes(TreeViewContainer treeViewContainer){
+        layoutAnimate(treeViewContainer);
     }
 }

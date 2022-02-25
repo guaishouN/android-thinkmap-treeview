@@ -13,25 +13,16 @@ import com.gyso.gysotreeviewapplication.base.Animal;
 import com.gyso.gysotreeviewapplication.base.AnimalTreeViewAdapter;
 import com.gyso.gysotreeviewapplication.databinding.ActivityMainBinding;
 import com.gyso.treeview.TreeViewEditor;
-import com.gyso.treeview.layout.CompactRightTreeLayoutManager;
-import com.gyso.treeview.layout.CompactVerticalTreeLayoutManager;
-import com.gyso.treeview.layout.ForceDirectedTreeLayoutManager;
-import com.gyso.treeview.layout.RightTreeLayoutManager;
-import com.gyso.treeview.layout.RingTreeLayoutManager;
+import com.gyso.treeview.layout.CompactUpTreeLayoutManager;
 import com.gyso.treeview.layout.TreeLayoutManager;
-import com.gyso.treeview.layout.VerticalTreeLayoutManager;
-import com.gyso.treeview.line.AngledLine;
+import com.gyso.treeview.layout.UpTreeLayoutManager;
 import com.gyso.treeview.line.BaseLine;
-import com.gyso.treeview.line.DashLine;
-import com.gyso.treeview.line.SmoothLine;
 import com.gyso.treeview.line.StraightLine;
 import com.gyso.treeview.listener.TreeViewControlListener;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
 
-import java.util.LinkedList;
 import java.util.Stack;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MainActivity extends AppCompatActivity {
@@ -156,7 +147,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDragMoveNodesHit(NodeModel<?> draggingNode, NodeModel<?> hittingNode, View draggingView, View hittingView) {
                 Log.e(TAG, "onDragMoveNodesHit: draging["+draggingNode+"]hittingNode["+hittingNode+"]");
-
             }
         });
     }
@@ -166,12 +156,16 @@ public class MainActivity extends AppCompatActivity {
         int space_20dp = 20;
         BaseLine line = getLine();
         //return new RightTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new LeftTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new CompactRightTreeLayoutManager(this,space_50dp,space_20dp,line);
-        //return new VerticalTreeLayoutManager(this,space_50dp,space_20dp,line);
-        return new CompactVerticalTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new CompactLeftTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new DownTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new UpTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new CompactDownTreeLayoutManager(this,space_50dp,space_20dp,line);
+        return new CompactUpTreeLayoutManager(this,space_50dp,space_20dp,line);
+
         //return new RingTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new ForceDirectedTreeLayoutManager(this,line);
-
     }
 
     private BaseLine getLine() {

@@ -236,7 +236,7 @@ public class Table {
     }
 
     private <T> void removeFromRecord(NodeModel<T> node){
-        tableRecordMap.put(new TableKey(node.floor, node.deep),null);
+        tableRecordMap.remove(new TableKey(node.floor, node.deep));
     }
 
     private <T> void record(NodeModel<T> node) {
@@ -250,6 +250,9 @@ public class Table {
 
     private boolean isImpact(NodeModel<?> node){
         NodeModel<?> nodeModel = tableRecordMap.get(new TableKey(node.floor, node.deep));
+        if(node.equals(nodeModel)){
+            return false;
+        }
         return nodeModel!=null;
     }
 }

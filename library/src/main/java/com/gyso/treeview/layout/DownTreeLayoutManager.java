@@ -3,6 +3,7 @@ package com.gyso.treeview.layout;
 import android.content.Context;
 import android.view.View;
 
+import com.gyso.treeview.R;
 import com.gyso.treeview.TreeViewContainer;
 import com.gyso.treeview.adapter.TreeViewHolder;
 import com.gyso.treeview.algorithm.table.Table;
@@ -11,19 +12,21 @@ import com.gyso.treeview.model.ITraversal;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
 import com.gyso.treeview.util.DensityUtils;
-import com.gyso.treeview.util.TreeViewLog;
 import com.gyso.treeview.util.ViewBox;
 
-public class CompactVerticalTreeLayoutManager extends TreeLayoutManager {
-    private static final String TAG = CompactVerticalTreeLayoutManager.class.getSimpleName();
+/**
+ * @Author: 怪兽N
+ * @Time: 2021/5/8  19:06
+ * @Email: 674149099@qq.com
+ * @WeChat: guaishouN
+ * @Describe:
+ * Vertically down layout the tree view
+ */
+public class DownTreeLayoutManager extends TreeLayoutManager {
+    private static final String TAG = DownTreeLayoutManager.class.getSimpleName();
 
-    public CompactVerticalTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
+    public DownTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
         super(context, spaceParentToChild, spacePeerToPeer, baseline);
-    }
-
-    @Override
-    public void calculateByLayoutAlgorithm(TreeModel<?> mTreeModel) {
-        new Table().reconstruction(mTreeModel,Table.COMPACT_TABLE);
     }
 
     @Override
@@ -31,6 +34,10 @@ public class CompactVerticalTreeLayoutManager extends TreeLayoutManager {
         return LAYOUT_TYPE_VERTICAL_DOWN;
     }
 
+    @Override
+    public void calculateByLayoutAlgorithm(TreeModel<?> mTreeModel) {
+        new Table().reconstruction(mTreeModel,Table.LOOSE_TABLE);
+    }
     public void performMeasureAndListen(TreeViewContainer treeViewContainer, TreeLayoutManager.MeasureListener measureListener) {
         final TreeModel<?> mTreeModel = treeViewContainer.getTreeModel();
         if (mTreeModel != null) {
@@ -118,7 +125,6 @@ public class CompactVerticalTreeLayoutManager extends TreeLayoutManager {
     }
 
     private void measure(NodeModel<?> node, TreeViewContainer treeViewContainer) {
-        TreeViewLog.e(TAG,node+"gyso-----");
         TreeViewHolder<?> currentHolder = treeViewContainer.getTreeViewHolder(node);
         View currentNodeView =  currentHolder==null?null:currentHolder.getView();
         if(currentNodeView==null){
@@ -153,7 +159,7 @@ public class CompactVerticalTreeLayoutManager extends TreeLayoutManager {
 
                 @Override
                 public void finish() {
-                    layoutAnimate(treeViewContainer);
+                    onManagerFinishLayoutAllNodes(treeViewContainer);
                 }
             });
         }
@@ -170,6 +176,7 @@ public class CompactVerticalTreeLayoutManager extends TreeLayoutManager {
         View currentNodeView =  currentHolder==null?null:currentHolder.getView();
         int deep = currentNode.deep;
         int floor = currentNode.floor;
+        int leafCount = currentNode.leafCount;
 
         if(currentNodeView==null){
             throw new NullPointerException(" currentNodeView can not be null");
@@ -180,14 +187,32 @@ public class CompactVerticalTreeLayoutManager extends TreeLayoutManager {
 
         int verticalCenterFix = Math.abs(currentWidth - deepMax.get(deep))/2;
 
+        int deltaWidth = 0;
+        if(leafCount>1){
+            deltaWidth = (deepStart.get(deep + leafCount) - deepStart.get(deep)-currentWidth)/2-verticalCenterFix;
+            deltaWidth -= spacePeerToPeer/2;
+        }
+
         int top = floorStart.get(floor);
-        int left  = deepStart.get(deep)+verticalCenterFix;
+        int left  = deepStart.get(deep)+verticalCenterFix+deltaWidth;
         int bottom = top+currentHeight;
         int right = left+currentWidth;
 
         ViewBox finalLocation = new ViewBox(top, left, bottom, right);
-        if(!layoutAnimatePrepare(currentNode,currentNodeView,finalLocation,treeViewContainer)){
-            currentNodeView.layout(left,top,right,bottom);
+        onManagerLayoutNode(currentNode,currentNodeView,finalLocation,treeViewContainer);
+    }
+
+    public void onManagerLayoutNode(NodeModel<?> currentNode,
+                                    View currentNodeView,
+                                    ViewBox finalLocation,
+                                    TreeViewContainer treeViewContainer){
+        treeViewContainer.setTag(R.id.target_node,null);
+        if (!layoutAnimatePrepare(currentNode, currentNodeView, finalLocation, treeViewContainer)) {
+            currentNodeView.layout(finalLocation.left, finalLocation.top, finalLocation.right, finalLocation.bottom);
         }
+    }
+
+    public void onManagerFinishLayoutAllNodes(TreeViewContainer treeViewContainer){
+        layoutAnimate(treeViewContainer);
     }
 }

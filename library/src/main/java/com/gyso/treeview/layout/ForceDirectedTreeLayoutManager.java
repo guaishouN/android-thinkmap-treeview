@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-public class ForceDirectedTreeLayoutManager extends VerticalTreeLayoutManager implements ForceListener {
+public class ForceDirectedTreeLayoutManager extends DownTreeLayoutManager implements ForceListener {
     private final static String TAG = ForceDirectedTreeLayoutManager.class.getSimpleName();
     private Force force;
     private final Handler handler;
