@@ -1,6 +1,8 @@
 package com.gyso.treeview.algorithm.table;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
+
+import android.util.Log;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
 import androidx.annotation.IntDef;
@@ -18,6 +20,7 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Table {
     public static final String TAG = Table.class.getSimpleName();
@@ -30,11 +33,13 @@ public class Table {
     private int minDeep =0;
     private final Map<TableKey,NodeModel<?>> tableRecordMap = new ConcurrentHashMap<>();
     private final LinkedList<NodeModel<?>>  shouldCheckNodes = new LinkedList<>();
+    private final SparseArray<NodeModel<?>> floorRightLast = new SparseArray<>();
     @Retention(SOURCE)
     @IntDef({LOOSE_TABLE,COMPACT_TABLE})
     public @interface TableLayoutAlgorithmType {}
     public<T> void reconstruction(TreeModel<T> treeModel, @TableLayoutAlgorithmType int tableLayoutAlgorithm){
         tableRecordMap.clear();
+        floorRightLast.clear();
         if(tableLayoutAlgorithm==COMPACT_TABLE){
             calculateTreeNodesDeepCompact(treeModel);
         }else{
@@ -113,7 +118,6 @@ public class Table {
             if(cur==null){
                 return;
             }
-            removeFromRecord(cur);
             cur.deep = deepSum.get(cur.floor,0);
             record(cur);
             deepSum.put(cur.floor,cur.deep+1);
@@ -123,6 +127,7 @@ public class Table {
             }
         }
         compactTable(treeModel);
+        rootNode.traverseIncludeSelf(node -> tableRecordMap.put(new TableKey(node.floor,node.deep),node));
         //remove space
         //moveMoreCompact(treeModel);
         TreeViewLog.e(TAG,"calculateTreeNodesDeepCompact end");
@@ -135,19 +140,37 @@ public class Table {
             if(shouldCheckNode.equals(treeModel.getRootNode())){
                 break;
             }
-            if(isDeepImpact(shouldCheckNode) || isDeepImpact(shouldCheckNode.parentNode)){
+            if(!nextDeepCellIsEmpty(shouldCheckNode) || !nextDeepCellIsEmpty(shouldCheckNode.parentNode)){
                 continue;
             }
-            Map<NodeModel<T>,TableKey>  oldPosition = new HashMap<>();
-            //branch old position
-            shouldCheckNode.traverseBranch(node -> {
-                oldPosition.put(node,new TableKey(node.floor,node.deep));
+            final int[] fd = new int[]{shouldCheckNode.parentNode.floor};
+            AtomicReference<NodeModel<T>> preFloorLast = new AtomicReference<>(shouldCheckNode.parentNode);
+            LinkedList<NodeModel<T>> rightLine = new LinkedList<>();
+            shouldCheckNode.parentNode.traverseIncludeSelf(node -> {
+                if(node.floor!=fd[0]){
+                    fd[0] = node.floor;
+                    rightLine.add(preFloorLast.get());
+                }
+                preFloorLast.set(node);
             });
-            final AtomicBoolean isMoveOk = new AtomicBoolean(true);
-            int count =0;
-            while (!isDeepImpact(shouldCheckNode)&&count<2){
-                count++;
-                removeFromRecord(shouldCheckNode);
+            rightLine.add(preFloorLast.get());
+            boolean isConMove = true;
+            for (NodeModel<T> lineNode : rightLine) {
+                if(!nextDeepCellIsEmpty(lineNode)){
+                    isConMove = false;
+                    break;
+                }
+            }
+            if(!isConMove){
+                continue;
+            }
+            while (nextDeepCellIsEmpty(shouldCheckNode)){
+                final AtomicBoolean isMoveOk = new AtomicBoolean(true);
+                Map<NodeModel<T>,TableKey>  oldPosition = new HashMap<>();
+                shouldCheckNode.traverseBranch(node -> oldPosition.put(node,new TableKey(node.floor,node.deep)));
+                LinkedList<TableKey> hasMoveAwayPosition = new LinkedList<>();
+
+                hasMoveAwayPosition.add(new TableKey(shouldCheckNode.floor,shouldCheckNode.deep));
                 shouldCheckNode.deep=shouldCheckNode.deep+1;
                 record(shouldCheckNode);
                 shouldCheckNode.traverseBranchParent(new NodeModel.INext<T>() {
@@ -163,25 +186,32 @@ public class Table {
                         for(NodeModel<?> nPeer:nnChildNodes ){
                             nSum = nSum +nPeer.deep;
                         }
-                        removeFromRecord(node);
+                        hasMoveAwayPosition.add(new TableKey(node.floor,node.deep));
                         node.deep = nSum /nnChildNodes.size();
                         record(node);
-                        if(isDeepImpact(node)){
+                        NodeModel<?> model = tableRecordMap.get(new TableKey(node.floor, node.deep));
+                        if(model!=null && !model.equals(node)){
                             isMoveOk.set(false);
-                             return true;
+                            hasMoveAwayPosition.clear();
+                            return true;
                         }
                         return false;
                     }
                 });
-            }
-            //move failed then reset old position
-            if(!isMoveOk.get()){
-                for (NodeModel<T> tNodeModel : oldPosition.keySet()) {
-                    TableKey tableKey = oldPosition.get(tNodeModel);
-                    removeFromRecord(tNodeModel);
-                    tNodeModel.floor=tableKey.floor;
-                    tNodeModel.deep=tableKey.deep;
-                    record(tNodeModel);
+                //move failed then reset old position
+                if(!isMoveOk.get()){
+                    for (NodeModel<T> tNodeModel : oldPosition.keySet()) {
+                        TableKey tableKey = oldPosition.get(tNodeModel);
+                        assert tableKey != null;
+                        tNodeModel.floor=tableKey.floor;
+                        tNodeModel.deep=tableKey.deep;
+                        record(tNodeModel);
+                    }
+                }else {
+                    for (TableKey k : hasMoveAwayPosition) {
+                        NodeModel<?> removeModel = tableRecordMap.remove(k);
+                        tableRecordMap.put(new TableKey(removeModel.floor,removeModel.deep),removeModel);
+                    }
                 }
             }
         }
@@ -218,9 +248,10 @@ public class Table {
                             //parent all left move to peers' mid
                             final int d = peerMidDeep-parentDeep;
                             fromRootToMyUpRight(treeModel,cur, next -> {
-                                removeFromRecord(next);
+                                Log.d(TAG, "compactTable: ---"+next);
                                 next.deep +=d;
                                 record(next);
+
                                 //next's parent fit center
                                 NodeModel<T> np = next.getParentNode();
                                 if(np!=null){
@@ -230,7 +261,6 @@ public class Table {
                                         for(NodeModel<?> nPeer:nnChildNodes ){
                                             nSum = nSum +nPeer.deep;
                                         }
-                                        removeFromRecord(nn);
                                         nn.deep = nSum /nnChildNodes.size();
                                         record(nn);
                                     });
@@ -243,7 +273,6 @@ public class Table {
                             int md = cur.deep;
                             for (NodeModel<T> afterMe:nodeModels) {
                                 if(afterMe.deep >= md){
-                                    removeFromRecord(afterMe);
                                     afterMe.deep += d;
                                     record(afterMe);
                                 }
@@ -300,36 +329,35 @@ public class Table {
         }
     }
 
-    private <T> void removeFromRecord(NodeModel<T> node){
-        tableRecordMap.remove(new TableKey(node.floor, node.deep));
-    }
-
     private <T> void record(NodeModel<T> node) {
         if(node==null){
             return;
         }
         maxDeep = Math.max(node.deep, maxDeep);
         minDeep = Math.min(node.deep, minDeep);
-        tableRecordMap.put(new TableKey(node.floor,node.deep),node);
-        if(node.getChildNodes().isEmpty()){
-             shouldCheckNodes.add(node);
-            TreeModel<T> treeModel = (TreeModel<T>)node.treeModel;
-            if(treeModel!=null){
-                SparseArray<LinkedList<NodeModel<T>>> arrayByFloor =  treeModel.getArrayByFloor();
-                LinkedList<NodeModel<T>> nodeModels = arrayByFloor.get(node.floor);
-                if(node.equals(nodeModels.getLast())){
-                    shouldCheckNodes.remove(node);
-                }
+        NodeModel<?> model = floorRightLast.get(node.floor);
+        if(model==null){
+            floorRightLast.put(node.floor,node);
+        }else{
+            if(model.deep <= node.deep){
+                floorRightLast.put(node.floor,node);
+            }
+        }
+        if(node.getChildNodes().isEmpty()&& !shouldCheckNodes.contains(node)){
+            shouldCheckNodes.add(node);
+            NodeModel<?> nodeModel = floorRightLast.get(node.floor);
+            if(nodeModel!=null && node.deep == nodeModel.deep){
+                shouldCheckNodes.remove(node);
             }
         }
     }
 
-    private boolean isDeepImpact(NodeModel<?> node){
+    private boolean nextDeepCellIsEmpty(NodeModel<?> node){
         NodeModel<?> nodeModel = tableRecordMap.get(new TableKey(node.floor, node.deep+1));
         if(node.equals(nodeModel)){
-            return false;
+            return true;
         }
-        return nodeModel!=null;
+        return nodeModel==null;
     }
 
     private boolean isFloorImpact(NodeModel<?> node){

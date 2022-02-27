@@ -29,6 +29,6 @@ public class TableKey {
     @NonNull
     @Override
     public String toString() {
-        return super.toString();
+        return "["+floor+","+deep+"]";
     }
 }
