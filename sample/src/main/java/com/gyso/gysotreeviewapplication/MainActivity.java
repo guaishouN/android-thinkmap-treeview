@@ -237,22 +237,35 @@ public class MainActivity extends AppCompatActivity {
         NodeModel<Animal> sub47 = new NodeModel<>(new Animal(R.drawable.ic_09,"sub47"));
         NodeModel<Animal> sub48 = new NodeModel<>(new Animal(R.drawable.ic_10,"sub48"));
         NodeModel<Animal> sub49 = new NodeModel<>(new Animal(R.drawable.ic_11,"sub49"));
+        NodeModel<Animal> sub50 = new NodeModel<>(new Animal(R.drawable.ic_05,"sub50"));
+        NodeModel<Animal> sub51 = new NodeModel<>(new Animal(R.drawable.ic_07,"sub51"));
+        NodeModel<Animal> sub52 = new NodeModel<>(new Animal(R.drawable.ic_07,"sub52"));
+        NodeModel<Animal> sub53 = new NodeModel<>(new Animal(R.drawable.ic_07,"sub53"));
 
         //build relationship
         treeModel.addNode(root,sub0,sub1,sub3,sub4);
         treeModel.addNode(sub3,sub12,sub13);
         treeModel.addNode(sub1,sub2);
-        treeModel.addNode(sub0,sub5,sub38,sub39);
+        treeModel.addNode(sub0,sub34,sub5,sub38,sub39);
         treeModel.addNode(sub4,sub6);
         treeModel.addNode(sub5,sub7,sub8);
         treeModel.addNode(sub6,sub9,sub10,sub11);
         treeModel.addNode(sub11,sub14,sub15);
         treeModel.addNode(sub10,sub40);
         treeModel.addNode(sub40,sub16);
-        treeModel.addNode(sub8,sub17,sub18,sub19,sub20,sub21,sub22,sub23);
+        treeModel.addNode(sub8,sub17,sub18,sub19,sub20,sub21,sub22,sub23,sub41,sub42,sub43,sub44);
         treeModel.addNode(sub9,sub47,sub48);
         treeModel.addNode(sub16,sub24,sub25,sub26,sub27,sub28,sub29,sub30,sub46,sub45);
         treeModel.addNode(sub47,sub49);
+        treeModel.addNode(sub12,sub37);
+        treeModel.addNode(sub0,sub36);
+        //treeModel.addNode(sub36,sub35);
+        //treeModel.addNode(sub34,sub50);
+        //treeModel.addNode(sub7,sub51,sub52,sub53);
+        //treeModel.addNode(sub35,sub31,sub32,sub33);
+
+
+
         //treeModel.addNode(sub15,sub31,sub32,sub33,sub34,sub35,sub36,sub37);
         //treeModel.addNode(sub2,sub40,sub41,sub42,sub43,sub44,sub45,sub46);
         //mark

@@ -235,6 +235,9 @@ public class Table {
             //deal parent and me
             NodeModel<T> parentNode = cur.getParentNode();
             if(parentNode!=null){
+                if(parentNode.toString().contains("08")){
+                    Log.d(TAG, "compactTable: ");
+                }
                 LinkedList<NodeModel<T>> peers = parentNode.getChildNodes();
                 if(!peers.isEmpty()){
                     int sum=0;
@@ -306,22 +309,21 @@ public class Table {
         deque.add(tmpNode);
         while (!deque.isEmpty()) {
             tmpNode = deque.poll();
-            if(tmpNode==null){
-                continue;
-            }
-            int markDeep= modelSparseArray.get(tmpNode.floor);
-            if(markDeep>tmpNode.deep){
+            if(tmpNode==null ){
                 continue;
             }
             if(tmpNode.floor>=node.floor){
                 break;
             }
-            if (traversal != null) {
-                traversal.next(tmpNode);
-            }
-            LinkedList<NodeModel<T>> childNodes = tmpNode.getChildNodes();
-            if (childNodes.size() > 0) {
-                deque.addAll(childNodes);
+            int markDeep= modelSparseArray.get(tmpNode.floor);
+            if(tmpNode.deep>=markDeep || tmpNode.deep>= node.deep){
+                if (traversal != null) {
+                    traversal.next(tmpNode);
+                }
+                LinkedList<NodeModel<T>> childNodes = tmpNode.getChildNodes();
+                if (childNodes.size() > 0) {
+                    deque.addAll(childNodes);
+                }
             }
         }
         if (traversal != null) {
