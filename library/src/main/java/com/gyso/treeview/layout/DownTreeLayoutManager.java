@@ -206,7 +206,6 @@ public class DownTreeLayoutManager extends TreeLayoutManager {
                                     View currentNodeView,
                                     ViewBox finalLocation,
                                     TreeViewContainer treeViewContainer){
-        treeViewContainer.setTag(R.id.target_node,null);
         if (!layoutAnimatePrepare(currentNode, currentNodeView, finalLocation, treeViewContainer)) {
             currentNodeView.layout(finalLocation.left, finalLocation.top, finalLocation.right, finalLocation.bottom);
         }

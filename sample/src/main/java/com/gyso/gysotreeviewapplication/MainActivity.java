@@ -18,6 +18,7 @@ import com.gyso.treeview.layout.CompactHorizonLeftAndRightLayoutManager;
 import com.gyso.treeview.layout.CompactRightTreeLayoutManager;
 import com.gyso.treeview.layout.CompactUpTreeLayoutManager;
 import com.gyso.treeview.layout.HorizonLeftAndRightLayoutManager;
+import com.gyso.treeview.layout.RingTreeLayoutManager;
 import com.gyso.treeview.layout.TreeLayoutManager;
 import com.gyso.treeview.layout.UpTreeLayoutManager;
 import com.gyso.treeview.line.BaseLine;
@@ -167,9 +168,9 @@ public class MainActivity extends AppCompatActivity {
         //return new CompactHorizonLeftAndRightLayoutManager(this,space_50dp,space_20dp,line);
         //return new DownTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new UpTreeLayoutManager(this,space_50dp,space_20dp,line);
-        return new CompactDownTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new CompactDownTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new CompactUpTreeLayoutManager(this,space_50dp,space_20dp,line);
-        //return new RingTreeLayoutManager(this,space_50dp,space_20dp,line);
+        return new RingTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new ForceDirectedTreeLayoutManager(this,line);
     }
 

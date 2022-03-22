@@ -19,11 +19,10 @@ public class RingForCompact {
     private final TreeModel<?> model;
     private final Map<NodeModel<?>, PointF> nodeModelPointFMap = new HashMap<>();
     private final Map<NodeModel<?>, Double> nodeModelAngleMap = new HashMap<>();
-    private final Map<NodeModel<?>, Double> piePartBaseAngleMap = new HashMap<>();
+    private final Map<NodeModel<?>, Double> nodeModelNewRadius = new HashMap<>();
     protected SparseIntArray floorStart = new SparseIntArray(200);
-    private final AtomicBoolean isGenPositionOK = new AtomicBoolean(true);
-    private final Map<NodeModel<?>, AtomicInteger> multiMap = new HashMap<>();
-    private final AtomicInteger multi = new AtomicInteger(1);
+    private double minAngle = 0;
+    private double maxAngle = 0;
     private RingForCompact(TreeModel<?> model) {
         this.model = model;
     }
@@ -50,9 +49,6 @@ public class RingForCompact {
         return this;
     }
 
-    public boolean isGenPositionOK(){
-        return isGenPositionOK.get();
-    }
 
     public Map<NodeModel<?>, PointF> genPositions() {
         if (model == null) {
@@ -60,36 +56,16 @@ public class RingForCompact {
         }
         NodeModel<?> rootNode = model.getRootNode();
         nodeModelPointFMap.clear();
+        minAngle =2f*Math.PI;
+        maxAngle = 0;
         nodeModelPointFMap.put(rootNode, new PointF(center.y, center.x));
-        isGenPositionOK.set(true);
-        int leafCount = model.getMaxDeep()- model.getMinDeep();
+        int pieCount = model.getMaxDeep()- model.getMinDeep();
         LinkedList<? extends NodeModel<?>> rootNodeChildNodes = rootNode.getChildNodes();
-        if(leafCount == 0 || rootNodeChildNodes.isEmpty()){
+        if(pieCount == 0 || rootNodeChildNodes.isEmpty()){
             return nodeModelPointFMap;
         }
-
         //keep in pie center
-        double deltaAngle = 2f*Math.PI / (leafCount+multi.get());
-        double pieAngle = 2f*Math.PI / leafCount;
-        double sumAngleDelta = 0;
-        double sumAnglePie = 0;
-        for (NodeModel<?> rootChild : rootNodeChildNodes) {
-            int count = leafCount/rootNodeChildNodes.size();
-            double da ,dp;
-            if(count<2){
-                da = sumAngleDelta+deltaAngle/2;
-                dp = sumAnglePie +pieAngle/2;
-                sumAngleDelta += deltaAngle;
-                sumAnglePie += pieAngle;
-            }else{
-                da = sumAngleDelta+deltaAngle*(count-1)/2f;
-                dp = sumAnglePie + pieAngle*(count-1)/2f;
-                sumAngleDelta += deltaAngle*(count-1);
-                sumAnglePie += pieAngle*(count-1);
-            }
-            piePartBaseAngleMap.put(rootChild,dp-da);
-        }
-
+        double pieAngle = 2f*Math.PI / pieCount;
         //doTraversalNodes
         model.doTraversalNodes((ITraversal<NodeModel<?>>) next -> {
             if(next.equals(rootNode)){
@@ -97,35 +73,20 @@ public class RingForCompact {
             }
             TreeViewLog.e(TAG,next+" -gyso");
             NodeModel<?> nextParentNode = next.getParentNode();
-            if(nextParentNode !=null && !nextParentNode.equals(rootNode)){
-                piePartBaseAngleMap.put(next,piePartBaseAngleMap.get(nextParentNode));
-            }
             PointF pointF = nodeModelPointFMap.get(next);
             if (pointF == null) {
                 pointF = new PointF();
                 int deep = next.deep;
                 int floor = next.floor;
-                double angle = deltaAngle * deep;
-                LinkedList<? extends NodeModel<?>> childNodes = next.getChildNodes();
-//                if(!childNodes.isEmpty()){
-//                    int count = next.leafCount;
-//                    if(count>=2){
-//                        double d = deltaAngle*(count-1)/2f;
-//                        angle += d;
-//                    }
-//                }
-                Double centerPieAngle = piePartBaseAngleMap.get(next);
-                if(centerPieAngle!=null){
-                    angle += centerPieAngle;
-                }
-
+                double angle = pieAngle * deep;
                 float radius = floorStart.get(floor);
                 TreeViewLog.e(TAG,"radius["+radius+"]angle["+angle+"]");
                 pointF.x = (float) (radius * Math.sin(angle))+center.y;
                 pointF.y = (float) (radius * Math.cos(angle))+center.x;
                 nodeModelPointFMap.put(next, pointF);
                 nodeModelAngleMap.put(next,angle);
-
+                nodeModelNewRadius.put(next, (double)radius);
+                recordMinMaxAngle(next);
                 //keep acute angle for parent
                 if(nextParentNode !=null && !nextParentNode.equals(rootNode)){
                     PointF parentPosition = nodeModelPointFMap.get(nextParentNode);
@@ -137,20 +98,57 @@ public class RingForCompact {
                     double l1 = c2r*Math.abs(Math.cos(dAngle));
                     TreeViewLog.e(TAG,"p2r["+p2r+"]c2r["+c2r+"]dAngle["+dAngle+"]Math.sin(dAngle)["+Math.sin(dAngle)+"]l1["+l1+"]l1 <= p2r["+(l1 <= p2r)+"]");
                     //if(false){
-                    if(l1 <= p2r){
-                        //no good layout request layout
-                        isGenPositionOK.set(false);
-                        int d = 2;
-                        multi.addAndGet(d==0?1:d);
-                        TreeViewLog.e(TAG,"Calculate ring position false!!!");
+                    if(l1 < p2r){
+                        TreeViewLog.e(TAG,"no acute children layout, should compact to acute!!");
+                        //Math.PI for layout all children
+                        LinkedList<? extends NodeModel<?>> childNodes = nextParentNode.getChildNodes();
+                        double childAngle = Math.PI / childNodes.size();
+                        float childRadius = (radius -floorStart.get(nextParentNode.floor))*2;
+                        double h,w;
+                        int count =0;
+                        for (NodeModel<?> child :childNodes) {
+                            double sumAngle = Math.PI/2-(count+1/2f)*childAngle;
+                            h =  childRadius * Math.sin(sumAngle);
+                            w = childRadius * Math.cos(sumAngle)+floorStart.get(nextParentNode.floor);
+                            double de = Math.atan2(h,w)+nodeModelAngleMap.get(nextParentNode);
+                            double nR = Math.sqrt(h*h+w*w);
+                            PointF nP = new PointF();
+                            nP.x = (float) (nR * Math.sin(de))+center.y;
+                            nP.y = (float) (nR * Math.cos(de))+center.x;
+                            nodeModelPointFMap.put(child, nP);
+                            nodeModelAngleMap.put(child, de);
+                            nodeModelNewRadius.put(child, (double)nR);
+                            recordMinMaxAngle(child);
+                            count++;
+                        }
                     }
                 }
             }
         });
-        if(isGenPositionOK.get()){
-            multi.set(1);
+        double spaceAngle = 2*Math.PI-(maxAngle-minAngle);
+        //   if(false){
+        if(spaceAngle>(Math.PI/8)){
+            double s = spaceAngle/pieCount;
+            model.doTraversalNodes((ITraversal<NodeModel<?>>) next -> {
+                if(!next.equals(rootNode)){
+                    nodeModelPointFMap.get(next);
+                    PointF pointF = new PointF();
+                    int deep = next.deep;
+                    double angle = nodeModelAngleMap.get(next)+s* deep;
+                    double radius = nodeModelNewRadius.get(next);
+                    pointF.x = (float) (radius * Math.sin(angle))+center.y;
+                    pointF.y = (float) (radius * Math.cos(angle))+center.x;
+                    nodeModelPointFMap.put(next, pointF);
+                    nodeModelAngleMap.put(next,angle);
+                }
+            });
         }
-        TreeViewLog.e(TAG,"isGenPositionOK["+isGenPositionOK+"]multi["+multi.get()+"]deltaAngle["+deltaAngle+"]nodeModelPointFMap{"+nodeModelPointFMap+"");
         return nodeModelPointFMap;
+    }
+
+    public void recordMinMaxAngle(NodeModel<?> node){
+        Double angle = nodeModelAngleMap.get(node);
+        minAngle = Math.min(minAngle,angle);
+        maxAngle = Math.max(maxAngle,angle);
     }
 }

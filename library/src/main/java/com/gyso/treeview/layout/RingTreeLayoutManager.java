@@ -7,6 +7,7 @@ import com.gyso.treeview.R;
 import com.gyso.treeview.TreeViewContainer;
 import com.gyso.treeview.adapter.TreeViewHolder;
 import com.gyso.treeview.algorithm.ring.Ring;
+import com.gyso.treeview.algorithm.ring.RingForCompact;
 import com.gyso.treeview.algorithm.table.Table;
 import com.gyso.treeview.line.BaseLine;
 import com.gyso.treeview.model.ITraversal;
@@ -19,7 +20,7 @@ import java.util.Map;
 
 public class RingTreeLayoutManager extends TreeLayoutManager {
     private static final String TAG = RingTreeLayoutManager.class.getSimpleName();
-    private Ring ring=null;
+    private RingForCompact ring=null;
     private Map<NodeModel<?>, PointF> ringPositions = null;
     public RingTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
         super(context, spaceParentToChild, spacePeerToPeer, baseline);
@@ -76,11 +77,8 @@ public class RingTreeLayoutManager extends TreeLayoutManager {
 
                     int rootCenterX = mFixedDx + fixedViewBox.getWidth() / 2;
                     int rootCenterY = mFixedDx + fixedViewBox.getHeight() / 2;
-                    ring = Ring.getInstance(mTreeModel).setCenter(rootCenterX,rootCenterY).setFloorStart(floorStart);
+                    ring = RingForCompact.getInstance(mTreeModel).setCenter(rootCenterX,rootCenterY).setFloorStart(floorStart);
                     ringPositions = ring.genPositions();
-                    while (!ring.isGenPositionOK()){
-                        ringPositions = ring.genPositions();
-                    }
                     if (measureListener != null) {
                         measureListener.onMeasureFinished();
                     }
@@ -199,7 +197,6 @@ public class RingTreeLayoutManager extends TreeLayoutManager {
         int right = left + currentWidth;
         TreeViewLog.e(TAG,"top["+top+"]left["+left+"]bottom["+bottom+"]right["+right+"]");
         ViewBox finalLocation = new ViewBox(top, left, bottom, right);
-        treeViewContainer.setTag(R.id.target_node,null);
         if (!layoutAnimatePrepare(currentNode, currentNodeView, finalLocation, treeViewContainer)) {
             currentNodeView.layout(left, top, right, bottom);
         }

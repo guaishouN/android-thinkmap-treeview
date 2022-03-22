@@ -14,7 +14,7 @@ import com.gyso.treeview.util.ViewBox;
 import java.util.LinkedList;
 
 public class CompactHorizonLeftAndRightLayoutManager  extends CompactRightTreeLayoutManager {
-    private static final String TAG = HorizonLeftAndRightLayoutManager.class.getSimpleName();
+    private static final String TAG = CompactHorizonLeftAndRightLayoutManager.class.getSimpleName();
     private boolean isJustCalculate;
     public CompactHorizonLeftAndRightLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
         super(context, spaceParentToChild, spacePeerToPeer, baseline);
