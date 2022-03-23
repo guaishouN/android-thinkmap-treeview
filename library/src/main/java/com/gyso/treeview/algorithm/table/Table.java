@@ -75,6 +75,7 @@ public class Table {
                     cur.deep = parentNode.deep;
                 }
             }
+            record(cur);
             LinkedList<NodeModel<T>> childNodes = cur.getChildNodes();
             for (int i = childNodes.size()-1; i >=0; i--) {
                 stack.add(childNodes.get(i));

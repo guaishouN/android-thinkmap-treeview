@@ -20,9 +20,13 @@ public class RingForCompact {
     private final Map<NodeModel<?>, PointF> nodeModelPointFMap = new HashMap<>();
     private final Map<NodeModel<?>, Double> nodeModelAngleMap = new HashMap<>();
     private final Map<NodeModel<?>, Double> nodeModelNewRadius = new HashMap<>();
+    private final Map<NodeModel<?>, Integer> nodeModelNewDeep = new HashMap<>();
     protected SparseIntArray floorStart = new SparseIntArray(200);
     private double minAngle = 0;
     private double maxAngle = 0;
+    private int minDeep = 0;
+    private int maxDeep = 0;
+
     private RingForCompact(TreeModel<?> model) {
         this.model = model;
     }
@@ -56,8 +60,13 @@ public class RingForCompact {
         }
         NodeModel<?> rootNode = model.getRootNode();
         nodeModelPointFMap.clear();
+        nodeModelAngleMap.clear();
+        nodeModelNewRadius.clear();
+        nodeModelNewDeep.clear();
         minAngle =2f*Math.PI;
         maxAngle = 0;
+        minDeep = 0;
+        maxDeep =0;
         nodeModelPointFMap.put(rootNode, new PointF(center.y, center.x));
         int pieCount = model.getMaxDeep()- model.getMinDeep();
         LinkedList<? extends NodeModel<?>> rootNodeChildNodes = rootNode.getChildNodes();
@@ -118,6 +127,7 @@ public class RingForCompact {
                             nodeModelPointFMap.put(child, nP);
                             nodeModelAngleMap.put(child, de);
                             nodeModelNewRadius.put(child, (double)nR);
+                            nodeModelNewDeep.put(child,nextParentNode.deep);
                             recordMinMaxAngle(child);
                             count++;
                         }
@@ -126,15 +136,17 @@ public class RingForCompact {
             }
         });
         double spaceAngle = 2*Math.PI-(maxAngle-minAngle);
+        double deepSpace = maxDeep - minDeep;
         //   if(false){
         if(spaceAngle>(Math.PI/8)){
             double s = spaceAngle/pieCount;
+            double d = deepSpace/pieCount;
             model.doTraversalNodes((ITraversal<NodeModel<?>>) next -> {
                 if(!next.equals(rootNode)){
                     nodeModelPointFMap.get(next);
                     PointF pointF = new PointF();
-                    int deep = next.deep;
-                    double angle = nodeModelAngleMap.get(next)+s* deep;
+                    int deep = nodeModelNewDeep.get(next)==null?next.deep:nodeModelNewDeep.get(next);
+                    double angle = nodeModelAngleMap.get(next)+s* deep*(1+d);
                     double radius = nodeModelNewRadius.get(next);
                     pointF.x = (float) (radius * Math.sin(angle))+center.y;
                     pointF.y = (float) (radius * Math.cos(angle))+center.x;
@@ -150,5 +162,7 @@ public class RingForCompact {
         Double angle = nodeModelAngleMap.get(node);
         minAngle = Math.min(minAngle,angle);
         maxAngle = Math.max(maxAngle,angle);
+        minDeep = Math.min(minDeep,node.deep);
+        maxDeep = Math.max(maxDeep,node.deep);
     }
 }

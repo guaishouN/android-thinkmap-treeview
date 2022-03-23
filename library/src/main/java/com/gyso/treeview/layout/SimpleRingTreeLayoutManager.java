@@ -3,10 +3,9 @@ package com.gyso.treeview.layout;
 import android.content.Context;
 import android.graphics.PointF;
 import android.view.View;
-import com.gyso.treeview.R;
+
 import com.gyso.treeview.TreeViewContainer;
 import com.gyso.treeview.adapter.TreeViewHolder;
-import com.gyso.treeview.algorithm.ring.Ring;
 import com.gyso.treeview.algorithm.ring.RingForCompact;
 import com.gyso.treeview.algorithm.table.Table;
 import com.gyso.treeview.line.BaseLine;
@@ -16,13 +15,14 @@ import com.gyso.treeview.model.TreeModel;
 import com.gyso.treeview.util.DensityUtils;
 import com.gyso.treeview.util.TreeViewLog;
 import com.gyso.treeview.util.ViewBox;
+
 import java.util.Map;
 
-public class RingTreeLayoutManager extends TreeLayoutManager {
-    private static final String TAG = RingTreeLayoutManager.class.getSimpleName();
+public class SimpleRingTreeLayoutManager  extends TreeLayoutManager {
+    private static final String TAG = CompactRingTreeLayoutManager.class.getSimpleName();
     private RingForCompact ring=null;
     private Map<NodeModel<?>, PointF> ringPositions = null;
-    public RingTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
+    public SimpleRingTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
         super(context, spaceParentToChild, spacePeerToPeer, baseline);
     }
 

@@ -13,14 +13,8 @@ import com.gyso.gysotreeviewapplication.base.Animal;
 import com.gyso.gysotreeviewapplication.base.AnimalTreeViewAdapter;
 import com.gyso.gysotreeviewapplication.databinding.ActivityMainBinding;
 import com.gyso.treeview.TreeViewEditor;
-import com.gyso.treeview.layout.CompactDownTreeLayoutManager;
-import com.gyso.treeview.layout.CompactHorizonLeftAndRightLayoutManager;
-import com.gyso.treeview.layout.CompactRightTreeLayoutManager;
-import com.gyso.treeview.layout.CompactUpTreeLayoutManager;
-import com.gyso.treeview.layout.HorizonLeftAndRightLayoutManager;
-import com.gyso.treeview.layout.RingTreeLayoutManager;
+import com.gyso.treeview.layout.CompactRingTreeLayoutManager;
 import com.gyso.treeview.layout.TreeLayoutManager;
-import com.gyso.treeview.layout.UpTreeLayoutManager;
 import com.gyso.treeview.line.BaseLine;
 import com.gyso.treeview.line.StraightLine;
 import com.gyso.treeview.listener.TreeViewControlListener;
@@ -170,7 +164,8 @@ public class MainActivity extends AppCompatActivity {
         //return new UpTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new CompactDownTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new CompactUpTreeLayoutManager(this,space_50dp,space_20dp,line);
-        return new RingTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new CompactVerticalUpAndDownLayoutManager(this,space_50dp,space_20dp,line);
+        return new CompactRingTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new ForceDirectedTreeLayoutManager(this,line);
     }
 
@@ -254,9 +249,9 @@ public class MainActivity extends AppCompatActivity {
         treeModel.addNode(sub11,sub14,sub15);
         treeModel.addNode(sub10,sub40);
         treeModel.addNode(sub40,sub16);
-        treeModel.addNode(sub8,sub17,sub18,sub19,sub20,sub21,sub22,sub23,sub41,sub42,sub43,sub44);
+        //treeModel.addNode(sub8,sub17,sub18,sub19,sub20,sub21,sub22,sub23,sub41,sub42,sub43,sub44);
         treeModel.addNode(sub9,sub47,sub48);
-        treeModel.addNode(sub16,sub24,sub25,sub26,sub27,sub28,sub29,sub30,sub46,sub45);
+        //treeModel.addNode(sub16,sub24,sub25,sub26,sub27,sub28,sub29,sub30,sub46,sub45);
         treeModel.addNode(sub47,sub49);
         treeModel.addNode(sub12,sub37);
         treeModel.addNode(sub0,sub36);
