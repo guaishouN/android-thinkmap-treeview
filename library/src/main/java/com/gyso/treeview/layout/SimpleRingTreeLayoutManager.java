@@ -6,7 +6,9 @@ import android.view.View;
 
 import com.gyso.treeview.TreeViewContainer;
 import com.gyso.treeview.adapter.TreeViewHolder;
+import com.gyso.treeview.algorithm.ring.Ring;
 import com.gyso.treeview.algorithm.ring.RingForCompact;
+import com.gyso.treeview.algorithm.ring.RingForSimple;
 import com.gyso.treeview.algorithm.table.Table;
 import com.gyso.treeview.line.BaseLine;
 import com.gyso.treeview.model.ITraversal;
@@ -20,7 +22,7 @@ import java.util.Map;
 
 public class SimpleRingTreeLayoutManager  extends TreeLayoutManager {
     private static final String TAG = CompactRingTreeLayoutManager.class.getSimpleName();
-    private RingForCompact ring=null;
+    private RingForSimple ring=null;
     private Map<NodeModel<?>, PointF> ringPositions = null;
     public SimpleRingTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
         super(context, spaceParentToChild, spacePeerToPeer, baseline);
@@ -77,7 +79,7 @@ public class SimpleRingTreeLayoutManager  extends TreeLayoutManager {
 
                     int rootCenterX = mFixedDx + fixedViewBox.getWidth() / 2;
                     int rootCenterY = mFixedDx + fixedViewBox.getHeight() / 2;
-                    ring = RingForCompact.getInstance(mTreeModel).setCenter(rootCenterX,rootCenterY).setFloorStart(floorStart);
+                    ring = RingForSimple.getInstance(mTreeModel).setCenter(rootCenterX,rootCenterY).setFloorStart(floorStart);
                     ringPositions = ring.genPositions();
                     if (measureListener != null) {
                         measureListener.onMeasureFinished();
