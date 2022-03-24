@@ -13,10 +13,10 @@ import com.gyso.treeview.util.ViewBox;
 
 import java.util.LinkedList;
 
-public class CompactVerticalUpAndDownLayoutManager extends CompactDownTreeLayoutManager {
+public class VerticalUpAndDownLayoutManager extends DownTreeLayoutManager {
     private static final String TAG = CompactVerticalUpAndDownLayoutManager.class.getSimpleName();
     private boolean isJustCalculate;
-    public CompactVerticalUpAndDownLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
+    public VerticalUpAndDownLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
         super(context, spaceParentToChild, spacePeerToPeer, baseline);
     }
 

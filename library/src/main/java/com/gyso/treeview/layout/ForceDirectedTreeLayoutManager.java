@@ -139,7 +139,6 @@ public class ForceDirectedTreeLayoutManager extends DownTreeLayoutManager implem
     public void performMeasure(TreeViewContainer treeViewContainer) {
         this.treeViewContainer = treeViewContainer;
         if(treeViewContainer!=null){
-            treeViewContainer.setTag(R.id.target_node,null);
             performMeasureAndListen(treeViewContainer, new TreeLayoutManager.MeasureListener(){
                 @Override
                 public void onMeasureChild(NodeModel<?> next) {
