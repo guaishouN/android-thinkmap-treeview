@@ -35,7 +35,7 @@ public class SimpleRingTreeLayoutManager  extends TreeLayoutManager {
 
     @Override
     public void calculateByLayoutAlgorithm(TreeModel<?> mTreeModel) {
-        new Table().reconstruction(mTreeModel,Table.COMPACT_TABLE);
+        RingForSimple.getInstance(mTreeModel).reconstruction(mTreeModel);
     }
 
     public void performMeasureAndListen(TreeViewContainer treeViewContainer, TreeLayoutManager.MeasureListener measureListener) {
