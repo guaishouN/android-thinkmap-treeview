@@ -85,7 +85,16 @@ public class RingForCompact {
             PointF pointF = nodeModelPointFMap.get(next);
             if (pointF == null) {
                 pointF = new PointF();
-                int deep = next.deep;
+                LinkedList<? extends NodeModel<?>> childNodes1 = next.getChildNodes();
+                float deep = next.deep;
+                if(!childNodes1.isEmpty()){
+                    float sum = 0;
+                    for (NodeModel<?> child : childNodes1) {
+                        sum +=child.deep;
+                    }
+                    deep = sum/childNodes1.size();
+                }
+
                 int floor = next.floor;
                 double angle = pieAngle * deep;
                 float radius = floorStart.get(floor);
