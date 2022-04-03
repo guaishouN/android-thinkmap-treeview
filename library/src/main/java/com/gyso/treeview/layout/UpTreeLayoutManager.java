@@ -61,7 +61,13 @@ public class UpTreeLayoutManager  extends DownTreeLayoutManager {
 
     @Override
     public void onManagerLayoutNode(NodeModel<?> currentNode, View currentNodeView, ViewBox finalLocation, TreeViewContainer treeViewContainer) {
-        super.onManagerLayoutNode(currentNode, currentNodeView, finalLocation, treeViewContainer);
+        if(isJustCalculate){
+            currentNodeView.layout(finalLocation.left, finalLocation.top, finalLocation.right, finalLocation.bottom);
+            return;
+        }
+        if (!layoutAnimatePrepare(currentNode, currentNodeView, finalLocation, treeViewContainer)) {
+            currentNodeView.layout(finalLocation.left, finalLocation.top, finalLocation.right, finalLocation.bottom);
+        }
     }
 
     @Override

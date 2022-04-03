@@ -168,11 +168,11 @@ public class MainActivity extends AppCompatActivity {
         //return new CompactRightTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new CompactLeftTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new HorizonLeftAndRightLayoutManager(this,space_50dp,space_20dp,line);
-        //return new CompactHorizonLeftAndRightLayoutManager(this,space_50dp,space_20dp,line);
+        return new CompactHorizonLeftAndRightLayoutManager(this,space_50dp,space_20dp,line);
         //return new DownTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new UpTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new CompactDownTreeLayoutManager(this,space_50dp,space_20dp,line);
-        return new CompactUpTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new CompactUpTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new CompactVerticalUpAndDownLayoutManager(this,space_50dp,space_20dp,line);
         //return new VerticalUpAndDownLayoutManager(this,space_50dp,space_20dp,line);
         //return new CompactRingTreeLayoutManager(this,space_50dp,space_20dp,line);
