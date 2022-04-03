@@ -24,7 +24,7 @@ import com.gyso.treeview.util.ViewBox;
  */
 public class DownTreeLayoutManager extends TreeLayoutManager {
     private static final String TAG = DownTreeLayoutManager.class.getSimpleName();
-
+    protected TreeLayoutManager.MeasureListener measureListener =null;
     public DownTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
         super(context, spaceParentToChild, spacePeerToPeer, baseline);
     }
@@ -44,6 +44,7 @@ public class DownTreeLayoutManager extends TreeLayoutManager {
             mContentViewBox.clear();
             floorMax.clear();
             deepMax.clear();
+            this.measureListener = measureListener;
             ITraversal<NodeModel<?>> traversal = new ITraversal<NodeModel<?>>() {
                 @Override
                 public void next(NodeModel<?> next) {
@@ -111,7 +112,7 @@ public class DownTreeLayoutManager extends TreeLayoutManager {
      * set the padding box
      * @param treeViewContainer tree view
      */
-    private void getPadding(TreeViewContainer treeViewContainer) {
+    protected void getPadding(TreeViewContainer treeViewContainer) {
         if(treeViewContainer.getPaddingStart()>0){
             paddingBox.setValues(
                     treeViewContainer.getPaddingTop(),
@@ -124,7 +125,7 @@ public class DownTreeLayoutManager extends TreeLayoutManager {
         }
     }
 
-    private void measure(NodeModel<?> node, TreeViewContainer treeViewContainer) {
+    public void measure(NodeModel<?> node, TreeViewContainer treeViewContainer) {
         TreeViewHolder<?> currentHolder = treeViewContainer.getTreeViewHolder(node);
         View currentNodeView =  currentHolder==null?null:currentHolder.getView();
         if(currentNodeView==null){
@@ -193,8 +194,8 @@ public class DownTreeLayoutManager extends TreeLayoutManager {
             deltaWidth -= spacePeerToPeer/2;
         }
 
-        int top = floorStart.get(floor);
-        int left  = deepStart.get(deep)+verticalCenterFix+deltaWidth;
+        int top = floorStart.get(floor)+extraDeltaY;
+        int left  = deepStart.get(deep)+verticalCenterFix+deltaWidth+extraDeltaX;
         int bottom = top+currentHeight;
         int right = left+currentWidth;
 
@@ -202,6 +203,7 @@ public class DownTreeLayoutManager extends TreeLayoutManager {
         onManagerLayoutNode(currentNode,currentNodeView,finalLocation,treeViewContainer);
     }
 
+    @Override
     public void onManagerLayoutNode(NodeModel<?> currentNode,
                                     View currentNodeView,
                                     ViewBox finalLocation,
@@ -211,6 +213,7 @@ public class DownTreeLayoutManager extends TreeLayoutManager {
         }
     }
 
+    @Override
     public void onManagerFinishLayoutAllNodes(TreeViewContainer treeViewContainer){
         layoutAnimate(treeViewContainer);
     }

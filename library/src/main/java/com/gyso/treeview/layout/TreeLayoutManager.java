@@ -56,6 +56,8 @@ public abstract class TreeLayoutManager {
     protected int mFixedDx;
     protected int mFixedDy;
 
+    protected int extraDeltaX,extraDeltaY;
+
     /**
      * content padding box
      */
@@ -385,6 +387,15 @@ public abstract class TreeLayoutManager {
         }
         return false;
     }
+
+    public void onManagerMeasureNode(NodeModel<?> currentNode,View currentNodeView,ViewBox finalLocation,TreeViewContainer treeViewContainer){}
+
+    public void onManagerFinishMeasureAllNodes(TreeViewContainer treeViewContainer){}
+
+    public void onManagerLayoutNode(NodeModel<?> currentNode,View currentNodeView,ViewBox finalLocation,TreeViewContainer treeViewContainer){}
+
+    public void onManagerFinishLayoutAllNodes(TreeViewContainer treeViewContainer){}
+
 
     public interface  LayoutListener{
         default void onLayoutChild(NodeModel<?> next){};

@@ -19,6 +19,47 @@ public class HorizonLeftAndRightLayoutManager extends RightTreeLayoutManager {
     public HorizonLeftAndRightLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
         super(context, spaceParentToChild, spacePeerToPeer, baseline);
     }
+    @Override
+    public void onManagerFinishMeasureAllNodes(TreeViewContainer treeViewContainer) {
+        getPadding(treeViewContainer);
+        mContentViewBox.bottom += (paddingBox.bottom+paddingBox.top);
+        extraDeltaX = mContentViewBox.right;
+        mContentViewBox.right  += (paddingBox.left+paddingBox.right+extraDeltaX);
+        fixedViewBox.setValues(mContentViewBox.top,mContentViewBox.left,mContentViewBox.right,mContentViewBox.bottom);
+        if(winHeight == 0 || winWidth==0){
+            return;
+        }
+        float scale = 1f*winWidth/winHeight;
+        float wr = 1f* mContentViewBox.getWidth()/winWidth;
+        float hr = 1f* mContentViewBox.getHeight()/winHeight;
+        if(wr>=hr){
+            float bh =  mContentViewBox.getWidth()/scale;
+            fixedViewBox.bottom = (int)bh;
+        }else{
+            float bw =  mContentViewBox.getHeight()*scale;
+            fixedViewBox.right = (int)bw;
+        }
+        mFixedDx = (fixedViewBox.getWidth()-mContentViewBox.getWidth())/2;
+        mFixedDy = (fixedViewBox.getHeight()-mContentViewBox.getHeight())/2;
+
+        //compute floor start position
+        for (int i = 0; i <= floorMax.size(); i++) {
+            int fn = (i == floorMax.size())?floorMax.size():floorMax.keyAt(i);
+            int preStart = floorStart.get(fn - 1, 0);
+            int preMax = floorMax.get(fn - 1, 0);
+            int startPos = (fn==0?(mFixedDx + paddingBox.left):spaceParentToChild) + preStart + preMax;
+            floorStart.put(fn,startPos);
+        }
+
+        //compute deep start position
+        for (int i = 0; i <= deepMax.size(); i++) {
+            int dn = (i == deepMax.size())?deepMax.size():deepMax.keyAt(i);
+            int preStart = deepStart.get(dn - 1, 0);
+            int preMax = deepMax.get(dn - 1, 0);
+            int startPos = (dn==0?(mFixedDy + paddingBox.top):spacePeerToPeer) + preStart + preMax;
+            deepStart.put(dn,startPos);
+        }
+    }
 
     @Override
     public int getTreeLayoutType() {

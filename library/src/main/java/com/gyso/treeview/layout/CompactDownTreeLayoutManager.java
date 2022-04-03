@@ -17,7 +17,7 @@ import com.gyso.treeview.util.ViewBox;
 
 public class CompactDownTreeLayoutManager extends TreeLayoutManager {
     private static final String TAG = CompactDownTreeLayoutManager.class.getSimpleName();
-
+    protected TreeLayoutManager.MeasureListener measureListener =null;
     public CompactDownTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
         super(context, spaceParentToChild, spacePeerToPeer, baseline);
     }
@@ -38,6 +38,7 @@ public class CompactDownTreeLayoutManager extends TreeLayoutManager {
             mContentViewBox.clear();
             floorMax.clear();
             deepMax.clear();
+            this.measureListener = measureListener;
             ITraversal<NodeModel<?>> traversal = new ITraversal<NodeModel<?>>() {
                 @Override
                 public void next(NodeModel<?> next) {
@@ -49,47 +50,7 @@ public class CompactDownTreeLayoutManager extends TreeLayoutManager {
 
                 @Override
                 public void finish() {
-                    getPadding(treeViewContainer);
-                    mContentViewBox.bottom += (paddingBox.bottom+paddingBox.top);
-                    mContentViewBox.right  += (paddingBox.left+paddingBox.right);
-                    fixedViewBox.setValues(mContentViewBox.top,mContentViewBox.left,mContentViewBox.right,mContentViewBox.bottom);
-                    if(winHeight == 0 || winWidth==0){
-                        return;
-                    }
-                    float scale = 1f*winWidth/winHeight;
-                    float wr = 1f* mContentViewBox.getWidth()/winWidth;
-                    float hr = 1f* mContentViewBox.getHeight()/winHeight;
-                    if(wr>=hr){
-                        float bh =  mContentViewBox.getWidth()/scale;
-                        fixedViewBox.bottom = (int)bh;
-                    }else{
-                        float bw =  mContentViewBox.getHeight()*scale;
-                        fixedViewBox.right = (int)bw;
-                    }
-                    mFixedDx = (fixedViewBox.getWidth()-mContentViewBox.getWidth())/2;
-                    mFixedDy = (fixedViewBox.getHeight()-mContentViewBox.getHeight())/2;
-
-                    //compute floor start position
-                    for (int i = 0; i <= floorMax.size(); i++) {
-                        int fn = (i == floorMax.size())?floorMax.size():floorMax.keyAt(i);
-                        int preStart = floorStart.get(fn - 1, 0);
-                        int preMax = floorMax.get(fn - 1, 0);
-                        int startPos = (fn==0?(mFixedDy + paddingBox.top):spaceParentToChild) + preStart + preMax;
-                        floorStart.put(fn,startPos);
-                    }
-
-                    //compute deep start position
-                    for (int i = 0; i <= deepMax.size(); i++) {
-                        int dn = (i == deepMax.size())?deepMax.size():deepMax.keyAt(i);
-                        int preStart = deepStart.get(dn - 1, 0);
-                        int preMax = deepMax.get(dn - 1, 0);
-                        int startPos = (dn==0?(mFixedDx + paddingBox.left):spacePeerToPeer) + preStart + preMax;
-                        deepStart.put(dn,startPos);
-                    }
-
-                    if(measureListener!=null){
-                        measureListener.onMeasureFinished();
-                    }
+                    onManagerFinishMeasureAllNodes(treeViewContainer);
                 }
             };
             mTreeModel.doTraversalNodes(traversal);
@@ -101,11 +62,56 @@ public class CompactDownTreeLayoutManager extends TreeLayoutManager {
         performMeasureAndListen(treeViewContainer,null);
     }
 
+    @Override
+    public void onManagerFinishMeasureAllNodes(TreeViewContainer treeViewContainer) {
+        getPadding(treeViewContainer);
+        mContentViewBox.bottom += (paddingBox.bottom+paddingBox.top);
+        mContentViewBox.right  += (paddingBox.left+paddingBox.right);
+        fixedViewBox.setValues(mContentViewBox.top,mContentViewBox.left,mContentViewBox.right,mContentViewBox.bottom);
+        if(winHeight == 0 || winWidth==0){
+            return;
+        }
+        float scale = 1f*winWidth/winHeight;
+        float wr = 1f* mContentViewBox.getWidth()/winWidth;
+        float hr = 1f* mContentViewBox.getHeight()/winHeight;
+        if(wr>=hr){
+            float bh =  mContentViewBox.getWidth()/scale;
+            fixedViewBox.bottom = (int)bh;
+        }else{
+            float bw =  mContentViewBox.getHeight()*scale;
+            fixedViewBox.right = (int)bw;
+        }
+        mFixedDx = (fixedViewBox.getWidth()-mContentViewBox.getWidth())/2;
+        mFixedDy = (fixedViewBox.getHeight()-mContentViewBox.getHeight())/2;
+
+        //compute floor start position
+        for (int i = 0; i <= floorMax.size(); i++) {
+            int fn = (i == floorMax.size())?floorMax.size():floorMax.keyAt(i);
+            int preStart = floorStart.get(fn - 1, 0);
+            int preMax = floorMax.get(fn - 1, 0);
+            int startPos = (fn==0?(mFixedDy + paddingBox.top):spaceParentToChild) + preStart + preMax;
+            floorStart.put(fn,startPos);
+        }
+
+        //compute deep start position
+        for (int i = 0; i <= deepMax.size(); i++) {
+            int dn = (i == deepMax.size())?deepMax.size():deepMax.keyAt(i);
+            int preStart = deepStart.get(dn - 1, 0);
+            int preMax = deepMax.get(dn - 1, 0);
+            int startPos = (dn==0?(mFixedDx + paddingBox.left):spacePeerToPeer) + preStart + preMax;
+            deepStart.put(dn,startPos);
+        }
+
+        if(measureListener!=null){
+            measureListener.onMeasureFinished();
+        }
+    }
+
     /**
      * set the padding box
      * @param treeViewContainer tree view
      */
-    private void getPadding(TreeViewContainer treeViewContainer) {
+    protected void getPadding(TreeViewContainer treeViewContainer) {
         if(treeViewContainer.getPaddingStart()>0){
             paddingBox.setValues(
                     treeViewContainer.getPaddingTop(),
@@ -181,14 +187,16 @@ public class CompactDownTreeLayoutManager extends TreeLayoutManager {
 
         int verticalCenterFix = Math.abs(currentWidth - deepMax.get(deep))/2;
 
-        int top = floorStart.get(floor);
-        int left  = deepStart.get(deep)+verticalCenterFix;
+        int top = floorStart.get(floor)+extraDeltaY;
+        int left  = deepStart.get(deep)+verticalCenterFix+extraDeltaX;
         int bottom = top+currentHeight;
         int right = left+currentWidth;
 
         ViewBox finalLocation = new ViewBox(top, left, bottom, right);
         onManagerLayoutNode(currentNode,currentNodeView,finalLocation,treeViewContainer);
     }
+
+    @Override
     public void onManagerLayoutNode(NodeModel<?> currentNode,
                                     View currentNodeView,
                                     ViewBox finalLocation,
@@ -198,6 +206,7 @@ public class CompactDownTreeLayoutManager extends TreeLayoutManager {
         }
     }
 
+    @Override
     public void onManagerFinishLayoutAllNodes(TreeViewContainer treeViewContainer){
         layoutAnimate(treeViewContainer);
     }

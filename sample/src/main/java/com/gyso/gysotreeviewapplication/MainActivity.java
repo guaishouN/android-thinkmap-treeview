@@ -19,6 +19,7 @@ import com.gyso.treeview.layout.CompactRightTreeLayoutManager;
 import com.gyso.treeview.layout.CompactRingTreeLayoutManager;
 import com.gyso.treeview.layout.CompactUpTreeLayoutManager;
 import com.gyso.treeview.layout.CompactVerticalUpAndDownLayoutManager;
+import com.gyso.treeview.layout.DownTreeLayoutManager;
 import com.gyso.treeview.layout.HorizonLeftAndRightLayoutManager;
 import com.gyso.treeview.layout.LeftTreeLayoutManager;
 import com.gyso.treeview.layout.RightTreeLayoutManager;
@@ -168,8 +169,8 @@ public class MainActivity extends AppCompatActivity {
         //return new CompactRightTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new CompactLeftTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new HorizonLeftAndRightLayoutManager(this,space_50dp,space_20dp,line);
-        return new CompactHorizonLeftAndRightLayoutManager(this,space_50dp,space_20dp,line);
-        //return new DownTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new CompactHorizonLeftAndRightLayoutManager(this,space_50dp,space_20dp,line);
+        return new DownTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new UpTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new CompactDownTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new CompactUpTreeLayoutManager(this,space_50dp,space_20dp,line);
