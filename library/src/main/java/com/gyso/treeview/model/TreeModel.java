@@ -25,7 +25,7 @@ public class TreeModel<T> implements Serializable {
      */
     private NodeModel<T> rootNode;
     private NodeModel<?> maxChildNode;
-    private SparseArray<LinkedList<NodeModel<T>>> arrayByFloor = new SparseArray<>(10);
+    private SparseArray<LinkedList<NodeModel>> arrayByFloor = new SparseArray<>(10);
     private transient ITraversal<NodeModel<?>> iTraversal;
     private int maxDeep =0;
     private int minDeep =0;
@@ -48,11 +48,18 @@ public class TreeModel<T> implements Serializable {
             List<NodeModel<T>> nodeModels = new LinkedList<>();
             for (int i = 0; i < childNodes.length; i++) {
                 nodeModels.add((NodeModel<T>)childNodes[i]);
-                ((NodeModel<T>)childNodes[i]).treeModel = this;
+                childNodes[i].treeModel = this;
             }
             ((NodeModel<T>)parent).addChildNodes(nodeModels);
-            List<NodeModel<T>> floorList = getFloorList(nodeModels.get(0).floor);
-            floorList.addAll(nodeModels);
+            for(NodeModel<?> child:childNodes){
+                child.traverseIncludeSelf(next->{
+                    next.floor = next.parentNode.floor+1;
+                    List<NodeModel> floorList = getFloorList(next.floor);
+                    floorList.add(next);
+                });
+            }
+
+
         }
         recordMaxChildrenNode(parent);
     }
@@ -86,8 +93,11 @@ public class TreeModel<T> implements Serializable {
     public void removeNode(NodeModel<?> parent, NodeModel<?> childNode) {
         if(parent!=null&&childNode!=null){
             parent.removeChildNode(childNode);
-            List<NodeModel<T>> floorList = getFloorList(childNode.floor);
-            floorList.remove(childNode);
+            childNode.traverseIncludeSelf(next->{
+                List<NodeModel> nf = getFloorList(next.floor);
+                nf.remove(next);
+                next.floor = 0;
+            });
         }
     }
 
@@ -145,7 +155,7 @@ public class TreeModel<T> implements Serializable {
         }
     }
 
-    public SparseArray<LinkedList<NodeModel<T>>> getArrayByFloor() {
+    public SparseArray<LinkedList<NodeModel>> getArrayByFloor() {
         return arrayByFloor;
     }
 
@@ -153,8 +163,8 @@ public class TreeModel<T> implements Serializable {
      * @param floor  level
      * @return all nodes in the same floor
      */
-    private List<NodeModel<T>> getFloorList(int floor){
-        LinkedList<NodeModel<T>> nodeModels = arrayByFloor.get(floor);
+    public List<NodeModel> getFloorList(int floor){
+        LinkedList<NodeModel> nodeModels = arrayByFloor.get(floor);
         if(nodeModels==null){
             nodeModels = new LinkedList<>();
             arrayByFloor.put(floor,nodeModels);

@@ -40,6 +40,9 @@ public class Table {
     public<T> void reconstruction(TreeModel<T> treeModel, @TableLayoutAlgorithmType int tableLayoutAlgorithm){
         tableRecordMap.clear();
         floorRightLast.clear();
+        shouldCheckNodes.clear();
+        maxDeep = Integer.MIN_VALUE;
+        minDeep = Integer.MAX_VALUE;
         if(tableLayoutAlgorithm==COMPACT_TABLE){
             calculateTreeNodesDeepCompact(treeModel);
         }else{
@@ -128,7 +131,7 @@ public class Table {
             }
         }
         compactTable(treeModel);
-        rootNode.traverseIncludeSelf(node -> tableRecordMap.put(new TableKey(node.floor,node.deep),node));
+        //rootNode.traverseIncludeSelf(node -> tableRecordMap.put(new TableKey(node.floor,node.deep),node));
         TreeViewLog.e(TAG,"calculateTreeNodesDeepCompact end");
     }
 
@@ -136,7 +139,7 @@ public class Table {
         //calculate final deep
         Deque<NodeModel<T>> deque = new ArrayDeque<>();
         NodeModel<T> rootNode = treeModel.getRootNode();
-        SparseArray<LinkedList<NodeModel<T>>> arrayByFloor = treeModel.getArrayByFloor();
+        SparseArray<LinkedList<NodeModel>> arrayByFloor = treeModel.getArrayByFloor();
         deque.add(rootNode);
         SparseIntArray deepSum = new SparseIntArray();
         while (!deque.isEmpty()) {
@@ -146,13 +149,12 @@ public class Table {
             }
             int peerMidDeep;
             int parentDeep;
-
+            if(cur.toString().contains("04")){
+                Log.d(TAG, "compactTable: ");
+            }
             //deal parent and me
             NodeModel<T> parentNode = cur.getParentNode();
             if(parentNode!=null){
-                if(parentNode.toString().contains("08")){
-                    Log.d(TAG, "compactTable: ");
-                }
                 LinkedList<NodeModel<T>> peers = parentNode.getChildNodes();
                 if(!peers.isEmpty()){
                     int sum=0;
@@ -167,6 +169,9 @@ public class Table {
                             final int d = peerMidDeep-parentDeep;
                             fromRootToMyUpRight(treeModel,cur, next -> {
                                 Log.d(TAG, "compactTable: ---"+next);
+                                if(next.toString().contains("04")){
+                                    Log.d(TAG, "compactTable: ");
+                                }
                                 next.deep +=d;
                                 record(next);
 
@@ -180,6 +185,9 @@ public class Table {
                                             nSum = nSum +nPeer.deep;
                                         }
                                         nn.deep = nSum /nnChildNodes.size();
+                                        if(nn.toString().contains("04")){
+                                            Log.d(TAG, "compactTable: ");
+                                        }
                                         record(nn);
                                     });
                                 }
@@ -187,12 +195,17 @@ public class Table {
                         }else{
                             final int d = parentDeep - peerMidDeep;
                             //peers' mid move to parent
-                            LinkedList<NodeModel<T>> nodeModels = arrayByFloor.get(cur.floor);
-                            int md = cur.deep;
-                            for (NodeModel<T> afterMe:nodeModels) {
-                                if(afterMe.deep >= md){
-                                    afterMe.deep += d;
-                                    record(afterMe);
+                            LinkedList<NodeModel> nodeModels = arrayByFloor.get(cur.floor);
+                            if(nodeModels!=null){
+                                int md = cur.deep;
+                                for (NodeModel<T> afterMe:nodeModels) {
+                                    if(afterMe.deep >= md){
+                                        afterMe.deep += d;
+                                        if(afterMe.toString().contains("04")){
+                                            Log.d(TAG, "compactTable: ");
+                                        }
+                                        record(afterMe);
+                                    }
                                 }
                             }
                         }

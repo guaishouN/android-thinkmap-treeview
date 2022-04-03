@@ -12,7 +12,7 @@ import com.gyso.treeview.model.TreeModel;
 import com.gyso.treeview.util.ViewBox;
 
 public class CompactUpTreeLayoutManager extends CompactDownTreeLayoutManager {
-    private static final String TAG = UpTreeLayoutManager.class.getSimpleName();
+    private static final String TAG = CompactUpTreeLayoutManager.class.getSimpleName();
     private boolean isJustCalculate;
     public CompactUpTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
         super(context, spaceParentToChild, spacePeerToPeer, baseline);

@@ -140,9 +140,6 @@ public class NodeModel<T> implements Serializable {
             childNodes.add(aChild);
         }
         traverse(aChild,node -> {
-            if(node.parentNode!=null){
-                node.floor = node.parentNode.floor+1;
-            }
             if(node.leafCount == 0){
                 leavesList.add(node);
             }
