@@ -24,7 +24,7 @@ android {
             buildConfigField "boolean", "isDebug", "false"
         }
         debug {
-            buildConfigField "boolean", "isDebug", "true"
+            buildConfigField "boolean", "isDebug", "false"
         }
     }
     compileOptions {

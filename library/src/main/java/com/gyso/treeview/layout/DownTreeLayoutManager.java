@@ -38,6 +38,7 @@ public class DownTreeLayoutManager extends TreeLayoutManager {
     public void calculateByLayoutAlgorithm(TreeModel<?> mTreeModel) {
         new Table().reconstruction(mTreeModel,Table.LOOSE_TABLE);
     }
+
     public void performMeasureAndListen(TreeViewContainer treeViewContainer, TreeLayoutManager.MeasureListener measureListener) {
         final TreeModel<?> mTreeModel = treeViewContainer.getTreeModel();
         if (mTreeModel != null) {
