@@ -15,19 +15,16 @@ import com.gyso.treeview.util.DensityUtils;
 import com.gyso.treeview.util.TreeViewLog;
 import com.gyso.treeview.util.ViewBox;
 
-/**
- * guaishouN xw 674149099@qq.com
- */
-public class RightTreeLayoutManager extends TreeLayoutManager {
-    private static final String TAG = RightTreeLayoutManager.class.getSimpleName();
+public class CompactRightTreeLayoutManager extends TreeLayoutManager {
+    private static final String TAG = CompactRightTreeLayoutManager.class.getSimpleName();
 
-    public RightTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
+    public CompactRightTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
         super(context, spaceParentToChild, spacePeerToPeer, baseline);
     }
 
     @Override
     public void calculateByLayoutAlgorithm(TreeModel<?> mTreeModel) {
-        new Table().reconstruction(mTreeModel,Table.LOOSE_TABLE);
+        new Table().reconstruction(mTreeModel,Table.COMPACT_TABLE);
     }
 
     @Override
@@ -98,6 +95,7 @@ public class RightTreeLayoutManager extends TreeLayoutManager {
         }
     }
 
+
     /**
      * set the padding box
      * @param treeViewContainer tree view
@@ -167,8 +165,6 @@ public class RightTreeLayoutManager extends TreeLayoutManager {
         View currentNodeView =  currentHolder==null?null:currentHolder.getView();
         int deep = currentNode.deep;
         int floor = currentNode.floor;
-        int leafCount = currentNode.leafCount;
-
         if(currentNodeView==null){
             throw new NullPointerException(" currentNodeView can not be null");
         }
@@ -177,13 +173,8 @@ public class RightTreeLayoutManager extends TreeLayoutManager {
         int currentHeight = currentNodeView.getMeasuredHeight();
         int horizonCenterFix = Math.abs(currentHeight - deepMax.get(deep))/2;
 
-        int deltaHeight = 0;
-        if(leafCount>1){
-            deltaHeight = (deepStart.get(deep + leafCount) - deepStart.get(deep)-currentHeight)/2-horizonCenterFix;
-            deltaHeight -= spacePeerToPeer/2;
-        }
 
-        int top  = deepStart.get(deep)+horizonCenterFix+deltaHeight+extraDeltaY;
+        int top  = deepStart.get(deep)+horizonCenterFix+extraDeltaY;
         int left = floorStart.get(floor)+extraDeltaX;
         int bottom = top+currentHeight;
         int right = left+currentWidth;
@@ -201,7 +192,6 @@ public class RightTreeLayoutManager extends TreeLayoutManager {
             currentNodeView.layout(finalLocation.left, finalLocation.top, finalLocation.right, finalLocation.bottom);
         }
     }
-
     @Override
     public void onManagerFinishLayoutAllNodes(TreeViewContainer treeViewContainer){
         layoutAnimate(treeViewContainer);

@@ -4,11 +4,9 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.graphics.Color;
 import android.util.SparseIntArray;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.LinearInterpolator;
 
 import com.gyso.treeview.R;
 import com.gyso.treeview.TreeViewContainer;
@@ -31,10 +29,17 @@ public abstract class TreeLayoutManager {
     public static final String TAG = TreeLayoutManager.class.getSimpleName();
     public static final int LAYOUT_TYPE_HORIZON_RIGHT = 0;
     public static final int LAYOUT_TYPE_VERTICAL_DOWN = 1;
+    public static final int LAYOUT_TYPE_FORCE_DIRECTED = 2;
+    public static final int LAYOUT_TYPE_HORIZON_LEFT = 3;
+    public static final int LAYOUT_TYPE_VERTICAL_UP = 4;
+    public static final int LAYOUT_TYPE_RING = 5;
+    public static final int LAYOUT_TYPE_HORIZON_LEFT_AND_RIGHT = 6;
+    public static final int LAYOUT_TYPE_VERTICAL_DOWN_AND_UP = 7;
+
     /**
      * the content padding, unit is dp;
      */
-    protected static final int DEFAULT_CONTENT_PADDING_DP = 100;
+    protected static final int DEFAULT_CONTENT_PADDING_DP = 50;
     public static final int DEFAULT_SPACE_PARENT_CHILD_DP = 50;
     public static final int DEFAULT_SPACE_PEER_PEER_DP = 20;
     public static final BaseLine DEFAULT_LINE = new SmoothLine();
@@ -50,6 +55,8 @@ public abstract class TreeLayoutManager {
     protected final ViewBox fixedViewBox;
     protected int mFixedDx;
     protected int mFixedDy;
+
+    protected int extraDeltaX,extraDeltaY;
 
     /**
      * content padding box
@@ -120,6 +127,8 @@ public abstract class TreeLayoutManager {
         this.winHeight =winHeight;
         this.winWidth = winWidth;
     }
+
+    public abstract void  calculateByLayoutAlgorithm(TreeModel<?> mTreeModel);
 
     public abstract void performMeasure(TreeViewContainer treeViewContainer);
 
@@ -377,5 +386,24 @@ public abstract class TreeLayoutManager {
             return true;
         }
         return false;
+    }
+
+    public void onManagerMeasureNode(NodeModel<?> currentNode,View currentNodeView,ViewBox finalLocation,TreeViewContainer treeViewContainer){}
+
+    public void onManagerFinishMeasureAllNodes(TreeViewContainer treeViewContainer){}
+
+    public void onManagerLayoutNode(NodeModel<?> currentNode,View currentNodeView,ViewBox finalLocation,TreeViewContainer treeViewContainer){}
+
+    public void onManagerFinishLayoutAllNodes(TreeViewContainer treeViewContainer){}
+
+
+    public interface  LayoutListener{
+        default void onLayoutChild(NodeModel<?> next){};
+        void onLayoutFinished();
+    }
+
+    public interface  MeasureListener{
+        default void onMeasureChild(NodeModel<?> next){};
+        void onMeasureFinished();
     }
 }

@@ -93,6 +93,14 @@ public class StraightLine extends BaseLine {
             //release
             PointPool.free(startPoint);
             PointPool.free(endPoint);
+        }else{
+            PointF startPoint =  PointPool.obtain(fromView.getLeft()+fromView.getWidth()/2f,fromView.getTop()+fromView.getHeight()/2f);
+            PointF endPoint =  PointPool.obtain(toView.getLeft()+toView.getWidth()/2f,toView.getTop()+toView.getHeight()/2f);
+            mPath.moveTo(startPoint.x,startPoint.y);
+            mPath.lineTo(endPoint.x,endPoint.y);
+            //release
+            PointPool.free(startPoint);
+            PointPool.free(endPoint);
         }
 
         //draw

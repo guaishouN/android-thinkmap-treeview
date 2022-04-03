@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -18,10 +17,25 @@ import java.util.Stack;
  */
 public class NodeModel<T> implements Serializable {
 
+    public TreeModel<?>  treeModel = null;
+
+    /**
+     * for mark this node
+     */
+    public boolean mark = false;
+    public void mark(){
+        mark = true;
+    }
+    public boolean isMarkThenReset(){
+        boolean b = mark;
+        mark = false;
+        return b;
+    }
+
     /**
      * the parent node,if root node parent node=null;
      */
-    public NodeModel<T> parentNode;
+    public NodeModel parentNode;
 
     /**
      * the data value
@@ -31,7 +45,7 @@ public class NodeModel<T> implements Serializable {
     /**
      * have the child nodes
      */
-    public LinkedList<NodeModel<T>> childNodes;
+    public final LinkedList<NodeModel<T>> childNodes;
 
     /**
      * focus tag for the tree add nodes
@@ -49,9 +63,14 @@ public class NodeModel<T> implements Serializable {
     public int deep = 0;
 
     /**
-     * num of leafs
+     * num of leaves
      */
-    public int leafCount=0;
+    public int leafCount =0;
+
+    /**
+     * leaves list for node
+     */
+    public final LinkedList<NodeModel<T>>  leavesList = new LinkedList<>();
 
     public boolean hidden = false;
 
@@ -86,14 +105,14 @@ public class NodeModel<T> implements Serializable {
 
     public void addChildNodes(List<NodeModel<T>> childNodes) {
         int allLeafByAddChild = 0;
-        boolean isLeafCur = leafCount==0;
+        boolean isLeafCur = leafCount ==0;
         boolean isContainChildBefore;
         for (NodeModel<T> aChild: childNodes) {
             isContainChildBefore = addChildNode(aChild);
             allLeafByAddChild +=
                     aChild.getChildNodes().isEmpty()?
                     (isContainChildBefore?0:1):
-                    (isContainChildBefore?aChild.leafCount-1:aChild.leafCount);
+                    (isContainChildBefore?aChild.leafCount -1:aChild.leafCount);
         }
         leafCount +=allLeafByAddChild;
         if(isLeafCur){
@@ -115,11 +134,14 @@ public class NodeModel<T> implements Serializable {
         boolean isExist = childNodes.contains(aChild);
         if(!isExist){
             aChild.setParentNode(this);
+            if(getParentNode()!=null){
+                getParentNode().leavesList.remove(this);
+            }
             childNodes.add(aChild);
         }
         traverse(aChild,node -> {
-            if(node.parentNode!=null){
-                node.floor = node.parentNode.floor+1;
+            if(node.leafCount == 0){
+                leavesList.add(node);
             }
         });
         return isExist;
@@ -173,6 +195,42 @@ public class NodeModel<T> implements Serializable {
     }
 
     /**
+     * traverse all nodes on branch  from me to root exclude self
+     * @param next callback
+     */
+    public void traverseBranchParent(INext<T> next){
+        if(next==null){
+            return;
+        }
+        NodeModel<?> parent = parentNode;
+        while (parent!=null){
+            next.next((NodeModel<T>) parent);
+            if(next.fetch((NodeModel<T>) parent)){
+                break;
+            }
+            parent = parent.parentNode;
+        }
+    }
+
+    /**
+     * traverse all nodes on branch  from me to root include self
+     * @param next callback
+     */
+    public void traverseBranch(INext<T> next){
+        if(next==null){
+            return;
+        }
+        NodeModel<?> parent = this;
+        while (parent!=null){
+            next.next((NodeModel<T>) parent);
+            if(next.fetch((NodeModel<T>) parent)){
+                break;
+            }
+            parent = parent.parentNode;
+        }
+    }
+
+    /**
      * traverse only direct children
      * @param next callback
      */
@@ -185,13 +243,13 @@ public class NodeModel<T> implements Serializable {
         }
     }
 
-    public void removeChildNode(NodeModel<T> aChild){
+    public void removeChildNode(NodeModel<?> aChild){
         childNodes.remove(aChild);
 
         int removeCount = Math.max(1,aChild.leafCount);
         leafCount -= removeCount;
 
-        NodeModel<T> parentNode = getParentNode();
+        NodeModel<?> parentNode = getParentNode();
 
         while (parentNode!=null){
             parentNode.leafCount -=removeCount;
@@ -230,6 +288,7 @@ public class NodeModel<T> implements Serializable {
 
     public interface INext<E>{
         void next(NodeModel<E> node);
+        default boolean fetch(NodeModel<E> node){ return false;}
     }
 
     @Override
