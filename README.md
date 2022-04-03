@@ -27,6 +27,8 @@ A custom tree view for Android,  designed for easy drawing some tree nodes (e.g.
 
 > **Base--Line, LayoutManger, Custom node view**
 
+<img src=".\images\new.jpg" width="70%"/>
+
 <img src=".\images\fs.png" width="70%"/>
 
 > **Add**

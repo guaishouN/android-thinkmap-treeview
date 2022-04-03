@@ -30,6 +30,8 @@ Tree View; Mind map; Think map; tree map; 树状图；思维导图；
 
 > **基础--连接线, 布局, 自定义节点View**
 
+<img src=".\images\new.jpg" width="70%"/>
+
 <img src=".\images\fs.png" width="70%"/>
 
 > **添加**
