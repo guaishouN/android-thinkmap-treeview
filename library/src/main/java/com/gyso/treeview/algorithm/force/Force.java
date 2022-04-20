@@ -16,7 +16,7 @@ import java.util.TimerTask;
 
 public class Force {
 
-    private static final long PERIOD_MILLIS = 16;
+    private static final long PERIOD_MILLIS = 160;
     private static final int DEFAULT_LINK_DISTANCE = 20;
     private static final float DEFAULT_LINK_STRENGTH = 0.1f;
     private static final float DEFAULT_CHARGE = -30f;

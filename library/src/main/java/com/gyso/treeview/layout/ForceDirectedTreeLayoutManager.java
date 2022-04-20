@@ -45,7 +45,7 @@ public class ForceDirectedTreeLayoutManager extends TreeLayoutManager implements
 
     @Override
     public void calculateByLayoutAlgorithm(TreeModel<?> mTreeModel) {
-        new Table().reconstruction(mTreeModel,Table.COMPACT_TABLE);
+        //new Table().reconstruction(mTreeModel,Table.COMPACT_TABLE);
     }
 
     private void init() {
@@ -83,7 +83,7 @@ public class ForceDirectedTreeLayoutManager extends TreeLayoutManager implements
                     measure(next, treeViewContainer);
                     if(boxHashMap==null){
                         boxHashMap =new HashMap<>();
-                        firstLayoutAfterMeasure(next);
+                        //firstLayoutAfterMeasure(next);
                     }
                 }
 
