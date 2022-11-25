@@ -1,6 +1,7 @@
 package com.gyso.treeview.model;
 
 import android.app.ActionBar;
+import android.util.Log;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
 
@@ -176,14 +177,22 @@ public class TreeModel<T> implements Serializable {
         this.finishTraversal = finishTraversal;
     }
 
+    public void doTraversalNodes(ITraversal<NodeModel<?>> ITraversal){
+        doTraversalNodes(ITraversal,true);
+    }
+
     /**
      * when ergodic this tree, it will call back on {@link ITraversal)}
      * @param ITraversal node
      */
-    public void doTraversalNodes(ITraversal<NodeModel<?>> ITraversal) {
+    public void doTraversalNodes(ITraversal<NodeModel<?>> ITraversal, boolean isOrderByFloor) {
         this.iTraversal = ITraversal;
         this.finishTraversal = false;
-        ergodicTreeByFloor();
+        if(isOrderByFloor){
+            ergodicTreeByFloor();
+        }else{
+            ergodicTreeByDeep();
+        }
     }
 
     /**

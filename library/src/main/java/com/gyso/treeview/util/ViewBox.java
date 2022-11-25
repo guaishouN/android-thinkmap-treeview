@@ -24,6 +24,13 @@ public class ViewBox {
         this.bottom = bottom;
     }
 
+    public void setValues(ViewBox viewBox) {
+        this.top = viewBox.top;
+        this.left = viewBox.left;
+        this.right = viewBox.right;
+        this.bottom = viewBox.bottom;
+    }
+
     public void setValues(int top, int left, int right, int bottom) {
         this.top = top;
         this.left = left;
