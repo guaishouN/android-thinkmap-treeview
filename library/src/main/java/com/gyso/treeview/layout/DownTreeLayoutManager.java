@@ -195,7 +195,17 @@ public class DownTreeLayoutManager extends TreeLayoutManager {
             deltaWidth -= spacePeerToPeer/2;
         }
 
-        int top = floorStart.get(floor)+extraDeltaY;
+        int top =extraDeltaY+(floor==0?floorStart.get(0):0);
+        if(currentNode.getParentNode()!=null){
+            NodeModel<?> parentNode = currentNode.getParentNode();
+            TreeViewHolder<?> parentHolder = treeViewContainer.getTreeViewHolder(parentNode);
+            View parentNodeView =  parentHolder==null?null:parentHolder.getView();
+            if(parentNodeView!=null){
+                top += parentNodeView.getBottom()+floor*spaceParentToChild;
+            }else{
+                top += paddingBox.top;
+            }
+        }
         int left  = deepStart.get(deep)+verticalCenterFix+deltaWidth+extraDeltaX;
         int bottom = top+currentHeight;
         int right = left+currentWidth;

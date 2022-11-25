@@ -3,7 +3,6 @@ package com.gyso.treeview.layout;
 import android.content.Context;
 import android.view.View;
 
-import com.gyso.treeview.R;
 import com.gyso.treeview.TreeViewContainer;
 import com.gyso.treeview.adapter.TreeViewHolder;
 import com.gyso.treeview.algorithm.table.Table;
@@ -184,7 +183,17 @@ public class RightTreeLayoutManager extends TreeLayoutManager {
         }
 
         int top  = deepStart.get(deep)+horizonCenterFix+deltaHeight+extraDeltaY;
-        int left = floorStart.get(floor)+extraDeltaX;
+        int left = extraDeltaX+(floor==0?floorStart.get(0):0);
+        if(currentNode.getParentNode()!=null){
+            NodeModel<?> parentNode = currentNode.getParentNode();
+            TreeViewHolder<?> parentHolder = treeViewContainer.getTreeViewHolder(parentNode);
+            View parentNodeView =  parentHolder==null?null:parentHolder.getView();
+            if(parentNodeView!=null){
+                left += parentNodeView.getRight()+floor*spaceParentToChild;
+            }else{
+                left += paddingBox.left;
+            }
+        }
         int bottom = top+currentHeight;
         int right = left+currentWidth;
 
