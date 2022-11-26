@@ -50,12 +50,10 @@ public class CompactLeftTreeLayoutManager extends CompactRightTreeLayoutManager{
         if (currentNodeView == null) {
             throw new NullPointerException(" currentNodeView can not be null");
         }
-        int currentWidth = currentNodeView.getMeasuredWidth();
-        int currentHeight = currentNodeView.getMeasuredHeight();
-        int left =centerX*2- currentNodeView.getLeft();
-        int right = left+currentWidth;
+        int  left = centerX*2 - currentNodeView.getRight();
+        int right = centerX*2- currentNodeView.getLeft();
         int top = currentNodeView.getTop();
-        int bottom = top+currentHeight;
+        int bottom =currentNodeView.getBottom();
         ViewBox finalLocation = new ViewBox(top, left, bottom, right);
         onManagerLayoutNode(currentNode, currentNodeView, finalLocation, treeViewContainer);
     }

@@ -11,15 +11,16 @@ import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
 import com.gyso.treeview.util.ViewBox;
 
-public class UpTreeLayoutManager  extends DownTreeLayoutManager {
-    private static final String TAG = UpTreeLayoutManager.class.getSimpleName();
+public class BoxLeftTreeLayoutManager extends BoxRightTreeLayoutManager{
+    private static final String TAG = LeftTreeLayoutManager.class.getSimpleName();
     private boolean isJustCalculate;
-    public UpTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
+    public BoxLeftTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
         super(context, spaceParentToChild, spacePeerToPeer, baseline);
     }
+
     @Override
     public int getTreeLayoutType() {
-        return LAYOUT_TYPE_VERTICAL_UP;
+        return LAYOUT_TYPE_HORIZON_LEFT;
     }
 
     @Override
@@ -29,11 +30,11 @@ public class UpTreeLayoutManager  extends DownTreeLayoutManager {
         isJustCalculate = false;
         final TreeModel<?> mTreeModel = treeViewContainer.getTreeModel();
         if (mTreeModel != null) {
-            final int cy= fixedViewBox.getHeight()/2;
+            final int cx = fixedViewBox.getWidth()/2;
             mTreeModel.doTraversalNodes(new ITraversal<NodeModel<?>>() {
                 @Override
                 public void next(NodeModel<?> next) {
-                    mirrorByCy(next,treeViewContainer,cy);
+                    mirrorByCx(next,treeViewContainer,cx);
                 }
                 @Override
                 public void finish() {
@@ -43,16 +44,16 @@ public class UpTreeLayoutManager  extends DownTreeLayoutManager {
         }
     }
 
-    private void mirrorByCy(NodeModel<?> currentNode, TreeViewContainer treeViewContainer,int centerY){
+    private void mirrorByCx(NodeModel<?> currentNode, TreeViewContainer treeViewContainer,int centerX){
         TreeViewHolder<?> currentHolder = treeViewContainer.getTreeViewHolder(currentNode);
         View currentNodeView = currentHolder == null ? null : currentHolder.getView();
         if (currentNodeView == null) {
             throw new NullPointerException(" currentNodeView can not be null");
         }
-        int left =currentNodeView.getLeft();
-        int right = currentNodeView.getRight();
-        int bottom= centerY*2- currentNodeView.getTop();
-        int top  =  centerY*2- currentNodeView.getBottom();
+        int  left = centerX*2 - currentNodeView.getRight();
+        int right = centerX*2- currentNodeView.getLeft();
+        int top = currentNodeView.getTop();
+        int bottom =currentNodeView.getBottom();
         ViewBox finalLocation = new ViewBox(top, left, bottom, right);
         onManagerLayoutNode(currentNode, currentNodeView, finalLocation, treeViewContainer);
     }
