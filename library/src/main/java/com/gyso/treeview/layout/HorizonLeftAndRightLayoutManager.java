@@ -25,7 +25,7 @@ public class HorizonLeftAndRightLayoutManager extends RightTreeLayoutManager {
         mContentViewBox.bottom += (paddingBox.bottom+paddingBox.top);
         extraDeltaX = mContentViewBox.right;
         mContentViewBox.right  += (paddingBox.left+paddingBox.right+extraDeltaX);
-        fixedViewBox.setValues(mContentViewBox.top,mContentViewBox.left,mContentViewBox.right,mContentViewBox.bottom);
+        fixedViewBox.setValues(mContentViewBox);
         if(winHeight == 0 || winWidth==0){
             return;
         }

@@ -31,7 +31,7 @@ public class VerticalUpAndDownLayoutManager extends DownTreeLayoutManager {
         extraDeltaY = mContentViewBox.bottom;
         mContentViewBox.bottom += (paddingBox.bottom+paddingBox.top)+extraDeltaY;
         mContentViewBox.right  += (paddingBox.left+paddingBox.right);
-        fixedViewBox.setValues(mContentViewBox.top,mContentViewBox.left,mContentViewBox.right,mContentViewBox.bottom);
+        fixedViewBox.setValues(mContentViewBox);
         if(winHeight == 0 || winWidth==0){
             return;
         }

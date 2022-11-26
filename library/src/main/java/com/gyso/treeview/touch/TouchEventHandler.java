@@ -77,7 +77,7 @@ public class TouchEventHandler {
      * @param winWidth win width
      */
     public void setViewport(int winWidth, int winHeight){
-        viewportBox.setValues(0,0,winWidth,winHeight);
+        viewportBox.setValues(0,0,winHeight,winWidth);
     }
 
     /**
@@ -253,7 +253,7 @@ public class TouchEventHandler {
         float top = v.getTop()*v.getScaleY()+v.getTranslationY();
         float right = v.getRight()*v.getScaleX()+v.getTranslationX();
         float bottom = v.getBottom()*v.getScaleY()+v.getTranslationY();
-        layoutLocationInParent.setValues((int)top,(int)left,(int)right,(int)bottom);
+        layoutLocationInParent.setValues((int)top,(int)left,(int)bottom,(int)right);
     }
     /**
      * 计算两个手指之间的距离

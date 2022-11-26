@@ -111,23 +111,6 @@ public class BoxRightTreeLayoutManager extends TreeLayoutManager {
         mFixedDy = paddingBox.left+(fixedViewBox.getHeight()-mContentViewBox.getHeight())/2;
     }
 
-    /**
-     * set the padding box
-     * @param treeViewContainer tree view
-     */
-    protected void getPadding(TreeViewContainer treeViewContainer) {
-        if(treeViewContainer.getPaddingStart()>0){
-            paddingBox.setValues(
-                    treeViewContainer.getPaddingTop(),
-                    treeViewContainer.getPaddingLeft(),
-                    treeViewContainer.getPaddingRight(),
-                    treeViewContainer.getPaddingBottom());
-        }else{
-            int padding = DensityUtils.dp2px(treeViewContainer.getContext(),DEFAULT_CONTENT_PADDING_DP);
-            paddingBox.setValues(padding,padding,padding,padding);
-        }
-    }
-
     private void measure(NodeModel<?> node, TreeViewContainer treeViewContainer) {
         TreeViewHolder<?> currentHolder = treeViewContainer.getTreeViewHolder(node);
         View currentNodeView =  currentHolder==null?null:currentHolder.getView();

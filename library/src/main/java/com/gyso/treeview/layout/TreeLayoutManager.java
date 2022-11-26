@@ -138,6 +138,19 @@ public abstract class TreeLayoutManager {
 
     public abstract int getTreeLayoutType();
 
+    public void getPadding(TreeViewContainer treeViewContainer){
+        if(treeViewContainer.getPaddingStart()>0){
+            paddingBox.setValues(
+                    treeViewContainer.getPaddingTop(),
+                    treeViewContainer.getPaddingLeft(),
+                    treeViewContainer.getPaddingBottom(),
+                    treeViewContainer.getPaddingRight());
+        }else{
+            int padding = DensityUtils.dp2px(treeViewContainer.getContext(),DEFAULT_CONTENT_PADDING_DP);
+            paddingBox.setValues(padding,padding,padding,padding);
+        }
+    }
+
     /**
      * draw line between node and node by you decision, you can get all draw element drawInfo;
      * canvas->total canvas for this tree view

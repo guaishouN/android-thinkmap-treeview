@@ -31,11 +31,11 @@ public class ViewBox {
         this.bottom = viewBox.bottom;
     }
 
-    public void setValues(int top, int left, int right, int bottom) {
+    public void setValues(int top, int left,int bottom,int right) {
         this.top = top;
         this.left = left;
-        this.right = right;
         this.bottom = bottom;
+        this.right = right;
     }
 
     public static ViewBox getViewBox(View view) {
