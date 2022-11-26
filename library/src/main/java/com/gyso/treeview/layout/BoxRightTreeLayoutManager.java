@@ -219,7 +219,7 @@ public class BoxRightTreeLayoutManager extends TreeLayoutManager {
         int currentHeight = currentNodeView.getMeasuredHeight();
 
         ViewBox viewBox = nodeToBoxMap.get(currentNode);
-        int centerFix = Math.max(viewBox.getHeight()-spacePeerToPeer,currentHeight)-currentHeight;
+        int centerFix = Math.max(viewBox.getHeight(),currentHeight)-currentHeight;
         int top  = mFixedDy+viewBox.top+centerFix/2;
         int left = mFixedDx+viewBox.left;
         NodeModel<?> pNode = currentNode.parentNode;
