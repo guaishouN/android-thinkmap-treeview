@@ -123,7 +123,15 @@ int space_20dp = 20;
 //choose a demo line or a customs line. StraightLine, PointedLine, DashLine, SmoothLine are available.
 Baseline line =  new DashLine(Color.parseColor("#4DB6AC"),8);
 //choose layoout manager. VerticalTreeLayoutManager,RightTreeLayoutManager are available.
-TreeLayoutManager treeLayoutManager = new RightTreeLayoutManager(this,space_50dp,space_20dp,line);
+TreeLayoutManager treeLayoutManager = new BoxRightTreeLayoutManager(this,space_50dp,space_20dp,line);
+
+// TODO Box[XXX]LayoutManager 系列的布局是稳定的，其他系列的布局还在优化中:
+// TODO Other stable layout managers like below:
+// new BoxDownTreeLayoutManager(this,space_50dp,space_20dp,line);
+// new BoxLeftTreeLayoutManager(this,space_50dp,space_20dp,line);
+// new BoxUpTreeLayoutManager(this,space_50dp,space_20dp,line);
+// new BoxHorizonLeftAndRightLayoutManager(this,space_50dp,space_20dp,line);
+// new BoxVerticalUpAndDownLayoutManager(this,space_50dp,space_20dp,line);
 ```
 
 3 把Adapter和LayoutManager设置到你的树状图
