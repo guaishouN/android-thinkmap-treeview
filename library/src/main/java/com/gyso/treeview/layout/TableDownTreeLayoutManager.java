@@ -3,7 +3,6 @@ package com.gyso.treeview.layout;
 import android.content.Context;
 import android.view.View;
 
-import com.gyso.treeview.R;
 import com.gyso.treeview.TreeViewContainer;
 import com.gyso.treeview.adapter.TreeViewHolder;
 import com.gyso.treeview.algorithm.table.Table;
@@ -11,7 +10,6 @@ import com.gyso.treeview.line.BaseLine;
 import com.gyso.treeview.model.ITraversal;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
-import com.gyso.treeview.util.DensityUtils;
 import com.gyso.treeview.util.ViewBox;
 
 /**
@@ -22,10 +20,10 @@ import com.gyso.treeview.util.ViewBox;
  * @Describe:
  * Vertically down layout the tree view
  */
-public class DownTreeLayoutManager extends TreeLayoutManager {
-    private static final String TAG = DownTreeLayoutManager.class.getSimpleName();
+public class TableDownTreeLayoutManager extends TreeLayoutManager {
+    private static final String TAG = TableDownTreeLayoutManager.class.getSimpleName();
     protected TreeLayoutManager.MeasureListener measureListener =null;
-    public DownTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
+    public TableDownTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
         super(context, spaceParentToChild, spacePeerToPeer, baseline);
     }
 

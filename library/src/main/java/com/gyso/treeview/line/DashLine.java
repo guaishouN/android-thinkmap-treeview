@@ -54,7 +54,7 @@ public class DashLine extends BaseLine {
         TreeViewHolder<?> toHolder = drawInfo.getToHolder();
         Paint mPaint = drawInfo.getPaint();
         Path mPath = drawInfo.getPath();
-        int layoutType = drawInfo.getLayoutType();
+        int holderLayoutType = toHolder.getHolderLayoutType();
         int spacePeerToPeer = drawInfo.getSpacePeerToPeer();
         int spaceParentToChild = drawInfo.getSpaceParentToChild();
 
@@ -65,6 +65,31 @@ public class DashLine extends BaseLine {
         NodeModel<?> toNode = toHolder.getNode();
         Context context = fromView.getContext();
 
+        PointF startPoint,point1,endPoint,point2;
+        if(holderLayoutType== TreeLayoutManager.LAYOUT_TYPE_HORIZON_RIGHT){
+            startPoint = PointPool.obtain(fromView.getRight(),(fromView.getTop()+fromView.getBottom())/2f);
+            point1 = PointPool.obtain(startPoint.x+DensityUtils.dp2px(context,15),startPoint.y);
+            endPoint =  PointPool.obtain(toView.getLeft(),(toView.getTop()+toView.getBottom())/2f);
+            point2 = PointPool.obtain(startPoint.x,endPoint.y);
+        }else if(holderLayoutType== TreeLayoutManager.LAYOUT_TYPE_HORIZON_LEFT){
+            startPoint = PointPool.obtain(fromView.getLeft(),(fromView.getTop()+fromView.getBottom())/2f);
+            point1 = PointPool.obtain(startPoint.x-DensityUtils.dp2px(context,15),startPoint.y);
+            endPoint =  PointPool.obtain(toView.getRight(),(toView.getTop()+toView.getBottom())/2f);
+            point2 = PointPool.obtain(startPoint.x,endPoint.y);
+        }else if(holderLayoutType== TreeLayoutManager.LAYOUT_TYPE_VERTICAL_DOWN){
+            startPoint = PointPool.obtain((fromView.getLeft()+fromView.getRight())/2f,fromView.getBottom());
+            point1 = PointPool.obtain(startPoint.x,startPoint.y+DensityUtils.dp2px(context,15));
+            endPoint =  PointPool.obtain((toView.getLeft()+toView.getRight())/2f,toView.getTop());
+            point2 = PointPool.obtain(endPoint.x,startPoint.y);
+        }else if(holderLayoutType== TreeLayoutManager.LAYOUT_TYPE_VERTICAL_UP){
+            startPoint = PointPool.obtain((fromView.getLeft()+fromView.getRight())/2f,fromView.getTop());
+            point1 = PointPool.obtain(startPoint.x,startPoint.y-DensityUtils.dp2px(context,15));
+            endPoint =  PointPool.obtain((toView.getLeft()+toView.getRight())/2f,toView.getBottom());
+            point2 = PointPool.obtain(endPoint.x,startPoint.y);
+        }else{
+            super.draw(drawInfo);
+            return;
+        }
         //set paint
         mPaint.reset();
         mPaint.setColor(lineColor);
@@ -73,50 +98,17 @@ public class DashLine extends BaseLine {
         mPaint.setAntiAlias(true);
         mPaint.setPathEffect(effect);
 
-        //setPath
-        mPath.reset();
-        if(layoutType== TreeLayoutManager.LAYOUT_TYPE_HORIZON_RIGHT){
-            if(toView.getLeft()-fromView.getRight()<spaceParentToChild){
-                return;
-            }
-            PointF startPoint = PointPool.obtain(fromView.getRight(),(fromView.getTop()+fromView.getBottom())/2f);
-            PointF point1 = PointPool.obtain(startPoint.x+DensityUtils.dp2px(context,15),startPoint.y);
-            PointF endPoint =  PointPool.obtain(toView.getLeft(),(toView.getTop()+toView.getBottom())/2f);
-            PointF point2 = PointPool.obtain(startPoint.x,endPoint.y);
-            mPath.moveTo(startPoint.x,startPoint.y);
-            mPath.cubicTo(
-                    point1.x,point1.y,
-                    point2.x,point2.y,
-                    endPoint.x,endPoint.y);
+        mPath.moveTo(startPoint.x,startPoint.y);
+        mPath.cubicTo(
+                point1.x,point1.y,
+                point2.x,point2.y,
+                endPoint.x,endPoint.y);
 
-            //do not forget release
-            PointPool.free(startPoint);
-            PointPool.free(point1);
-            PointPool.free(point2);
-            PointPool.free(endPoint);
-        }else if(layoutType== TreeLayoutManager.LAYOUT_TYPE_VERTICAL_DOWN){
-            if(toView.getTop()-fromView.getBottom()<spaceParentToChild){
-                return;
-            }
-            PointF startPoint = PointPool.obtain((fromView.getLeft()+fromView.getRight())/2f,fromView.getBottom());
-            PointF point1 = PointPool.obtain(startPoint.x,startPoint.y+DensityUtils.dp2px(context,15));
-            PointF endPoint =  PointPool.obtain((toView.getLeft()+toView.getRight())/2f,toView.getTop());
-            PointF point2 = PointPool.obtain(endPoint.x,startPoint.y);
-            mPath.moveTo(startPoint.x,startPoint.y);
-            mPath.cubicTo(
-                    point1.x,point1.y,
-                    point2.x,point2.y,
-                    endPoint.x,endPoint.y);
-
-            //do not forget release
-            PointPool.free(startPoint);
-            PointPool.free(point1);
-            PointPool.free(point2);
-            PointPool.free(endPoint);
-        }else{
-            return;
-        }
-
+        //do not forget release
+        PointPool.free(startPoint);
+        PointPool.free(point1);
+        PointPool.free(point2);
+        PointPool.free(endPoint);
         //draw
         canvas.drawPath(mPath,mPaint);
     }

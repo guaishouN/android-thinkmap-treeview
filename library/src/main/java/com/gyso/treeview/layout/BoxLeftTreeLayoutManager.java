@@ -12,7 +12,7 @@ import com.gyso.treeview.model.TreeModel;
 import com.gyso.treeview.util.ViewBox;
 
 public class BoxLeftTreeLayoutManager extends BoxRightTreeLayoutManager{
-    private static final String TAG = LeftTreeLayoutManager.class.getSimpleName();
+    private static final String TAG = BoxLeftTreeLayoutManager.class.getSimpleName();
     private boolean isJustCalculate;
     public BoxLeftTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
         super(context, spaceParentToChild, spacePeerToPeer, baseline);

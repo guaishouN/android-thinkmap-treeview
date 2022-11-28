@@ -3,6 +3,8 @@ package com.gyso.treeview.adapter;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Point;
+import android.graphics.PointF;
 
 /**
  * @Author: 怪兽N
@@ -54,6 +56,12 @@ public class DrawInfo {
      * layout type {@link com.gyso.treeview.layout.TreeLayoutManager#LAYOUT_TYPE_HORIZON_RIGHT #LAYOUT_TYPE_VERTICAL_DOWN}
      */
     private int layoutType;
+
+    /**
+     * the end or start point of the join line from parent view to child node view
+     */
+    private PointF startPointFOfJoinLine;
+    private PointF endPointFOfJoinLine;
 
     public Canvas getCanvas() {
         return canvas;
@@ -130,5 +138,21 @@ public class DrawInfo {
 
     public void setLayoutType(int layoutType) {
         this.layoutType = layoutType;
+    }
+
+    public PointF getStartPointFOfJoinLine() {
+        return startPointFOfJoinLine;
+    }
+
+    public void setStartPointFOfJoinLine(PointF startPointFOfJoinLine) {
+        this.startPointFOfJoinLine = startPointFOfJoinLine;
+    }
+
+    public PointF getEndPointFOfJoinLine() {
+        return endPointFOfJoinLine;
+    }
+
+    public void setEndPointFOfJoinLine(PointF endPointFOfJoinLine) {
+        this.endPointFOfJoinLine = endPointFOfJoinLine;
     }
 }

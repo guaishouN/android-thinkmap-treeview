@@ -120,6 +120,7 @@ public class BoxHorizonLeftAndRightLayoutManager  extends BoxRightTreeLayoutMana
         if (currentNodeView == null) {
             throw new NullPointerException(" currentNodeView can not be null");
         }
+        currentHolder.setHolderLayoutType(LAYOUT_TYPE_HORIZON_RIGHT);
         int currentWidth = currentNodeView.getMeasuredWidth();
         int currentHeight = currentNodeView.getMeasuredHeight();
         int left =currentNodeView.getLeft();
@@ -136,6 +137,7 @@ public class BoxHorizonLeftAndRightLayoutManager  extends BoxRightTreeLayoutMana
         if (currentNodeView == null) {
             throw new NullPointerException(" currentNodeView can not be null");
         }
+        currentHolder.setHolderLayoutType(LAYOUT_TYPE_HORIZON_LEFT);
         int right =centerX*2- currentNodeView.getLeft();
         int left =centerX*2- currentNodeView.getRight();
         int top = deltaY+currentNodeView.getTop();

@@ -120,6 +120,7 @@ public class BoxVerticalUpAndDownLayoutManager extends BoxDownTreeLayoutManager 
         if (currentNodeView == null) {
             throw new NullPointerException(" currentNodeView can not be null");
         }
+        currentHolder.setHolderLayoutType(LAYOUT_TYPE_VERTICAL_DOWN);
         int currentWidth = currentNodeView.getMeasuredWidth();
         int currentHeight = currentNodeView.getMeasuredHeight();
         int left =deltaX+ currentNodeView.getLeft();
@@ -136,7 +137,7 @@ public class BoxVerticalUpAndDownLayoutManager extends BoxDownTreeLayoutManager 
         if (currentNodeView == null) {
             throw new NullPointerException(" currentNodeView can not be null");
         }
-
+        currentHolder.setHolderLayoutType(LAYOUT_TYPE_VERTICAL_UP);
         int currentWidth = currentNodeView.getMeasuredWidth();
         int currentHeight = currentNodeView.getMeasuredHeight();
         int left =deltaX+currentNodeView.getLeft();

@@ -284,16 +284,23 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
 
     /**
      * 绘制树形的连线
-     * @param root root node
+     * @param parent parent node
      */
-    private void drawTreeLine(NodeModel<?> root) {
-        LinkedList<? extends NodeModel<?>> childNodes = root.getChildNodes();
+    private void drawTreeLine(NodeModel<?> parent) {
+        LinkedList<? extends NodeModel<?>> childNodes = parent.getChildNodes();
         for (NodeModel<?> node : childNodes) {
-            drawInfo.setFromHolder(getTreeViewHolder(root));
-            TreeViewHolder<?> toHolder = getTreeViewHolder(node);
-            drawInfo.setToHolder(toHolder);
-            drawDragBackGround(toHolder.getView());
-            if(isDraggingNodeMode && toHolder.getView().getTag(R.id.edit_and_dragging) == IS_EDIT_DRAGGING){
+            TreeViewHolder<?> parentHolder = getTreeViewHolder(parent);
+            if(parentHolder.getHolderLayoutType()==TreeLayoutManager.LAYOUT_TYPE_NONE){
+                parentHolder.setHolderLayoutType(mTreeLayoutManager.getTreeLayoutType());
+            }
+            drawInfo.setFromHolder(parentHolder);
+            TreeViewHolder<?> childHolder = getTreeViewHolder(node);
+            if(childHolder.getHolderLayoutType()==TreeLayoutManager.LAYOUT_TYPE_NONE){
+                childHolder.setHolderLayoutType(mTreeLayoutManager.getTreeLayoutType());
+            }
+            drawInfo.setToHolder(childHolder);
+            drawDragBackGround(childHolder.getView());
+            if(isDraggingNodeMode && childHolder.getView().getTag(R.id.edit_and_dragging) == IS_EDIT_DRAGGING){
                //Is editing and dragging, so not draw line.
                 drawTreeLine(node);
                continue;

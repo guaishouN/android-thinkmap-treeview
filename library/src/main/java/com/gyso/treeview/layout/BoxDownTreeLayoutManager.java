@@ -27,7 +27,7 @@ import java.util.Set;
  * guaishouN xw 674149099@qq.com
  */
 public class BoxDownTreeLayoutManager extends TreeLayoutManager {
-    private static final String TAG = BoxRightTreeLayoutManager.class.getSimpleName();
+    private static final String TAG = BoxDownTreeLayoutManager.class.getSimpleName();
     private final Deque<NodeModel<?>> parentsStack = new ArrayDeque<>();
     private final Set<NodeModel<?>> childrenSet = new HashSet<>();
     private final Map<NodeModel<?>,ViewBox> nodeToBoxMap = new HashMap<>();

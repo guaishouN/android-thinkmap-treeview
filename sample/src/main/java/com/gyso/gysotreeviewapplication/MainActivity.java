@@ -1,6 +1,5 @@
 package com.gyso.gysotreeviewapplication;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -13,27 +12,11 @@ import com.gyso.gysotreeviewapplication.base.Animal;
 import com.gyso.gysotreeviewapplication.base.AnimalTreeViewAdapter;
 import com.gyso.gysotreeviewapplication.databinding.ActivityMainBinding;
 import com.gyso.treeview.TreeViewEditor;
-import com.gyso.treeview.layout.BoxDownTreeLayoutManager;
-import com.gyso.treeview.layout.BoxHorizonLeftAndRightLayoutManager;
-import com.gyso.treeview.layout.BoxLeftTreeLayoutManager;
 import com.gyso.treeview.layout.BoxRightTreeLayoutManager;
-import com.gyso.treeview.layout.BoxUpTreeLayoutManager;
 import com.gyso.treeview.layout.BoxVerticalUpAndDownLayoutManager;
-import com.gyso.treeview.layout.CompactDownTreeLayoutManager;
-import com.gyso.treeview.layout.CompactHorizonLeftAndRightLayoutManager;
-import com.gyso.treeview.layout.CompactRightTreeLayoutManager;
-import com.gyso.treeview.layout.CompactRingTreeLayoutManager;
-import com.gyso.treeview.layout.CompactUpTreeLayoutManager;
-import com.gyso.treeview.layout.CompactVerticalUpAndDownLayoutManager;
-import com.gyso.treeview.layout.DownTreeLayoutManager;
-import com.gyso.treeview.layout.ForceDirectedTreeLayoutManager;
-import com.gyso.treeview.layout.HorizonLeftAndRightLayoutManager;
-import com.gyso.treeview.layout.LeftTreeLayoutManager;
-import com.gyso.treeview.layout.RightTreeLayoutManager;
 import com.gyso.treeview.layout.TreeLayoutManager;
-import com.gyso.treeview.layout.VerticalUpAndDownLayoutManager;
 import com.gyso.treeview.line.BaseLine;
-import com.gyso.treeview.line.StraightLine;
+import com.gyso.treeview.line.SmoothLine;
 import com.gyso.treeview.listener.TreeViewControlListener;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
@@ -167,6 +150,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Box[XXX]TreeLayoutManagers are recommend for your project for they are running stably. Others treeLayoutManagers are developing.
+     * @return layout manager
+     */
     private TreeLayoutManager getTreeLayoutManager() {
         int space_50dp = 30;
         int space_20dp = 20;
@@ -178,33 +165,36 @@ public class MainActivity extends AppCompatActivity {
         //return new BoxHorizonLeftAndRightLayoutManager(this,space_50dp,space_20dp,line);
         //return new BoxVerticalUpAndDownLayoutManager(this,space_50dp,space_20dp,line);
 
-        //return new RightTreeLayoutManager(this,space_50dp,space_20dp,line);
-        //return new LeftTreeLayoutManager(this,space_50dp,space_20dp,line);
+
+        //TODO !!!!! the layoutManagers below are just for test don't use in your projects. Just for test now
+        //return new TableRightTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new TableLeftTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new TableDownTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new TableUpTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new TableHorizonLeftAndRightLayoutManager(this,space_50dp,space_20dp,line);
+        //return new TableVerticalUpAndDownLayoutManager(this,space_50dp,space_20dp,line);
+
         //return new CompactRightTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new CompactLeftTreeLayoutManager(this,space_50dp,space_20dp,line);
-        //return new HorizonLeftAndRightLayoutManager(this,space_50dp,space_20dp,line);
         //return new CompactHorizonLeftAndRightLayoutManager(this,space_50dp,space_20dp,line);
-        //return new DownTreeLayoutManager(this,space_50dp,space_20dp,line);
-        //return new UpTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new CompactDownTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new CompactUpTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new CompactVerticalUpAndDownLayoutManager(this,space_50dp,space_20dp,line);
-        //return new VerticalUpAndDownLayoutManager(this,space_50dp,space_20dp,line);
+
         //return new CompactRingTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new ForceDirectedTreeLayoutManager(this,line);
     }
 
     private BaseLine getLine() {
-        //return new SmoothLine();
-        return new StraightLine(Color.parseColor("#055287"),2);
-        //return new PointedLine();
+        return new SmoothLine();
+        //return new StraightLine(Color.parseColor("#055287"),2);
         //return new DashLine(Color.parseColor("#F1286C"),3);
         //return new AngledLine();
     }
 
     private void setData(AnimalTreeViewAdapter adapter){
         //root
-        NodeModel<Animal> root = new NodeModel<>(new Animal(R.drawable.ic_01,"-root-"));
+        NodeModel<Animal> root = new NodeModel<>(new Animal(R.drawable.ic_01,"-root-\n%%%%%%%%%%%%%%%%\n%%%%%%%%%%\n%%%%%%%%%%\n%%%%%%%%%%\n%%%%%%%%%%"));
         TreeModel<Animal> treeModel = new TreeModel<>(root);
 
         //child nodes

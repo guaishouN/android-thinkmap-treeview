@@ -11,10 +11,10 @@ import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
 import com.gyso.treeview.util.ViewBox;
 
-public class UpTreeLayoutManager  extends DownTreeLayoutManager {
-    private static final String TAG = UpTreeLayoutManager.class.getSimpleName();
+public class TableUpTreeLayoutManagerTable extends TableDownTreeLayoutManager {
+    private static final String TAG = TableUpTreeLayoutManagerTable.class.getSimpleName();
     private boolean isJustCalculate;
-    public UpTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
+    public TableUpTreeLayoutManagerTable(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
         super(context, spaceParentToChild, spacePeerToPeer, baseline);
     }
     @Override

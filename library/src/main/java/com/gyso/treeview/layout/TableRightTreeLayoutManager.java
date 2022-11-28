@@ -10,17 +10,16 @@ import com.gyso.treeview.line.BaseLine;
 import com.gyso.treeview.model.ITraversal;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
-import com.gyso.treeview.util.DensityUtils;
 import com.gyso.treeview.util.TreeViewLog;
 import com.gyso.treeview.util.ViewBox;
 
 /**
  * guaishouN xw 674149099@qq.com
  */
-public class RightTreeLayoutManager extends TreeLayoutManager {
-    private static final String TAG = RightTreeLayoutManager.class.getSimpleName();
+public class TableRightTreeLayoutManager extends TreeLayoutManager {
+    private static final String TAG = TableRightTreeLayoutManager.class.getSimpleName();
 
-    public RightTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
+    public TableRightTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
         super(context, spaceParentToChild, spacePeerToPeer, baseline);
     }
 

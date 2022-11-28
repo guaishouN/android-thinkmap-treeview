@@ -4,6 +4,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
+import com.gyso.treeview.layout.TreeLayoutManager;
 import com.gyso.treeview.model.NodeModel;
 
 /**
@@ -15,6 +16,7 @@ import com.gyso.treeview.model.NodeModel;
  * View holder
  */
 public class TreeViewHolder<T> {
+    private int holderLayoutType = TreeLayoutManager.LAYOUT_TYPE_NONE;
     private View view;
     private NodeModel<T> node;
     public TreeViewHolder(View view, @NonNull NodeModel<T> node) {
@@ -36,5 +38,13 @@ public class TreeViewHolder<T> {
 
     public void setNode(NodeModel<?> node) {
         this.node = (NodeModel<T>)node;
+    }
+
+    public int getHolderLayoutType() {
+        return holderLayoutType;
+    }
+
+    public void setHolderLayoutType(int holderLayoutType) {
+        this.holderLayoutType = holderLayoutType;
     }
 }

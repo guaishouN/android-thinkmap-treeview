@@ -10,10 +10,10 @@ import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
 import com.gyso.treeview.util.ViewBox;
 
-public class LeftTreeLayoutManager extends RightTreeLayoutManager {
-    private static final String TAG = LeftTreeLayoutManager.class.getSimpleName();
+public class TableLeftTreeLayoutManager extends TableRightTreeLayoutManager {
+    private static final String TAG = TableLeftTreeLayoutManager.class.getSimpleName();
     private boolean isJustCalculate;
-    public LeftTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
+    public TableLeftTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
         super(context, spaceParentToChild, spacePeerToPeer, baseline);
     }
 

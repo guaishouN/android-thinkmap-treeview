@@ -52,7 +52,7 @@ public class StraightLine extends BaseLine {
         TreeViewHolder<?> toHolder = drawInfo.getToHolder();
         Paint mPaint = drawInfo.getPaint();
         Path mPath = drawInfo.getPath();
-        int layoutType = drawInfo.getLayoutType();
+        int holderLayoutType = toHolder.getHolderLayoutType();
         int spacePeerToPeer = drawInfo.getSpacePeerToPeer();
         int spaceParentToChild = drawInfo.getSpaceParentToChild();
         //get view and node
@@ -62,6 +62,29 @@ public class StraightLine extends BaseLine {
         NodeModel<?> toNode = toHolder.getNode();
         Context context = fromView.getContext();
 
+
+        PointF startPoint,endPoint;
+        if(holderLayoutType == TreeLayoutManager.LAYOUT_TYPE_HORIZON_RIGHT){
+            startPoint =  PointPool.obtain(fromView.getRight(),(fromView.getTop()+fromView.getBottom())/2f);
+            endPoint =  PointPool.obtain(toView.getLeft(),(toView.getTop()+toView.getBottom())/2f);
+
+        }else if(holderLayoutType == TreeLayoutManager.LAYOUT_TYPE_HORIZON_LEFT){
+            startPoint =  PointPool.obtain(fromView.getLeft(),(fromView.getTop()+fromView.getBottom())/2f);
+            endPoint =  PointPool.obtain(toView.getRight(),(toView.getTop()+toView.getBottom())/2f);
+
+        }else if(holderLayoutType == TreeLayoutManager.LAYOUT_TYPE_VERTICAL_UP){
+            startPoint =  PointPool.obtain((fromView.getLeft()+fromView.getRight())/2f,fromView.getTop());
+            endPoint =  PointPool.obtain((toView.getLeft()+toView.getRight())/2f,toView.getBottom());
+
+        }else if (holderLayoutType == TreeLayoutManager.LAYOUT_TYPE_VERTICAL_DOWN){
+            startPoint =  PointPool.obtain((fromView.getLeft()+fromView.getRight())/2f,fromView.getBottom());
+            endPoint =  PointPool.obtain((toView.getLeft()+toView.getRight())/2f,toView.getTop());
+
+        }else{
+            super.draw(drawInfo);
+            return;
+        }
+
         //set paint
         mPaint.reset();
         mPaint.setColor(lineColor);
@@ -69,40 +92,11 @@ public class StraightLine extends BaseLine {
         mPaint.setStrokeWidth(DensityUtils.dp2px(context,lineWidth));
         mPaint.setAntiAlias(true);
 
-        //setPath
-        mPath.reset();
-        if(layoutType == TreeLayoutManager.LAYOUT_TYPE_HORIZON_RIGHT){
-            if(toView.getLeft()-fromView.getRight()<spaceParentToChild){
-                return;
-            }
-            PointF startPoint =  PointPool.obtain(fromView.getRight(),(fromView.getTop()+fromView.getBottom())/2f);
-            PointF endPoint =  PointPool.obtain(toView.getLeft(),(toView.getTop()+toView.getBottom())/2f);
-            mPath.moveTo(startPoint.x,startPoint.y);
-            mPath.lineTo(endPoint.x,endPoint.y);
-            //release
-            PointPool.free(startPoint);
-            PointPool.free(endPoint);
-        }else if (layoutType == TreeLayoutManager.LAYOUT_TYPE_VERTICAL_DOWN){
-            if(toView.getTop()-fromView.getBottom()<spaceParentToChild){
-                return;
-            }
-            PointF startPoint =  PointPool.obtain((fromView.getLeft()+fromView.getRight())/2f,fromView.getBottom());
-            PointF endPoint =  PointPool.obtain((toView.getLeft()+toView.getRight())/2f,toView.getTop());
-            mPath.moveTo(startPoint.x,startPoint.y);
-            mPath.lineTo(endPoint.x,endPoint.y);
-            //release
-            PointPool.free(startPoint);
-            PointPool.free(endPoint);
-        }else{
-            PointF startPoint =  PointPool.obtain(fromView.getLeft()+fromView.getWidth()/2f,fromView.getTop()+fromView.getHeight()/2f);
-            PointF endPoint =  PointPool.obtain(toView.getLeft()+toView.getWidth()/2f,toView.getTop()+toView.getHeight()/2f);
-            mPath.moveTo(startPoint.x,startPoint.y);
-            mPath.lineTo(endPoint.x,endPoint.y);
-            //release
-            PointPool.free(startPoint);
-            PointPool.free(endPoint);
-        }
-
+        mPath.moveTo(startPoint.x,startPoint.y);
+        mPath.lineTo(endPoint.x,endPoint.y);
+        //release
+        PointPool.free(startPoint);
+        PointPool.free(endPoint);
         //draw
         canvas.drawPath(mPath,mPaint);
     }
