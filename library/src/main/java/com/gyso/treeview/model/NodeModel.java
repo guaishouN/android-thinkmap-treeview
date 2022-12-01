@@ -257,8 +257,8 @@ public class NodeModel<T> implements Serializable {
         final TreeLayoutManager useLayout = nodeLayoutManager==null?layoutManager:nodeLayoutManager;
         viewBox = useLayout.onMeasureNode(this,container);
         traverseDirectChildren(childNode -> {
-            ViewBox childBox = childNode.onMeasure(useLayout, container);
-            useLayout.onMeasureNodeBox(viewBox,childBox,container);
+            childNode.onMeasure(useLayout, container);
+            useLayout.onMeasureNodeBox(this,childNode,container);
         });
         return viewBox;
     }

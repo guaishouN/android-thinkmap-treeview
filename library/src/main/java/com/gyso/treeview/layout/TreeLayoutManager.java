@@ -412,23 +412,10 @@ public abstract class TreeLayoutManager {
     }
 
     public ViewBox onMeasureNode(NodeModel<?> node, TreeViewContainer treeViewContainer){
-        TreeViewHolder<?> currentHolder = treeViewContainer.getTreeViewHolder(node);
-        View currentNodeView =  currentHolder==null?null:currentHolder.getView();
-        if(currentNodeView==null){
-            throw new NullPointerException(" currentNodeView can not be null");
-        }
-        int curW = currentNodeView.getMeasuredWidth();
-        int curH = currentNodeView.getMeasuredHeight();
-        ViewBox viewBox = node.getViewBox();
-        viewBox.clear();
-        viewBox.right = curW;
-        viewBox.bottom = curH;
-        return viewBox;
+        return node.getViewBox();
     }
 
-    public void onMeasureNodeBox(ViewBox parentBox, ViewBox childBox, TreeViewContainer container){};
-
-
+    public void onMeasureNodeBox(NodeModel<?> parentNode, NodeModel<?> childNode, TreeViewContainer container){}
 
     public void onManagerFinishMeasureAllNodes(TreeViewContainer treeViewContainer){}
 
@@ -436,20 +423,8 @@ public abstract class TreeLayoutManager {
 
     public void onManagerFinishLayoutAllNodes(TreeViewContainer treeViewContainer){}
 
-    public void onLayoutNode(ViewBox parentBox, NodeModel tNodeModel, TreeViewContainer container) {}
-
-    public ViewBox onLayoutNodeBox(ViewBox parentBox, NodeModel tNodeModel, TreeViewContainer container){
-        return null;
-    };
-
-
-    public interface  LayoutListener{
-        default void onLayoutChild(NodeModel<?> next){};
-        void onLayoutFinished();
+    public ViewBox onLayoutNodeBox(ViewBox parentBox, NodeModel<?> tNodeModel, TreeViewContainer container){
+        return parentBox;
     }
-
-    public interface  MeasureListener{
-        default void onMeasureChild(NodeModel<?> next){};
-        void onMeasureFinished();
-    }
+    public void onLayoutNode(ViewBox baseLocationBox, NodeModel<?> tNodeModel, TreeViewContainer container) {}
 }

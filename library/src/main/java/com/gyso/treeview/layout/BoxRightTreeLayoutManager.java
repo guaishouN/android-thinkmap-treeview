@@ -1,34 +1,24 @@
 package com.gyso.treeview.layout;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 
 import com.gyso.treeview.TreeViewContainer;
 import com.gyso.treeview.adapter.TreeViewHolder;
-import com.gyso.treeview.algorithm.table.Table;
 import com.gyso.treeview.line.BaseLine;
-import com.gyso.treeview.model.ITraversal;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
-import com.gyso.treeview.util.DensityUtils;
-import com.gyso.treeview.util.TreeViewLog;
 import com.gyso.treeview.util.ViewBox;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * guaishouN xw 674149099@qq.com
  */
 public class BoxRightTreeLayoutManager extends TreeLayoutManager {
     private static final String TAG = BoxRightTreeLayoutManager.class.getSimpleName();
-
+    private Map<NodeModel<?>,Integer> nodeSumHeight = new HashMap<>();
     public BoxRightTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
         super(context, spaceParentToChild, spacePeerToPeer, baseline);
     }
@@ -44,14 +34,74 @@ public class BoxRightTreeLayoutManager extends TreeLayoutManager {
     }
 
     @Override
+    public ViewBox getTreeLayoutBox() {
+        return fixedViewBox;
+    }
+
+    @Override
     public void performMeasure(TreeViewContainer treeViewContainer) {
         final TreeModel<?> mTreeModel = treeViewContainer.getTreeModel();
         if (mTreeModel != null) {
             mContentViewBox.clear();
+            nodeSumHeight.clear();
             ViewBox contentBox = mTreeModel.onMeasure(this,treeViewContainer);;
             mContentViewBox.setValues(contentBox);
             onManagerFinishMeasureAllNodes(treeViewContainer);
         }
+    }
+
+    @Override
+    public ViewBox onMeasureNode(NodeModel<?> node, TreeViewContainer treeViewContainer) {
+        TreeViewHolder<?> currentHolder = treeViewContainer.getTreeViewHolder(node);
+        View currentNodeView =  currentHolder==null?null:currentHolder.getView();
+        if(currentNodeView==null){
+            throw new NullPointerException(" currentNodeView can not be null");
+        }
+        int curW = currentNodeView.getMeasuredWidth();
+        int curH = currentNodeView.getMeasuredHeight();
+        ViewBox viewBox = node.getViewBox();
+        viewBox.clear();
+        viewBox.right = curW;
+        viewBox.bottom = curH;
+        return viewBox;
+    }
+
+
+    @Override
+    public void onMeasureNodeBox(NodeModel<?> parentNode, NodeModel<?> childNode, TreeViewContainer container){
+        TreeViewHolder<?> parentHolder = treeViewContainer.getTreeViewHolder(parentNode);
+        View parentNodeView =  parentHolder==null?null:parentHolder.getView();
+        if(parentNodeView==null){
+            throw new NullPointerException(" parentNodeView can not be null");
+        }
+        TreeViewHolder<?> childHolder = treeViewContainer.getTreeViewHolder(childNode);
+        View childNodeView =  childHolder==null?null:childHolder.getView();
+
+        if(childNodeView==null){
+            throw new NullPointerException(" childNodeView can not be null");
+        }
+        ViewBox parentBox = parentNode.getViewBox();
+        ViewBox childBox = childNode.getViewBox();
+
+        Integer sumHeight = nodeSumHeight.get(parentNode);
+        if(sumHeight==null){
+            sumHeight = 0;
+        }
+
+        int childWidth = childBox.getWidth();
+        int childHeight = childBox.getHeight();
+        childBox.top = sumHeight;
+        childBox.left = spaceParentToChild*2 + parentNodeView.getMeasuredWidth();
+        childBox.bottom = childBox.top+childHeight;
+        childBox.right = childBox.left+childWidth;
+
+
+        sumHeight += spacePeerToPeer + childBox.getHeight();
+        parentBox.top    = 0;
+        parentBox.left   = 0;
+        parentBox.right  = Math.max(parentBox.right,spaceParentToChild*2 + childBox.getWidth()+parentNodeView.getMeasuredWidth());
+        parentBox.bottom = Math.max(spacePeerToPeer + parentNodeView.getMeasuredHeight(),sumHeight);
+        nodeSumHeight.put(parentNode, sumHeight);
     }
 
     @Override
@@ -81,54 +131,19 @@ public class BoxRightTreeLayoutManager extends TreeLayoutManager {
     public void performLayout(final TreeViewContainer treeViewContainer) {
         final TreeModel<?> mTreeModel = treeViewContainer.getTreeModel();
         if (mTreeModel != null) {
-            mTreeModel.onLayout(new ViewBox(mFixedDy,mFixedDx,0,0),this,treeViewContainer);
+            mTreeModel.onLayout(new ViewBox(),this,treeViewContainer);
             onManagerFinishLayoutAllNodes(treeViewContainer);
         }
     }
 
     @Override
-    public ViewBox getTreeLayoutBox() {
-        return fixedViewBox;
+    public ViewBox onLayoutNodeBox(ViewBox parentLocationBox, NodeModel<?> tNodeModel, TreeViewContainer container){
+        return parentLocationBox.add(tNodeModel.getViewBox());
     }
 
-    private void layoutByBox(NodeModel<?> parentNode, TreeViewContainer treeViewContainer){
-        TreeViewHolder<?> parentHolder = treeViewContainer.getTreeViewHolder(parentNode);
-        View parentNodeView =  parentHolder==null?null:parentHolder.getView();
-        if(parentNodeView==null){
-            throw new NullPointerException(" parentNodeView can not be null");
-        }
-        ViewBox parentLocationBox = nodeToBoxMap.get(parentNode);
-        int maxChildWidth = 0;
-        int sumHeight = 0;
-        for(NodeModel<?> childNode:parentNode.childNodes){
-            ViewBox childLocationBox = nodeToBoxMap.get(childNode);
-            maxChildWidth = Math.max(maxChildWidth,childLocationBox.getWidth());
-            int childWidth = childLocationBox.getWidth();
-            int childHeight = childLocationBox.getHeight();
-            childLocationBox.top = sumHeight;
-            childLocationBox.left = spaceParentToChild*2 + parentLocationBox.getWidth();
-            childLocationBox.bottom = childLocationBox.top+childHeight;
-            childLocationBox.right = childLocationBox.left+childWidth;
-            nodeToBoxMap.put(childNode,childLocationBox);
-            sumHeight += childLocationBox.getHeight()+spacePeerToPeer;
-        }
-        sumHeight -= spacePeerToPeer;
-        int delta = (parentLocationBox.getHeight()-sumHeight)/2;
-        if(delta>0){
-             ViewBox deltaBox = new ViewBox(delta,0,delta,0);
-            for(NodeModel<?> childNode:parentNode.childNodes){
-                ViewBox childLocationBox = nodeToBoxMap.get(childNode);
-                ViewBox newLocation = childLocationBox.add(deltaBox);
-                nodeToBoxMap.put(childNode,newLocation);
-            }
-        }
-        parentLocationBox.right = spaceParentToChild*2 + parentLocationBox.getWidth() + maxChildWidth;
-        parentLocationBox.bottom = Math.max(parentLocationBox.getHeight(),sumHeight);
-        nodeToBoxMap.put(parentNode,parentLocationBox);
-    }
-
-    private void layoutNodes(NodeModel<?> currentNode, TreeViewContainer treeViewContainer){
-         TreeViewHolder<?> currentHolder = treeViewContainer.getTreeViewHolder(currentNode);
+    @Override
+    public void onLayoutNode(ViewBox baseLocationBox, NodeModel<?> currentNode, TreeViewContainer container) {
+        TreeViewHolder<?> currentHolder = treeViewContainer.getTreeViewHolder(currentNode);
         View currentNodeView =  currentHolder==null?null:currentHolder.getView();
 
         if(currentNodeView==null){
@@ -138,18 +153,10 @@ public class BoxRightTreeLayoutManager extends TreeLayoutManager {
         int currentWidth = currentNodeView.getMeasuredWidth();
         int currentHeight = currentNodeView.getMeasuredHeight();
 
-        ViewBox viewBox = nodeToBoxMap.get(currentNode);
+        ViewBox viewBox = currentNode.getViewBox();
         int centerFix = Math.max(viewBox.getHeight(),currentHeight)-currentHeight;
-        int top  = mFixedDy+viewBox.top+centerFix/2;
-        int left = mFixedDx+viewBox.left;
-        NodeModel<?> pNode = currentNode.parentNode;
-        while(pNode!=null){
-            ViewBox upViewBox = nodeToBoxMap.get(pNode);
-            top += upViewBox.top;
-            left += upViewBox.left;
-            pNode = pNode.parentNode;
-        }
-
+        int top  = mFixedDy+viewBox.top+centerFix/2+baseLocationBox.top;
+        int left = mFixedDx+viewBox.left+baseLocationBox.left;
         int bottom = top+currentHeight;
         int right = left+currentWidth;
 
