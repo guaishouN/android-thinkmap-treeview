@@ -28,9 +28,6 @@ import java.util.Set;
  */
 public class BoxRightTreeLayoutManager extends TreeLayoutManager {
     private static final String TAG = BoxRightTreeLayoutManager.class.getSimpleName();
-    private final Deque<NodeModel<?>> parentsStack = new ArrayDeque<>();
-    private final Set<NodeModel<?>> childrenSet = new HashSet<>();
-    private final Map<NodeModel<?>,ViewBox> nodeToBoxMap = new HashMap<>();
 
     public BoxRightTreeLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
         super(context, spaceParentToChild, spacePeerToPeer, baseline);
@@ -51,40 +48,9 @@ public class BoxRightTreeLayoutManager extends TreeLayoutManager {
         final TreeModel<?> mTreeModel = treeViewContainer.getTreeModel();
         if (mTreeModel != null) {
             mContentViewBox.clear();
-            nodeToBoxMap.clear();
-            parentsStack.clear();
-            childrenSet.clear();
-            ITraversal<NodeModel<?>> traversal = new ITraversal<NodeModel<?>>() {
-                @Override
-                public void next(NodeModel<?> next) {
-                    Log.d(TAG, "performMeasure:"+next);
-                    if(!next.childNodes.isEmpty()){
-                        parentsStack.add(next);
-                    }else{
-                        childrenSet.add(next);
-                    }
-                    measure(next, treeViewContainer);
-                }
-
-                @Override
-                public void finish() {
-                    while (!parentsStack.isEmpty()){
-                        NodeModel<?> oneParent = parentsStack.pollFirst();
-                        if(childrenSet.containsAll(oneParent.childNodes)){
-                            layoutByBox(oneParent,treeViewContainer);
-                            childrenSet.add(oneParent);
-                            childrenSet.removeAll(oneParent.childNodes);
-                        }else{
-                            parentsStack.addLast(oneParent);
-                        }
-                    }
-                    ViewBox rootBox = nodeToBoxMap.get(mTreeModel.getRootNode());
-                    mContentViewBox.setValues(rootBox);
-                    onManagerFinishMeasureAllNodes(treeViewContainer);
-                }
-            };
-            //deep traversal
-            mTreeModel.doTraversalNodes(traversal,false);
+            ViewBox contentBox = mTreeModel.onMeasure(this,treeViewContainer);;
+            mContentViewBox.setValues(contentBox);
+            onManagerFinishMeasureAllNodes(treeViewContainer);
         }
     }
 
@@ -111,41 +77,12 @@ public class BoxRightTreeLayoutManager extends TreeLayoutManager {
         mFixedDy = paddingBox.left+(fixedViewBox.getHeight()-mContentViewBox.getHeight())/2;
     }
 
-    private void measure(NodeModel<?> node, TreeViewContainer treeViewContainer) {
-        TreeViewHolder<?> currentHolder = treeViewContainer.getTreeViewHolder(node);
-        View currentNodeView =  currentHolder==null?null:currentHolder.getView();
-        if(currentNodeView==null){
-            throw new NullPointerException(" currentNodeView can not be null");
-        }
-        int curW = currentNodeView.getMeasuredWidth();
-        int curH = currentNodeView.getMeasuredHeight();
-        ViewBox viewBox = nodeToBoxMap.get(node);
-        if(viewBox==null){
-            viewBox=new ViewBox(0, 0, curH, curW);
-            nodeToBoxMap.put(node,viewBox);
-        }
-        viewBox.clear();
-        viewBox.right = curW;
-        viewBox.bottom = curH;
-    }
-
     @Override
     public void performLayout(final TreeViewContainer treeViewContainer) {
-
         final TreeModel<?> mTreeModel = treeViewContainer.getTreeModel();
         if (mTreeModel != null) {
-            ITraversal<NodeModel<?>> traversal = new ITraversal<NodeModel<?>>() {
-                @Override
-                public void next(NodeModel<?> next) {
-                    layoutNodes(next, treeViewContainer);
-                }
-
-                @Override
-                public void finish() {
-                    onManagerFinishLayoutAllNodes(treeViewContainer);
-                }
-            };
-            mTreeModel.doTraversalNodes(traversal,false);
+            mTreeModel.onLayout(new ViewBox(mFixedDy,mFixedDx,0,0),this,treeViewContainer);
+            onManagerFinishLayoutAllNodes(treeViewContainer);
         }
     }
 

@@ -523,6 +523,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
 
     public void setTreeLayoutManager(TreeLayoutManager TreeLayoutManager) {
         mTreeLayoutManager = TreeLayoutManager;
+        mTreeLayoutManager.setTreeViewContainer(this);
     }
 
     public TreeViewAdapter<?> getAdapter() {

@@ -3,6 +3,10 @@ package com.gyso.treeview.model;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.gyso.treeview.TreeViewContainer;
+import com.gyso.treeview.layout.TreeLayoutManager;
+import com.gyso.treeview.util.ViewBox;
+
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
@@ -62,22 +66,21 @@ public class NodeModel<T> implements Serializable {
      */
     public int deep = 0;
 
-    /**
-     * num of leaves
-     */
-    public int leafCount =0;
-
-    /**
-     * leaves list for node
-     */
-    public final LinkedList<NodeModel<T>>  leavesList = new LinkedList<>();
-
     public boolean hidden = false;
+
+    public ViewBox viewBox = new ViewBox();
+
+    private TreeLayoutManager nodeLayoutManager;
 
     public NodeModel(T value) {
         this.value = value;
         this.childNodes = new LinkedList<>();
+        this.focus = false;
+        this.parentNode = null;
+    }
 
+    public NodeModel() {
+        this.childNodes = new LinkedList<>();
         this.focus = false;
         this.parentNode = null;
     }
@@ -104,26 +107,8 @@ public class NodeModel<T> implements Serializable {
     }
 
     public void addChildNodes(List<NodeModel<T>> childNodes) {
-        int allLeafByAddChild = 0;
-        boolean isLeafCur = leafCount ==0;
-        boolean isContainChildBefore;
         for (NodeModel<T> aChild: childNodes) {
-            isContainChildBefore = addChildNode(aChild);
-            allLeafByAddChild +=
-                    aChild.getChildNodes().isEmpty()?
-                    (isContainChildBefore?0:1):
-                    (isContainChildBefore?aChild.leafCount -1:aChild.leafCount);
-        }
-        leafCount +=allLeafByAddChild;
-        if(isLeafCur){
-            allLeafByAddChild--;
-        }
-        if(allLeafByAddChild>0&&!childNodes.isEmpty()){
-            NodeModel<T> parentNode = getParentNode();
-            while (parentNode!=null){
-                parentNode.leafCount +=allLeafByAddChild;
-                parentNode = parentNode.getParentNode();
-            }
+            addChildNode(aChild);
         }
     }
 
@@ -134,16 +119,8 @@ public class NodeModel<T> implements Serializable {
         boolean isExist = childNodes.contains(aChild);
         if(!isExist){
             aChild.setParentNode(this);
-            if(getParentNode()!=null){
-                getParentNode().leavesList.remove(this);
-            }
             childNodes.add(aChild);
         }
-        traverse(aChild,node -> {
-            if(node.leafCount == 0){
-                leavesList.add(node);
-            }
-        });
         return isExist;
     }
 
@@ -245,20 +222,6 @@ public class NodeModel<T> implements Serializable {
 
     public void removeChildNode(NodeModel<?> aChild){
         childNodes.remove(aChild);
-
-        int removeCount = Math.max(1,aChild.leafCount);
-        leafCount -= removeCount;
-
-        NodeModel<?> parentNode = getParentNode();
-
-        while (parentNode!=null){
-            parentNode.leafCount -=removeCount;
-            //if current become a leaf
-            if(childNodes.isEmpty()){
-                parentNode.leafCount++;
-            }
-            parentNode = parentNode.getParentNode();
-        }
         aChild.setParentNode(null);
     }
 
@@ -286,6 +249,29 @@ public class NodeModel<T> implements Serializable {
         this.hidden = hidden;
     }
 
+    public ViewBox getViewBox() {
+        return viewBox;
+    }
+
+    public ViewBox onMeasure(TreeLayoutManager layoutManager, TreeViewContainer container) {
+        final TreeLayoutManager useLayout = nodeLayoutManager==null?layoutManager:nodeLayoutManager;
+        viewBox = useLayout.onMeasureNode(this,container);
+        traverseDirectChildren(childNode -> {
+            ViewBox childBox = childNode.onMeasure(useLayout, container);
+            useLayout.onMeasureNodeBox(viewBox,childBox,container);
+        });
+        return viewBox;
+    }
+
+    public void onLayout(ViewBox parentLocationBox,TreeLayoutManager layoutManager, TreeViewContainer container){
+        final TreeLayoutManager useLayout = nodeLayoutManager==null?layoutManager:nodeLayoutManager;
+        ViewBox baseLocationBox = useLayout.onLayoutNodeBox(parentLocationBox,this,container);
+        traverseDirectChildren(childNode -> {
+            childNode.onLayout(baseLocationBox, useLayout, container);
+            useLayout.onLayoutNode(baseLocationBox,childNode,container);
+        });
+    }
+
     public interface INext<E>{
         void next(NodeModel<E> node);
         default boolean fetch(NodeModel<E> node){ return false;}
@@ -293,14 +279,17 @@ public class NodeModel<T> implements Serializable {
 
     @Override
     public int hashCode() {
-        return value.hashCode();
+        return value==null?super.hashCode():value.hashCode();
     }
 
     @Override
     public boolean equals(@Nullable Object obj) {
         if(obj instanceof NodeModel){
-            NodeModel<T> nodeModel = (NodeModel)obj;
-            return value!=null&&value.equals(nodeModel.value);
+            if (value!=null){
+                return value.equals(((NodeModel)obj).value);
+            }else{
+                return super.equals(obj);
+            }
         }
         return false;
     }
@@ -311,7 +300,6 @@ public class NodeModel<T> implements Serializable {
                 "value=" + value +
                 ", floor=" + floor +
                 ", deep=" + deep +
-                ", leafCount=" + leafCount +
                 ", parent=" + (parentNode==null?null:parentNode.value) +
                 '}';
     }

@@ -1,9 +1,15 @@
 package com.gyso.treeview.model;
 
 import android.util.SparseArray;
+
+import com.gyso.treeview.TreeViewContainer;
+import com.gyso.treeview.layout.TreeLayoutManager;
+import com.gyso.treeview.util.ViewBox;
+
 import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -12,7 +18,7 @@ import java.util.Stack;
  * manager the tree data nodes
  * guaishouN 674149099@qq.com
  */
-public class TreeModel<T> implements Serializable {
+public class TreeModel<T> extends NodeModel<T> implements Serializable {
     private static final String TAG = TreeModel.class.getSimpleName();
     /**
      * the root for the tree
@@ -20,11 +26,9 @@ public class TreeModel<T> implements Serializable {
     private NodeModel<T> rootNode;
     private SparseArray<LinkedList<NodeModel>> arrayByFloor = new SparseArray<>(10);
     private transient ITraversal<NodeModel<?>> iTraversal;
+    private final HashSet<NodeModel<T>> rootNodeSet = new HashSet<>();
     private int maxDeep =0;
     private int minDeep =0;
-    public TreeModel(NodeModel<T> rootNode) {
-        this.rootNode = rootNode;
-    }
 
     private boolean finishTraversal = false;
 
