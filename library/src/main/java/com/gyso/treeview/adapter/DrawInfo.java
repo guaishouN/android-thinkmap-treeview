@@ -52,10 +52,6 @@ public class DrawInfo {
      * viewport height
      */
     private int windowHeight;
-    /**
-     * layout type {@link com.gyso.treeview.layout.TreeLayoutManager#LAYOUT_TYPE_HORIZON_RIGHT #LAYOUT_TYPE_VERTICAL_DOWN}
-     */
-    private int layoutType;
 
     /**
      * the end or start point of the join line from parent view to child node view
@@ -130,14 +126,6 @@ public class DrawInfo {
 
     public void setWindowHeight(int windowHeight) {
         this.windowHeight = windowHeight;
-    }
-
-    public int getLayoutType() {
-        return layoutType;
-    }
-
-    public void setLayoutType(int layoutType) {
-        this.layoutType = layoutType;
     }
 
     public PointF getStartPointFOfJoinLine() {

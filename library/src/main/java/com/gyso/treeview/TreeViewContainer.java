@@ -324,17 +324,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
      */
     private void addNoteViews() {
         if (mTreeModel != null) {
-            NodeModel<?> rootNode = mTreeModel.getRootNode();
-            Deque<NodeModel<?>> deque = new ArrayDeque<>();
-            deque.add(rootNode);
-            while (!deque.isEmpty()) {
-                NodeModel<?> poll = deque.poll();
-                addNodeViewToGroup(poll);
-                if(poll!=null){
-                    LinkedList<? extends NodeModel<?>> childNodes = poll.getChildNodes();
-                    deque.addAll(childNodes);
-                }
-            }
+            mTreeModel.doTraversalNodes(this::addNodeViewToGroup);
         }
     }
 
@@ -533,7 +523,6 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
 
     public void setTreeLayoutManager(TreeLayoutManager TreeLayoutManager) {
         mTreeLayoutManager = TreeLayoutManager;
-        drawInfo.setLayoutType(mTreeLayoutManager.getTreeLayoutType());
     }
 
     public TreeViewAdapter<?> getAdapter() {

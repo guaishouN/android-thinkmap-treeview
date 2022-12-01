@@ -1,13 +1,6 @@
 package com.gyso.treeview.model;
 
-import android.app.ActionBar;
-import android.util.Log;
 import android.util.SparseArray;
-import android.util.SparseIntArray;
-
-import com.gyso.treeview.algorithm.table.Table;
-import com.gyso.treeview.util.TreeViewLog;
-
 import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -25,14 +18,12 @@ public class TreeModel<T> implements Serializable {
      * the root for the tree
      */
     private NodeModel<T> rootNode;
-    private NodeModel<?> maxChildNode;
     private SparseArray<LinkedList<NodeModel>> arrayByFloor = new SparseArray<>(10);
     private transient ITraversal<NodeModel<?>> iTraversal;
     private int maxDeep =0;
     private int minDeep =0;
     public TreeModel(NodeModel<T> rootNode) {
         this.rootNode = rootNode;
-        this.maxChildNode = rootNode;
     }
 
     private boolean finishTraversal = false;
@@ -59,30 +50,6 @@ public class TreeModel<T> implements Serializable {
                     floorList.add(next);
                 });
             }
-
-
-        }
-        recordMaxChildrenNode(parent);
-    }
-
-    public void recordMaxChildrenNode(NodeModel<?> aChildNode){
-        if(aChildNode==null){
-            return;
-        }
-        LinkedList<?> cLs = aChildNode.getChildNodes();
-        if(!cLs.isEmpty()){
-            LinkedList<?> mLs = maxChildNode.getChildNodes();
-           float k = (cLs.size()+aChildNode.leafCount)/2f;
-           float l = (mLs.size()+maxChildNode.leafCount)/2f;
-            if(rootNode.equals(maxChildNode)){
-                if( cLs.size()>mLs.size()){
-                    maxChildNode = aChildNode;
-                }
-            } else  if(k>l ){
-                maxChildNode = aChildNode;
-            }else if(k==l && cLs.size()>mLs.size()){
-                maxChildNode = aChildNode;
-            }
         }
     }
 
@@ -106,22 +73,6 @@ public class TreeModel<T> implements Serializable {
         return rootNode;
     }
 
-    public NodeModel<?> getMaxChildrenNodeAsRootNode() {
-        if(rootNode.equals(maxChildNode)){
-            return rootNode;
-        }
-        NodeModel parent = maxChildNode.getParentNode();
-        while (parent!=null){
-            //exchange parent
-            NodeModel graP = parent.parentNode;
-            graP.removeChildNode(parent);
-            maxChildNode.parentNode = graP;
-            parent.removeChildNode(maxChildNode);
-            addNode(maxChildNode,parent);
-            parent = graP;
-        }
-        return maxChildNode;
-    }
 
     /**
      *child nodes will ergodic in the last
