@@ -1,5 +1,7 @@
 package com.gyso.treeview.model;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -20,7 +22,7 @@ import java.util.Stack;
  *  so that it works well because some methods of this class are using {@link java.util.Collection#contains(Object)} and so on.
  */
 public class NodeModel<T> implements Serializable {
-
+    private final static String TAG = NodeModel.class.getSimpleName();
     public TreeModel<?>  treeModel = null;
 
     /**

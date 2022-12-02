@@ -277,7 +277,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     protected void dispatchDraw(Canvas canvas) {
         if (mTreeModel != null) {
             drawInfo.setCanvas(canvas);
-            drawTreeLine(mTreeModel.getRootNode());
+            mTreeModel.traverseDirectChildren(this::drawTreeLine);
         }
         super.dispatchDraw(canvas);
     }

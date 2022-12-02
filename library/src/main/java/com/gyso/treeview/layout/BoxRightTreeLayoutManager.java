@@ -55,7 +55,7 @@ public class BoxRightTreeLayoutManager extends TreeLayoutManager {
         TreeViewHolder<?> currentHolder = treeViewContainer.getTreeViewHolder(node);
         View currentNodeView =  currentHolder==null?null:currentHolder.getView();
         if(currentNodeView==null){
-            throw new NullPointerException(" currentNodeView can not be null");
+            return node.getViewBox();
         }
         int curW = currentNodeView.getMeasuredWidth();
         int curH = currentNodeView.getMeasuredHeight();
@@ -71,17 +71,14 @@ public class BoxRightTreeLayoutManager extends TreeLayoutManager {
     public void onMeasureNodeBox(NodeModel<?> parentNode, NodeModel<?> childNode, TreeViewContainer container){
         TreeViewHolder<?> parentHolder = treeViewContainer.getTreeViewHolder(parentNode);
         View parentNodeView =  parentHolder==null?null:parentHolder.getView();
-        if(parentNodeView==null){
-            throw new NullPointerException(" parentNodeView can not be null");
-        }
-        TreeViewHolder<?> childHolder = treeViewContainer.getTreeViewHolder(childNode);
-        View childNodeView =  childHolder==null?null:childHolder.getView();
 
-        if(childNodeView==null){
-            throw new NullPointerException(" childNodeView can not be null");
-        }
         ViewBox parentBox = parentNode.getViewBox();
         ViewBox childBox = childNode.getViewBox();
+
+        if(parentNodeView==null){
+            parentBox.setValues(childBox);
+            return;
+        }
 
         Integer sumHeight = nodeSumHeight.get(parentNode);
         if(sumHeight==null){
@@ -102,6 +99,16 @@ public class BoxRightTreeLayoutManager extends TreeLayoutManager {
         parentBox.right  = Math.max(parentBox.right,spaceParentToChild*2 + childBox.getWidth()+parentNodeView.getMeasuredWidth());
         parentBox.bottom = Math.max(spacePeerToPeer + parentNodeView.getMeasuredHeight(),sumHeight);
         nodeSumHeight.put(parentNode, sumHeight);
+        if(parentNode.childNodes.getLast()==childNode){
+            if(sumHeight < parentNodeView.getMeasuredHeight()){
+                final int parentBoxFixed = (parentNodeView.getMeasuredHeight()-sumHeight)/2;
+                parentNode.traverseDirectChildren(next->{
+                    ViewBox nextBox = next.getViewBox();
+                    nextBox.top    += parentBoxFixed;
+                    nextBox.bottom += parentBoxFixed;
+                });
+            }
+        }
     }
 
     @Override
@@ -123,8 +130,8 @@ public class BoxRightTreeLayoutManager extends TreeLayoutManager {
             float bw =  mContentViewBox.getHeight()*scale;
             fixedViewBox.right = (int)bw;
         }
-        mFixedDx = paddingBox.top+(fixedViewBox.getWidth()-mContentViewBox.getWidth())/2;
-        mFixedDy = paddingBox.left+(fixedViewBox.getHeight()-mContentViewBox.getHeight())/2;
+        mViewportFixedDx = paddingBox.top+(fixedViewBox.getWidth()-mContentViewBox.getWidth())/2;
+        mViewportFixedDy = paddingBox.left+(fixedViewBox.getHeight()-mContentViewBox.getHeight())/2;
     }
 
     @Override
@@ -155,8 +162,8 @@ public class BoxRightTreeLayoutManager extends TreeLayoutManager {
 
         ViewBox viewBox = currentNode.getViewBox();
         int centerFix = Math.max(viewBox.getHeight(),currentHeight)-currentHeight;
-        int top  = mFixedDy+viewBox.top+centerFix/2+baseLocationBox.top;
-        int left = mFixedDx+viewBox.left+baseLocationBox.left;
+        int top  = mViewportFixedDy + viewBox.top + centerFix/2+baseLocationBox.top;
+        int left = mViewportFixedDx +viewBox.left+baseLocationBox.left;
         int bottom = top+currentHeight;
         int right = left+currentWidth;
 

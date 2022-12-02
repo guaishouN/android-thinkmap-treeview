@@ -8,6 +8,7 @@ import com.gyso.treeview.util.ViewBox;
 
 import java.io.Serializable;
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -20,13 +21,8 @@ import java.util.Stack;
  */
 public class TreeModel<T> extends NodeModel<T> implements Serializable {
     private static final String TAG = TreeModel.class.getSimpleName();
-    /**
-     * the root for the tree
-     */
-    private NodeModel<T> rootNode;
     private SparseArray<LinkedList<NodeModel>> arrayByFloor = new SparseArray<>(10);
     private transient ITraversal<NodeModel<?>> iTraversal;
-    private final HashSet<NodeModel<T>> rootNodeSet = new HashSet<>();
     private int maxDeep =0;
     private int minDeep =0;
 
@@ -38,8 +34,12 @@ public class TreeModel<T> extends NodeModel<T> implements Serializable {
      * @param childNodes
      */
     @SafeVarargs
-    public final void addNode(NodeModel<?> parent, NodeModel<?>... childNodes) {
+    public final void addNode(NodeModel parent, NodeModel... childNodes) {
         if(parent!=null&&childNodes!=null && childNodes.length>0){
+            this.childNodes.removeAll(Arrays.asList(childNodes));
+            if(parent.parentNode==null){
+                this.childNodes.add(parent);
+            }
             parent.treeModel = this;
             List<NodeModel<T>> nodeModels = new LinkedList<>();
             for (int i = 0; i < childNodes.length; i++) {
@@ -73,11 +73,6 @@ public class TreeModel<T> extends NodeModel<T> implements Serializable {
         }
     }
 
-    public NodeModel<T> getRootNode() {
-        return rootNode;
-    }
-
-
     /**
      *child nodes will ergodic in the last
      * 广度遍历
@@ -87,28 +82,29 @@ public class TreeModel<T> extends NodeModel<T> implements Serializable {
      */
     private void ergodicTreeByFloor() {
         Deque<NodeModel<T>> deque = new ArrayDeque<>();
-        NodeModel<T> rootNode = getRootNode();
-        deque.add(rootNode);
-        while (!deque.isEmpty()) {
-            rootNode = deque.poll();
+        traverseDirectChildren(rootNode->{
+            deque.add(rootNode);
+            while (!deque.isEmpty()) {
+                rootNode = deque.poll();
+                if (iTraversal != null) {
+                    iTraversal.next(rootNode);
+                }
+                if(this.finishTraversal){
+                    break;
+                }
+                if(rootNode==null){
+                    continue;
+                }
+                LinkedList<NodeModel<T>> childNodes = rootNode.getChildNodes();
+                if (childNodes.size() > 0) {
+                    deque.addAll(childNodes);
+                }
+            }
             if (iTraversal != null) {
-                iTraversal.next(rootNode);
+                iTraversal.finish();
+                this.finishTraversal = false;
             }
-            if(this.finishTraversal){
-                break;
-            }
-            if(rootNode==null){
-                continue;
-            }
-            LinkedList<NodeModel<T>> childNodes = rootNode.getChildNodes();
-            if (childNodes.size() > 0) {
-                deque.addAll(childNodes);
-            }
-        }
-        if (iTraversal != null) {
-            iTraversal.finish();
-            this.finishTraversal = false;
-        }
+        });
     }
 
     public SparseArray<LinkedList<NodeModel>> getArrayByFloor() {
@@ -159,28 +155,29 @@ public class TreeModel<T> extends NodeModel<T> implements Serializable {
      */
     private void ergodicTreeByDeep(){
         Stack<NodeModel<T>> stack = new Stack<>();
-        NodeModel<T> rootNode = getRootNode();
-        stack.add(rootNode);
-        while (!stack.isEmpty()) {
-            rootNode = stack.pop();
+        traverseDirectChildren(rootNode->{
+            stack.add(rootNode);
+            while (!stack.isEmpty()) {
+                rootNode = stack.pop();
+                if (iTraversal != null) {
+                    iTraversal.next(rootNode);
+                }
+                if(this.finishTraversal){
+                    break;
+                }
+                if(rootNode==null){
+                    continue;
+                }
+                LinkedList<NodeModel<T>> childNodes = rootNode.getChildNodes();
+                if (childNodes.size() > 0) {
+                    stack.addAll(childNodes);
+                }
+            }
             if (iTraversal != null) {
-                iTraversal.next(rootNode);
+                iTraversal.finish();
+                this.finishTraversal = false;
             }
-            if(this.finishTraversal){
-                break;
-            }
-            if(rootNode==null){
-                continue;
-            }
-            LinkedList<NodeModel<T>> childNodes = rootNode.getChildNodes();
-            if (childNodes.size() > 0) {
-                stack.addAll(childNodes);
-            }
-        }
-        if (iTraversal != null) {
-            iTraversal.finish();
-            this.finishTraversal = false;
-        }
+        });
     }
 
     public int getMaxDeep() {

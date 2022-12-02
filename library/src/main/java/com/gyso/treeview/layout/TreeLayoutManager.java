@@ -54,8 +54,8 @@ public abstract class TreeLayoutManager {
      * the fixedViewBox means that the fixedViewBox's width/height is the same as the given viewPort's.
      */
     protected final ViewBox fixedViewBox;
-    protected int mFixedDx;
-    protected int mFixedDy;
+    protected int mViewportFixedDx;
+    protected int mViewportFixedDy;
 
     protected int extraDeltaX,extraDeltaY;
 
