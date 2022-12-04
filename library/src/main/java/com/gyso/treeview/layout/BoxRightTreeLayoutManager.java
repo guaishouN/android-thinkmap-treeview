@@ -100,6 +100,9 @@ public class BoxRightTreeLayoutManager extends TreeLayoutManager {
         parentBox.bottom = Math.max(spacePeerToPeer + parentNodeView.getMeasuredHeight(),sumHeight);
         nodeSumHeight.put(parentNode, sumHeight);
         if(parentNode.childNodes.getLast()==childNode){
+            sumHeight -= spacePeerToPeer;
+            parentBox.bottom = Math.max(parentNodeView.getMeasuredHeight(),sumHeight);
+            nodeSumHeight.put(parentNode, sumHeight);
             if(sumHeight < parentNodeView.getMeasuredHeight()){
                 final int parentBoxFixed = (parentNodeView.getMeasuredHeight()-sumHeight)/2;
                 parentNode.traverseDirectChildren(next->{

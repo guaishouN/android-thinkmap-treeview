@@ -333,11 +333,11 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         adapter.onBindViewHolder((TreeViewHolder)treeViewHolder);
         View view = treeViewHolder.getView();
         view.setElevation(Z_NOR);
-        this.addView(view);
         view.setTag(R.id.item_holder,treeViewHolder);
         if(nodeViewMap !=null ){
             nodeViewMap.put(node,treeViewHolder);
         }
+        this.addView(view);
     }
 
     private final ViewDragHelper.Callback dragCallback = new ViewDragHelper.Callback(){
