@@ -87,6 +87,7 @@ public class StraightLine extends BaseLine {
 
         //set paint
         mPaint.reset();
+        mPath.reset();
         mPaint.setColor(lineColor);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(DensityUtils.dp2px(context,lineWidth));

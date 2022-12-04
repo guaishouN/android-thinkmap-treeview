@@ -53,12 +53,6 @@ public class DrawInfo {
      */
     private int windowHeight;
 
-    /**
-     * the end or start point of the join line from parent view to child node view
-     */
-    private PointF startPointFOfJoinLine;
-    private PointF endPointFOfJoinLine;
-
     public Canvas getCanvas() {
         return canvas;
     }
@@ -126,21 +120,5 @@ public class DrawInfo {
 
     public void setWindowHeight(int windowHeight) {
         this.windowHeight = windowHeight;
-    }
-
-    public PointF getStartPointFOfJoinLine() {
-        return startPointFOfJoinLine;
-    }
-
-    public void setStartPointFOfJoinLine(PointF startPointFOfJoinLine) {
-        this.startPointFOfJoinLine = startPointFOfJoinLine;
-    }
-
-    public PointF getEndPointFOfJoinLine() {
-        return endPointFOfJoinLine;
-    }
-
-    public void setEndPointFOfJoinLine(PointF endPointFOfJoinLine) {
-        this.endPointFOfJoinLine = endPointFOfJoinLine;
     }
 }
