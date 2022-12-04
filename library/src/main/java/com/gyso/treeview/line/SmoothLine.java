@@ -93,8 +93,9 @@ public class SmoothLine extends BaseLine {
             return;
         }
 
-        //set paint
         mPaint.reset();
+        mPath.reset();
+        //set paint
         mPaint.setColor(lineColor);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(DensityUtils.dp2px(context,lineWidth));

@@ -36,6 +36,7 @@ public class BaseLine {
 
         //set paint
         mPaint.reset();
+        mPath.reset();
         mPaint.setColor(Color.MAGENTA);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeWidth(DensityUtils.dp2px(context,3));
