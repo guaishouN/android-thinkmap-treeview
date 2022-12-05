@@ -38,6 +38,7 @@ public class TreeModel<T> extends NodeModel<T> implements Serializable {
         if(parent!=null&&childNodes!=null && childNodes.length>0){
             this.childNodes.removeAll(Arrays.asList(childNodes));
             if(parent.parentNode==null){
+                this.childNodes.remove(parent);
                 this.childNodes.add(parent);
             }
             parent.treeModel = this;
