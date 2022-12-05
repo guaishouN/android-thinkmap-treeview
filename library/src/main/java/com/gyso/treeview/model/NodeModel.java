@@ -298,11 +298,6 @@ public class NodeModel<T> implements Serializable {
 
     @Override
     public String toString() {
-        return "NodeModel{" +
-                "value=" + value +
-                ", floor=" + floor +
-                ", deep=" + deep +
-                ", parent=" + (parentNode==null?null:parentNode.value) +
-                '}';
+        return "NodeModel{" + value +"----"+ viewBox.toString()+'}';
     }
 }
