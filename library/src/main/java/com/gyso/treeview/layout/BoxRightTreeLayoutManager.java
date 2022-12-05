@@ -1,7 +1,6 @@
 package com.gyso.treeview.layout;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 
 import com.gyso.treeview.TreeViewContainer;
@@ -41,7 +40,6 @@ public class BoxRightTreeLayoutManager extends TreeLayoutManager {
 
     @Override
     public void performMeasure(TreeViewContainer treeViewContainer) {
-        Log.d(TAG, "performMeasure: *********************************");
         final TreeModel<?> mTreeModel = treeViewContainer.getTreeModel();
         if (mTreeModel != null) {
             mContentViewBox.clear();
@@ -65,7 +63,6 @@ public class BoxRightTreeLayoutManager extends TreeLayoutManager {
         viewBox.clear();
         viewBox.right = curW;
         viewBox.bottom = curH;
-        Log.d(TAG, "onMeasureNode: "+node);
         return viewBox;
     }
 
@@ -96,7 +93,6 @@ public class BoxRightTreeLayoutManager extends TreeLayoutManager {
             sumHeight += spacePeerToPeer + childBox.getHeight();
             parentBox.bottom = sumHeight;
             nodeSumHeight.put(parentNode, sumHeight);
-            Log.d(TAG, "onMeasureNodeBox: parent-"+parentNode+";   child-"+childNode);
             return;
         }
 
@@ -125,7 +121,6 @@ public class BoxRightTreeLayoutManager extends TreeLayoutManager {
                 });
             }
         }
-        Log.d(TAG, "onMeasureNodeBox: parent-"+parentNode+";   child-"+childNode);
     }
 
     @Override
@@ -153,7 +148,6 @@ public class BoxRightTreeLayoutManager extends TreeLayoutManager {
 
     @Override
     public void performLayout(final TreeViewContainer treeViewContainer) {
-        Log.d(TAG, "performLayout: ##################################");
         final TreeModel<?> mTreeModel = treeViewContainer.getTreeModel();
         if (mTreeModel != null) {
             mTreeModel.onLayout(new ViewBox(),this,treeViewContainer);
@@ -163,9 +157,7 @@ public class BoxRightTreeLayoutManager extends TreeLayoutManager {
 
     @Override
     public ViewBox onLayoutNodeBox(ViewBox parentLocationBox, NodeModel<?> tNodeModel, TreeViewContainer container){
-        ViewBox resultBox = parentLocationBox.add(tNodeModel.getViewBox());
-        Log.d(TAG, "onLayoutNodeBox: currentNodeModel->"+tNodeModel+",  nextLevel->"+resultBox);
-        return resultBox;
+        return parentLocationBox.add(tNodeModel.getViewBox());
     }
 
     @Override
@@ -188,7 +180,6 @@ public class BoxRightTreeLayoutManager extends TreeLayoutManager {
         int right = left+currentWidth;
 
         ViewBox finalLocation = new ViewBox(top, left, bottom, right);
-        Log.d(TAG, "onLayoutNode: "+currentNode);
         onManagerLayoutNode(currentNode, currentNodeView, finalLocation, treeViewContainer);
     }
 

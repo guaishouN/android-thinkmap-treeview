@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
         int space_50dp = 30;
         int space_20dp = 20;
         BaseLine line = getLine();
-        return new BoxRightTreeLayoutManager(this,0,0,line);
+        return new BoxRightTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new BoxDownTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new BoxLeftTreeLayoutManager(this,space_50dp,space_20dp,line);
         //return new BoxUpTreeLayoutManager(this,space_50dp,space_20dp,line);
@@ -193,17 +193,17 @@ public class MainActivity extends AppCompatActivity {
 
     private void setData(AnimalTreeViewAdapter adapter){
         //root
-        NodeModel<Animal> root = new NodeModel<>(new Animal(R.drawable.ic_01,"-root-"));
+        NodeModel<Animal> root = new NodeModel<>(new Animal(R.drawable.ic_01,"-root-\n%%%%%%%%%%%%%%%%\n%%%%%%%%%%\n%%%%%%%%%%\n%%%%%%%%%%\n%%%%%%%%%%"));
         TreeModel<Animal> treeModel = new TreeModel<>();
 
         //child nodes
         NodeModel<Animal> sub0 = new NodeModel<>(new Animal(R.drawable.ic_02,"sub00"));
         NodeModel<Animal> sub1 = new NodeModel<>(new Animal(R.drawable.ic_03,"sub01"));
         NodeModel<Animal> sub2 = new NodeModel<>(new Animal(R.drawable.ic_04,"sub02"));
-        NodeModel<Animal> sub3 = new NodeModel<>(new Animal(R.drawable.ic_05,"sub03"));
+        NodeModel<Animal> sub3 = new NodeModel<>(new Animal(R.drawable.ic_05,"sub03===\n=====\n======\n===\n=====\n=====\n===\n====\n=======\n=====\n======\n=====\n======\n========\n=====\n=====\n===\n======="));
         NodeModel<Animal> sub4 = new NodeModel<>(new Animal(R.drawable.ic_06,"sub04"));
-        NodeModel<Animal> sub5 = new NodeModel<>(new Animal(R.drawable.ic_07,"sub05"));
-        NodeModel<Animal> sub6 = new NodeModel<>(new Animal(R.drawable.ic_08,"sub06"));
+        NodeModel<Animal> sub5 = new NodeModel<>(new Animal(R.drawable.ic_07,"sub05****************************************************"));
+        NodeModel<Animal> sub6 = new NodeModel<>(new Animal(R.drawable.ic_08,"sub06666\n666666\n6666666\n666666\n666666666\n66666\n6666\n66666666\n66666666666\n666\n666666666\n666555\n5555\n55555555"));
         NodeModel<Animal> sub7 = new NodeModel<>(new Animal(R.drawable.ic_09,"sub07"));
         NodeModel<Animal> sub8 = new NodeModel<>(new Animal(R.drawable.ic_10,"sub08"));
         NodeModel<Animal> sub9 = new NodeModel<>(new Animal(R.drawable.ic_11,"sub09"));
@@ -237,7 +237,7 @@ public class MainActivity extends AppCompatActivity {
         NodeModel<Animal> sub37 = new NodeModel<>(new Animal(R.drawable.ic_09,"sub37"));
         NodeModel<Animal> sub38 = new NodeModel<>(new Animal(R.drawable.ic_10,"sub38"));
         NodeModel<Animal> sub39 = new NodeModel<>(new Animal(R.drawable.ic_11,"sub39"));
-        NodeModel<Animal> sub40 = new NodeModel<>(new Animal(R.drawable.ic_02,"sub40"));
+        NodeModel<Animal> sub40 = new NodeModel<>(new Animal(R.drawable.ic_02,"sub40&&\n&&&\n&&&&\n&&&\n&&&\n&&&&\n&&&\n&&&\n&&&&\n&&&\n&&&\n&&&&\n&&&"));
         NodeModel<Animal> sub41 = new NodeModel<>(new Animal(R.drawable.ic_03,"sub41"));
         NodeModel<Animal> sub42 = new NodeModel<>(new Animal(R.drawable.ic_04,"sub42"));
         NodeModel<Animal> sub43 = new NodeModel<>(new Animal(R.drawable.ic_05,"sub43"));
@@ -253,26 +253,26 @@ public class MainActivity extends AppCompatActivity {
         NodeModel<Animal> sub53 = new NodeModel<>(new Animal(R.drawable.ic_07,"sub53"));
 
         //build relationship
-        treeModel.addNode(root,sub3);
-
+        treeModel.addNode(root,sub0,sub1,sub3,sub4);
+        treeModel.addNode(sub3,sub12,sub13);
         treeModel.addNode(sub1,sub2);
-
-
-//        treeModel.addNode(sub5,sub7,sub8);
-//        treeModel.addNode(sub6,sub9,sub10,sub11);
-//        treeModel.addNode(sub11,sub14,sub15);
-//        treeModel.addNode(sub10,sub40);
-//        treeModel.addNode(sub40,sub16);
-//        //treeModel.addNode(sub8,sub17,sub18,sub19,sub20,sub21,sub22,sub23,sub41,sub42,sub43,sub44);
-//        treeModel.addNode(sub9,sub47,sub48);
-//        //treeModel.addNode(sub16,sub24,sub25,sub26,sub27,sub28,sub29,sub30,sub46,sub45);
-//        treeModel.addNode(sub47,sub49);
-//        treeModel.addNode(sub12,sub37);
-//        treeModel.addNode(sub0,sub36);
-//        treeModel.addNode(sub39,sub52,sub53);
-//        treeModel.addNode(sub37,sub41);
-//        treeModel.addNode(sub41,sub42);
-//        treeModel.addNode(sub42,sub43);
+        treeModel.addNode(sub0,sub34,sub5,sub38,sub39);
+        treeModel.addNode(sub4,sub6);
+        treeModel.addNode(sub5,sub7,sub8);
+        treeModel.addNode(sub6,sub9,sub10,sub11);
+        treeModel.addNode(sub11,sub14,sub15);
+        treeModel.addNode(sub10,sub40);
+        treeModel.addNode(sub40,sub16);
+        //treeModel.addNode(sub8,sub17,sub18,sub19,sub20,sub21,sub22,sub23,sub41,sub42,sub43,sub44);
+        treeModel.addNode(sub9,sub47,sub48);
+        //treeModel.addNode(sub16,sub24,sub25,sub26,sub27,sub28,sub29,sub30,sub46,sub45);
+        treeModel.addNode(sub47,sub49);
+        treeModel.addNode(sub12,sub37);
+        treeModel.addNode(sub0,sub36);
+        treeModel.addNode(sub39,sub52,sub53);
+        treeModel.addNode(sub37,sub41);
+        treeModel.addNode(sub41,sub42);
+        treeModel.addNode(sub42,sub43);
         //mark
         parentToRemoveChildren = sub0;
         targetNode = sub1;

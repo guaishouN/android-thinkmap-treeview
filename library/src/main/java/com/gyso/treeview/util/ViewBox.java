@@ -149,10 +149,10 @@ public class ViewBox {
     @Override
     public String toString() {
         return "{" +
-                "l:" + left +","+
-                "t:" + top +","+
-                "r:" + right +","+
-                "b:" + bottom +
+                "t:" + top +
+                " l:" + left +
+                " b:" + bottom +
+                " r:" + right +
                 '}';
     }
 }
