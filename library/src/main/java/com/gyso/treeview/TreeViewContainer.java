@@ -329,6 +329,10 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     }
 
     private void addNodeViewToGroup(NodeModel<?> node) {
+        if(nodeViewMap.get(node)!=null){
+            adapter.onBindViewHolder((TreeViewHolder)nodeViewMap.get(node));
+            return;
+        }
         TreeViewHolder<?> treeViewHolder = createHolder(node);
         adapter.onBindViewHolder((TreeViewHolder)treeViewHolder);
         View view = treeViewHolder.getView();
@@ -562,6 +566,9 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
             }
             mTreeModel.addNode(parent,childNodes);
             mTreeLayoutManager.calculateByLayoutAlgorithm(mTreeModel);
+            if(parent.parentNode==null){
+                addNodeViewToGroup(parent);
+            }
             for (NodeModel<?> node:childNodes) {
                 addNodeViewToGroup(node);
             }

@@ -41,12 +41,16 @@ public class TreeModel<T> extends NodeModel<T> implements Serializable {
                 this.childNodes.add(parent);
             }
             parent.treeModel = this;
-            List<NodeModel<T>> nodeModels = new LinkedList<>();
-            for (int i = 0; i < childNodes.length; i++) {
-                nodeModels.add((NodeModel<T>)childNodes[i]);
-                childNodes[i].treeModel = this;
+            List<NodeModel> nodeModels = new LinkedList<>();
+            for (NodeModel childNode : childNodes) {
+                NodeModel child =  childNode;
+                if (child.parentNode != null) {
+                    child.parentNode.removeChildNode(child);
+                }
+                nodeModels.add(child);
+                childNode.treeModel = this;
             }
-            ((NodeModel<T>)parent).addChildNodes(nodeModels);
+            parent.addChildNodes(nodeModels);
             for(NodeModel<?> child:childNodes){
                 child.traverseIncludeSelf(next->{
                     next.floor = next.parentNode.floor+1;

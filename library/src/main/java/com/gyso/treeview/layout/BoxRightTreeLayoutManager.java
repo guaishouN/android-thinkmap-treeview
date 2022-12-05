@@ -75,18 +75,27 @@ public class BoxRightTreeLayoutManager extends TreeLayoutManager {
         ViewBox parentBox = parentNode.getViewBox();
         ViewBox childBox = childNode.getViewBox();
 
-        if(parentNodeView==null){
-            parentBox.setValues(childBox);
-            return;
-        }
-
         Integer sumHeight = nodeSumHeight.get(parentNode);
         if(sumHeight==null){
             sumHeight = 0;
         }
-
         int childWidth = childBox.getWidth();
         int childHeight = childBox.getHeight();
+
+        if(parentNodeView==null){
+            childBox.top = sumHeight;
+            childBox.left = 0;
+            childBox.bottom = childBox.top+childHeight;
+            childBox.right = childBox.left+childWidth;
+            parentBox.top    = 0;
+            parentBox.left   = 0;
+            parentBox.right  = Math.max(parentBox.right,spaceParentToChild*2 + childBox.getWidth());
+            sumHeight += spacePeerToPeer + childBox.getHeight();
+            parentBox.bottom = sumHeight;
+            nodeSumHeight.put(parentNode, sumHeight);
+            return;
+        }
+
         childBox.top = sumHeight;
         childBox.left = spaceParentToChild*2 + parentNodeView.getMeasuredWidth();
         childBox.bottom = childBox.top+childHeight;
@@ -157,7 +166,7 @@ public class BoxRightTreeLayoutManager extends TreeLayoutManager {
         View currentNodeView =  currentHolder==null?null:currentHolder.getView();
 
         if(currentNodeView==null){
-            throw new NullPointerException(" currentNodeView can not be null");
+            throw new NullPointerException("currentNodeView can not be null. #"+currentNode);
         }
 
         int currentWidth = currentNodeView.getMeasuredWidth();
