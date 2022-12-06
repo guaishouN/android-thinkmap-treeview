@@ -253,7 +253,7 @@ public class TouchEventHandler {
         float top = v.getTop()*v.getScaleY()+v.getTranslationY();
         float right = v.getRight()*v.getScaleX()+v.getTranslationX();
         float bottom = v.getBottom()*v.getScaleY()+v.getTranslationY();
-        layoutLocationInParent.setValues((int)top,(int)left,(int)bottom,(int)right);
+        layoutLocationInParent.setValues((int)left,(int)top,(int)right,(int)bottom);
     }
     /**
      * 计算两个手指之间的距离

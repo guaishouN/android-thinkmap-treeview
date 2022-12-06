@@ -52,13 +52,6 @@ public class TreeViewEditor {
     }
 
     /**
-     *  change layout algorithm
-     */
-    public void changeLayoutAlgorithm(){
-
-    }
-
-    /**
      *  get current relation ship, you can use when you change
      * @param traverse relations node
      */
@@ -100,7 +93,11 @@ public class TreeViewEditor {
      * @param targetParentNode targetParentNode
      */
     public void collapse(NodeModel<?> targetParentNode){
-
+        targetParentNode.collapse();
+        TreeViewContainer container = getContainer();
+        if (container!=null){
+            container.onDataSetChange();
+        }
     }
 
     /**
@@ -108,7 +105,11 @@ public class TreeViewEditor {
      * @param targetParentNode targetParentNode
      */
     public void expand(NodeModel<?> targetParentNode){
-
+        targetParentNode.expand();
+        TreeViewContainer container = getContainer();
+        if (container!=null){
+            container.onDataSetChange();
+        }
     }
 
     /**

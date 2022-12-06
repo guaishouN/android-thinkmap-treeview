@@ -2,15 +2,10 @@ package com.gyso.treeview.model;
 
 import android.util.SparseArray;
 
-import com.gyso.treeview.TreeViewContainer;
-import com.gyso.treeview.layout.TreeLayoutManager;
-import com.gyso.treeview.util.ViewBox;
-
 import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -21,17 +16,23 @@ import java.util.Stack;
  */
 public class TreeModel<T> extends NodeModel<T> implements Serializable {
     private static final String TAG = TreeModel.class.getSimpleName();
-    private SparseArray<LinkedList<NodeModel>> arrayByFloor = new SparseArray<>(10);
+    private final SparseArray<LinkedList<NodeModel>> arrayByFloor = new SparseArray<>(10);
     private transient ITraversal<NodeModel<?>> iTraversal;
     private int maxDeep =0;
     private int minDeep =0;
 
     private boolean finishTraversal = false;
 
+    public NodeModel<T> createNode(T value){
+        NodeModel<T> node = new NodeModel<>(value);
+        node.treeModel = this;
+        return node;
+    }
+
     /**
      * add the node in some father node
-     * @param parent
-     * @param childNodes
+     * @param parent parent
+     * @param childNodes childNodes
      */
     @SafeVarargs
     public final void addNode(NodeModel parent, NodeModel... childNodes) {
@@ -42,16 +43,15 @@ public class TreeModel<T> extends NodeModel<T> implements Serializable {
                 this.childNodes.add(parent);
             }
             parent.treeModel = this;
-            List<NodeModel> nodeModels = new LinkedList<>();
-            for (NodeModel childNode : childNodes) {
-                NodeModel child =  childNode;
-                if (child.parentNode != null) {
-                    child.parentNode.removeChildNode(child);
+            List<NodeModel<T>> nodeModels = new LinkedList<>();
+            for (NodeModel<T> childNode : childNodes) {
+                if (childNode.parentNode != null) {
+                    childNode.parentNode.innerRemoveChildNode(childNode);
                 }
-                nodeModels.add(child);
+                nodeModels.add(childNode);
                 childNode.treeModel = this;
             }
-            parent.addChildNodes(nodeModels);
+            parent.innerAddChildNodes(nodeModels);
             for(NodeModel<?> child:childNodes){
                 child.traverseIncludeSelf(next->{
                     next.floor = next.parentNode.floor+1;
@@ -67,16 +67,17 @@ public class TreeModel<T> extends NodeModel<T> implements Serializable {
      * @param parent p node
      * @param childNode c node
      */
-    public void removeNode(NodeModel<?> parent, NodeModel<?> childNode) {
+    public void removeNode(NodeModel parent, NodeModel childNode) {
         if(parent!=null&&childNode!=null){
-            parent.removeChildNode(childNode);
+            parent.innerRemoveChildNode(childNode);
             childNode.traverseIncludeSelf(next->{
-                List<NodeModel> nf = getFloorList(next.floor);
+                List<NodeModel> nf= getFloorList(next.floor);
                 nf.remove(next);
                 next.floor = 0;
             });
         }
     }
+
 
     /**
      *child nodes will ergodic in the last

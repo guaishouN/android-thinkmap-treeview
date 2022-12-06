@@ -10,6 +10,7 @@ import com.gyso.treeview.layout.TreeLayoutManager;
 import com.gyso.treeview.util.ViewBox;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -23,7 +24,7 @@ import java.util.Stack;
  */
 public class NodeModel<T> implements Serializable {
     private final static String TAG = NodeModel.class.getSimpleName();
-    public TreeModel<?>  treeModel = null;
+    public TreeModel<T>  treeModel = null;
 
     /**
      * for mark this node
@@ -68,7 +69,7 @@ public class NodeModel<T> implements Serializable {
      */
     public int deep = 0;
 
-    public boolean hidden = false;
+    public boolean isExpand = true;
 
     public ViewBox viewBox = new ViewBox();
 
@@ -108,8 +109,28 @@ public class NodeModel<T> implements Serializable {
         return childNodes;
     }
 
+    @SafeVarargs
+    public final void addChildNodes(NodeModel<T>... childNodes){
+        if(childNodes == null || childNodes.length==0){
+            return;
+        }
+        if(treeModel!=null){
+            treeModel.addNode(this, childNodes);
+            return;
+        }
+        innerAddChildNodes(Arrays.asList(childNodes));
+    }
+
     public void addChildNodes(List<NodeModel<T>> childNodes) {
-        for (NodeModel<T> aChild: childNodes) {
+        if(treeModel!=null){
+            treeModel.addNode(this, (NodeModel<T>[])childNodes.toArray());
+            return;
+        }
+        innerAddChildNodes(childNodes);
+    }
+
+    protected void innerAddChildNodes(List<NodeModel<T>> childNodes){
+        for (NodeModel aChild: childNodes) {
             addChildNode(aChild);
         }
     }
@@ -117,13 +138,27 @@ public class NodeModel<T> implements Serializable {
     /**
      * @param aChild node
      */
-    private boolean addChildNode(NodeModel<T> aChild){
+    private boolean addChildNode(NodeModel aChild){
         boolean isExist = childNodes.contains(aChild);
         if(!isExist){
             aChild.setParentNode(this);
+            aChild.treeModel = this.treeModel;
             childNodes.add(aChild);
         }
         return isExist;
+    }
+
+    public void removeChildNode(NodeModel<T> aChild){
+        if(treeModel!=null){
+            treeModel.removeNode(this,aChild);
+            return;
+        }
+        innerRemoveChildNode(aChild);
+    }
+
+    protected void innerRemoveChildNode(NodeModel<T> aChild){
+        childNodes.remove(aChild);
+        aChild.setParentNode(null);
     }
 
     /**
@@ -222,11 +257,6 @@ public class NodeModel<T> implements Serializable {
         }
     }
 
-    public void removeChildNode(NodeModel<?> aChild){
-        childNodes.remove(aChild);
-        aChild.setParentNode(null);
-    }
-
     public boolean isFocus() {
         return focus;
     }
@@ -243,12 +273,16 @@ public class NodeModel<T> implements Serializable {
         this.floor = floor;
     }
 
-    public boolean isHidden() {
-        return hidden;
+    public void setNodeLayoutManager(TreeLayoutManager nodeLayoutManager) {
+        this.nodeLayoutManager = nodeLayoutManager;
     }
 
-    public void setHidden(boolean hidden) {
-        this.hidden = hidden;
+    public void expand(){
+        isExpand=true;
+    }
+
+    public void collapse(){
+        isExpand=false;
     }
 
     public ViewBox getViewBox() {
@@ -258,6 +292,9 @@ public class NodeModel<T> implements Serializable {
     public ViewBox onMeasure(TreeLayoutManager layoutManager, TreeViewContainer container) {
         final TreeLayoutManager useLayout = nodeLayoutManager==null?layoutManager:nodeLayoutManager;
         viewBox = useLayout.onMeasureNode(this,container);
+        if(!this.isExpand){
+            return viewBox;
+        }
         traverseDirectChildren(childNode -> {
             childNode.onMeasure(useLayout, container);
             useLayout.onMeasureNodeBox(this,childNode,container);
@@ -268,6 +305,9 @@ public class NodeModel<T> implements Serializable {
     public void onLayout(ViewBox parentLocationBox,TreeLayoutManager layoutManager, TreeViewContainer container){
         final TreeLayoutManager useLayout = nodeLayoutManager==null?layoutManager:nodeLayoutManager;
         ViewBox baseLocationBox = useLayout.onLayoutNodeBox(parentLocationBox,this,container);
+        if(!this.isExpand){
+            return;
+        }
         traverseDirectChildren(childNode -> {
             childNode.onLayout(baseLocationBox, useLayout, container);
             useLayout.onLayoutNode(baseLocationBox,childNode,container);

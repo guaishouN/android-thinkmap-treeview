@@ -4,9 +4,8 @@ import android.graphics.Matrix;
 import android.view.View;
 
 public class ViewBox {
-
-    public int top;
     public int left;
+    public int top;
     public int right;
     public int bottom;
 
@@ -14,10 +13,10 @@ public class ViewBox {
 
     }
     public ViewBox(View view){
-        this(view.getTop(),view.getLeft(),view.getBottom(),view.getRight());
+        this(view.getLeft(),view.getTop(),view.getRight(),view.getBottom());
     }
 
-    public ViewBox(int top, int left, int bottom, int right) {
+    public ViewBox(int left,int top, int right, int bottom) {
         this.top = top;
         this.left = left;
         this.right = right;
@@ -31,7 +30,7 @@ public class ViewBox {
         this.bottom = viewBox.bottom;
     }
 
-    public void setValues(int top, int left,int bottom,int right) {
+    public void setValues(int left,int top,int right,int bottom) {
         this.top = top;
         this.left = left;
         this.bottom = bottom;
@@ -64,7 +63,7 @@ public class ViewBox {
         float topI = top*scaleY+translY;
         float rightI = right*scaleX+translX;
         float bottomI = bottom*scaleY+translY;
-        return new ViewBox((int)topI,(int)leftI,(int)bottomI,(int)rightI);
+        return new ViewBox((int)leftI,(int)topI,(int)rightI,(int)bottomI);
     }
 
     public ViewBox invert(Matrix matrix){
@@ -78,8 +77,8 @@ public class ViewBox {
         float topI = (top-translY)/scaleY;
         float rightI = (right-translX)/scaleX;
         float bottomI = (bottom-translY)/scaleY;
-        setValues((int)topI,(int)leftI,(int)rightI,(int)bottomI);
-        return new ViewBox((int)topI,(int)leftI,(int)bottomI,(int)rightI);
+        setValues((int)leftI,(int)topI,(int)rightI,(int)bottomI);
+        return new ViewBox((int)leftI,(int)topI,(int)rightI,(int)bottomI);
     }
 
     public boolean contain(ViewBox other){
@@ -92,10 +91,10 @@ public class ViewBox {
 
     public ViewBox multiply(float radio) {
         return new ViewBox(
-                (int)(top * radio),
                 (int)(left * radio),
-                (int)(bottom * radio),
-                (int)(right * radio)
+                (int)(top * radio),
+                (int)(right * radio),
+                (int)(bottom * radio)
               );
     }
 
@@ -104,10 +103,10 @@ public class ViewBox {
             return this;
         }
         return new ViewBox(
-                top + other.top,
                 left + other.left,
-                bottom + other.bottom,
-                right + other.right
+                top + other.top,
+                right + other.right,
+                bottom + other.bottom
         );
     }
 
@@ -116,11 +115,10 @@ public class ViewBox {
             return this;
         }
         return new ViewBox(
-                top - other.top,
                 left - other.left,
-                bottom - other.bottom,
-                right - other.right
-                );
+                top - other.top,
+                right - other.right,
+                bottom - other.bottom);
     }
 
     /**
@@ -149,10 +147,10 @@ public class ViewBox {
     @Override
     public String toString() {
         return "{" +
-                "t:" + top +
                 " l:" + left +
-                " b:" + bottom +
+                " t:" + top +
                 " r:" + right +
+                " b:" + bottom +
                 '}';
     }
 }

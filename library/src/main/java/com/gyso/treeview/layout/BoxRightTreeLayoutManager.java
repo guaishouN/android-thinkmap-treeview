@@ -179,7 +179,7 @@ public class BoxRightTreeLayoutManager extends TreeLayoutManager {
         int bottom = top+currentHeight;
         int right = left+currentWidth;
 
-        ViewBox finalLocation = new ViewBox(top, left, bottom, right);
+        ViewBox finalLocation = new ViewBox(left,top,right,bottom);
         onManagerLayoutNode(currentNode, currentNodeView, finalLocation, treeViewContainer);
     }
 
