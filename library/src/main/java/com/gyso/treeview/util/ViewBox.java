@@ -3,7 +3,16 @@ package com.gyso.treeview.util;
 import android.graphics.Matrix;
 import android.view.View;
 
+import com.gyso.treeview.TreeViewContainer;
+import com.gyso.treeview.adapter.TreeViewHolder;
+import com.gyso.treeview.model.NodeModel;
+
 public class ViewBox {
+    public static final int MIRROR_TYPE_NONE = 0;
+    public static final int MIRROR_TYPE_X = 1;
+    public static final int MIRROR_TYPE_Y = 2;
+    public static final int MIRROR_TYPE_XY = 3;
+
     public int left;
     public int top;
     public int right;
@@ -87,6 +96,43 @@ public class ViewBox {
                 left<=other.left &&
                 right>=other.right &&
                 bottom>=other.bottom;
+    }
+
+    public ViewBox mirrorByX(int centerX){
+        return mirrorByXY(this, centerX,0,MIRROR_TYPE_X);
+    }
+    public ViewBox mirrorByY(int centerY){
+        return mirrorByXY(this,0,centerY,MIRROR_TYPE_Y);
+    }
+
+    private ViewBox mirrorByXY(ViewBox box,int centerX,int centerY, int mirrorType){
+        int left,right,top,bottom;
+        switch (mirrorType){
+            case MIRROR_TYPE_X:{
+                right   = centerX*2 - box.left;
+                left    = centerX*2 - box.right;
+                top     = box.top;
+                bottom  = box.bottom;
+                break;
+            }
+            case MIRROR_TYPE_Y:{
+                right   = box.right;
+                left    = box.left;
+                bottom  = centerY*2 - box.top;
+                top     = centerY*2 - box.bottom;
+                break;
+            }
+            case MIRROR_TYPE_XY:{
+                right   = centerX*2 - box.left;
+                left    = centerX*2 - box.right;
+                bottom  = centerY*2 - box.top;
+                top     = centerY*2 - box.bottom;
+                break;
+            }
+            default:
+                return box;
+        }
+        return new ViewBox(left, top, right, bottom);
     }
 
     public ViewBox multiply(float radio) {

@@ -14,7 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * guaishouN xw 674149099@qq.com
+ * xw guaishouN
+ * qq 674149099@qq.com
  */
 public class BoxRightTreeLayoutManager extends TreeLayoutManager {
     private static final String TAG = BoxRightTreeLayoutManager.class.getSimpleName();
