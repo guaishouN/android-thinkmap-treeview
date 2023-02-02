@@ -98,6 +98,14 @@ public class ViewBox {
                 bottom>=other.bottom;
     }
 
+    public ViewBox extend(ViewBox other){
+        top=Math.min(top,other.top);
+        left=Math.min(left,other.left);
+        right=Math.max(right,other.right);
+        bottom=Math.max(bottom,other.bottom);
+        return this;
+    }
+
     public ViewBox mirrorByX(int centerX){
         return mirrorByXY(this, centerX,0,MIRROR_TYPE_X);
     }

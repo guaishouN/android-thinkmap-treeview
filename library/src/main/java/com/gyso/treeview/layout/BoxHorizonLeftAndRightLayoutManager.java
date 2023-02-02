@@ -11,7 +11,9 @@ import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.model.TreeModel;
 import com.gyso.treeview.util.ViewBox;
 
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
 /**
  * xw guaishouN
@@ -21,6 +23,10 @@ public class BoxHorizonLeftAndRightLayoutManager extends BoxRightTreeLayoutManag
     private static final String TAG = BoxHorizonLeftAndRightLayoutManager.class.getSimpleName();
     private final Point translateOfLowIndexPart = new Point();
     private final Point translateOfHighIndexPart = new Point();
+    private final Set<NodeModel<?>> parentNodeOfLowIndexPart = new HashSet<>();
+    private final Set<NodeModel<?>> parentNodeOfHighIndexPart = new HashSet<>();
+    private final Set<NodeModel<?>> rootNodes = new HashSet<>();
+    private final ViewBox tmpTranslateBox = new ViewBox();
     public BoxHorizonLeftAndRightLayoutManager(Context context, int spaceParentToChild, int spacePeerToPeer, BaseLine baseline) {
         super(context, spaceParentToChild, spacePeerToPeer, baseline);
     }
@@ -31,53 +37,56 @@ public class BoxHorizonLeftAndRightLayoutManager extends BoxRightTreeLayoutManag
     }
 
     @Override
+    public void onManagerFinishMeasureAllNodes(TreeViewContainer treeViewContainer) {
+        super.onManagerFinishMeasureAllNodes(treeViewContainer);
+        calculateTranslate(treeViewContainer);
+    }
+
+    @Override
     public void onManagerLayoutNode(NodeModel<?> currentNode,
                                     View currentNodeView,
                                     ViewBox finalLocation,
                                     TreeViewContainer treeViewContainer){
+        NodeModel<?> tmpParentNode = currentNode;
+        tmpTranslateBox.clear();
+
         if (!layoutAnimatePrepare(currentNode, currentNodeView, finalLocation, treeViewContainer)) {
             currentNodeView.layout(finalLocation.left, finalLocation.top, finalLocation.right, finalLocation.bottom);
         }
     }
 
-    @Override
-    public void onManagerFinishLayoutAllNodes(TreeViewContainer treeViewContainer) {
-
-        super.onManagerFinishLayoutAllNodes(treeViewContainer);
+    private void changeNodeLayoutType(NodeModel<?> currentNode,TreeViewContainer treeViewContainer,int layoutType){
+        TreeViewHolder<?> currentHolder = treeViewContainer.getTreeViewHolder(currentNode);
+        View currentNodeView = currentHolder == null ? null : currentHolder.getView();
+        if (currentNodeView == null) {
+            throw new NullPointerException(" currentNodeView can not be null");
+        }
+        currentHolder.setHolderLayoutType(layoutType);
     }
 
     private void calculateTranslate(TreeViewContainer treeViewContainer) {
+        parentNodeOfLowIndexPart.clear();
+        parentNodeOfHighIndexPart.clear();
+        rootNodes.clear();
         final TreeModel<?> mTreeModel = treeViewContainer.getTreeModel();
         LinkedList<? extends NodeModel<?>> rootNodes = mTreeModel.getChildNodes();
         LinkedList<? extends NodeModel<?>> rootNodeChildNodes;
+        ViewBox lowBox = new ViewBox();
+        ViewBox highBox = new ViewBox();
+        ViewBox oneRootNodeBox = new ViewBox();
         if(rootNodes.size()==1){
             rootNodeChildNodes = rootNodes.get(0).getChildNodes();
         }else{
             rootNodeChildNodes = rootNodes;
         }
-
+        this.rootNodes.addAll(rootNodes);
         int divider = rootNodeChildNodes.size()/2;
         int count = 0;
-        int minLowIndex,maxLowIndex,minHighIndex,maxHighIndex;
-        minLowIndex = minHighIndex = Integer.MAX_VALUE;
-        maxLowIndex= maxHighIndex = Integer.MIN_VALUE;
-
         for (NodeModel<?> currentNode : rootNodeChildNodes) {
-            TreeViewHolder<?> currentHolder = treeViewContainer.getTreeViewHolder(currentNode);
-            View currentNodeView = currentHolder == null ? null : currentHolder.getView();
-            if (currentNodeView == null) {
-                throw new NullPointerException(" currentNodeView can not be null");
-            }
-            int left =currentNodeView.getLeft();
-            int top = currentNodeView.getTop();
-            int currentHeight = currentNodeView.getMeasuredHeight();
-            int currentWidth = currentNodeView.getMeasuredWidth();
             if(count<divider){
-                minLowIndex = Math.min(minLowIndex,top);
-                maxLowIndex = Math.max(maxLowIndex, top+currentHeight);
+                lowBox.extend(currentNode.viewBox);
             }else{
-                minHighIndex = Math.min(minHighIndex,top);
-                maxHighIndex = Math.max(maxHighIndex, top+currentHeight);
+                highBox.extend(currentNode.viewBox);
             }
             count++;
         }
@@ -86,9 +95,9 @@ public class BoxHorizonLeftAndRightLayoutManager extends BoxRightTreeLayoutManag
         int centerY = fixedViewBox.getHeight()/2;
 
         translateOfLowIndexPart.x  = centerX;
-        translateOfLowIndexPart.y  = centerY - (maxLowIndex+minLowIndex)/2;
+        //translateOfLowIndexPart.y  = centerY - low/2;
 
-        translateOfHighIndexPart.x = -centerX;
-        translateOfHighIndexPart.y = centerY - (maxHighIndex+minHighIndex)/2;
+        translateOfHighIndexPart.x = centerX;
+        //translateOfHighIndexPart.y = centerY - high/2;
     }
 }
