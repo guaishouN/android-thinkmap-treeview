@@ -8,6 +8,7 @@
 A custom tree view for Android,  designed for easy drawing some tree nodes (e.g. thind mind and tree nodes). Includes smoothly zoom, move, limit and center fix animation support, and allows easy extension so you can add your own child node's customs view and touch event detection.
 ```groovy
     dependencies {
+//请直接使用lib中的代码，1.0.0这个引用库很久没有更新了
     	implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
    	implementation 'io.github.guaishoun:gyso-treeview:1.0.1'
    }
