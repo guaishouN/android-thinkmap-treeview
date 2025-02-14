@@ -69,7 +69,7 @@ public class GysoTreeView extends FrameLayout {
         treeViewContainer.setAnimateAdd(true);
         treeViewContainer.setAnimateRemove(true);
         treeViewContainer.setAnimateMove(true);
-        //paint.setColor(Color.RED);
+//        paint.setColor(Color.RED);
         //paint.setStyle(Paint.Style.FILL);        ;
         //setLayerType(LAYER_TYPE_HARDWARE,paint);
     }
@@ -79,6 +79,11 @@ public class GysoTreeView extends FrameLayout {
         super.requestDisallowInterceptTouchEvent(disallowIntercept);
         this.disallowIntercept = disallowIntercept;
         TreeViewLog.e(TAG, "requestDisallowInterceptTouchEvent:"+disallowIntercept);
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
     }
 
     @Override

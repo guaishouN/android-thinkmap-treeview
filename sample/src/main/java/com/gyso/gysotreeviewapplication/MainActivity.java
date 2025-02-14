@@ -14,6 +14,7 @@ import com.gyso.gysotreeviewapplication.databinding.ActivityMainBinding;
 import com.gyso.treeview.TreeViewEditor;
 import com.gyso.treeview.layout.BoxRightTreeLayoutManager;
 import com.gyso.treeview.layout.BoxVerticalUpAndDownLayoutManager;
+import com.gyso.treeview.layout.ForceDirectedTreeLayoutManager;
 import com.gyso.treeview.layout.TreeLayoutManager;
 import com.gyso.treeview.line.BaseLine;
 import com.gyso.treeview.line.SmoothLine;
