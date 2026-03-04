@@ -196,3 +196,7 @@ Secondly, customing lines by extends BaseLine may be a little complicate for And
 Finally, this custom view will be continuely improved,  if you has some innovative ideas, please tell me. Thanks for you patience.
 
 I will tell you how it works on [my CSDN blogs](https://blog.csdn.net/guaisou/article/details/116611140).Thx.
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/image?repos=guaishouN/android-thinkmap-treeview&type=date&legend=top-left)](https://www.star-history.com/?repos=mpquant%2FMyTT&type=date&legend=top-left)
